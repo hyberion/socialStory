@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Kid app: calm, predictable, installable PWA that works offline.",
   "scripts": {
-    "dev": "vite --port 5174",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5174",
     "typecheck": "tsc --noEmit",
