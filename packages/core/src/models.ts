@@ -11,7 +11,8 @@ export const MODEL_IDS = {
   transcribe: "muse-voice-transcribe-1.0",
 } as const;
 
-export type ReasoningEffort = "low" | "medium" | "high";
+/** Values Muse Spark 1.3 accepts. "none" is not supported (HTTP 400). */
+export type ReasoningEffort = "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
 
 export interface TextTask {
   model: string;
@@ -48,7 +49,7 @@ export const TEXT_TASKS = {
   /** Tiny health check. */
   smoke: {
     model: MODEL_IDS.spark,
-    effort: "low",
+    effort: "minimal",
     note: "Connectivity check only.",
   },
 } as const satisfies Record<string, TextTask>;
