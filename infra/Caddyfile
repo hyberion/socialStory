@@ -1,0 +1,27 @@
+# Production reverse proxy. Caddy gets and renews HTTPS certificates
+# automatically. Replace the two hostnames with your real (sub)domains,
+# both pointed at the droplet's IP with A records.
+
+parent.example.com {
+	encode gzip
+	handle /api/* {
+		reverse_proxy api:8787
+	}
+	handle {
+		root * /srv/parent-web
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+kid.example.com {
+	encode gzip
+	handle /api/* {
+		reverse_proxy api:8787
+	}
+	handle {
+		root * /srv/kid-app
+		try_files {path} /index.html
+		file_server
+	}
+}

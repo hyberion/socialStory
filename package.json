@@ -1,0 +1,22 @@
+{
+  "name": "socialstory",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Personalized prep journeys that help autistic kids get ready for new or hard moments.",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:api": "pnpm --filter @socialstory/api dev",
+    "dev:parent": "pnpm --filter @socialstory/parent-web dev",
+    "dev:kid": "pnpm --filter @socialstory/kid-app dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "smoke": "pnpm --filter @socialstory/api smoke"
+  }
+}

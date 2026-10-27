@@ -1,0 +1,21 @@
+{
+  "name": "@socialstory/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared schemas and logic: Event, story, Gray-criteria validator, model config.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
