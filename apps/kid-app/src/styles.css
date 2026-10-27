@@ -23,8 +23,10 @@ body {
   min-height: 100dvh;
 }
 
+/* The reader always fits the screen exactly, so the buttons are always
+   in the same place and never scroll out of view. */
 .reader {
-  min-height: 100dvh;
+  height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 16px;
@@ -48,10 +50,15 @@ body {
   display: grid;
   gap: 20px;
   align-content: start;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .picture {
   aspect-ratio: 4 / 3;
+  /* Cap the picture so words and buttons stay on screen on wide, short windows. */
+  width: min(100%, calc(42dvh * 4 / 3));
+  justify-self: center;
   border-radius: 16px;
   background: linear-gradient(160deg, #e5ece8, #ece6da);
 }
