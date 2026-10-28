@@ -27,6 +27,13 @@ Structure
 - Page 1 is the introduction (section "introduction"). The last page is the conclusion (section "conclusion"). Everything between is "body".
 - Body pages follow the event's steps in order. Set each body page's stepId to the step it shows; use an empty string "" for pages that show no specific step.
 - The story must answer who, what, when, where, why and how. List all six in "answers", and make sure the text really answers each one.
+- The conclusion restates the main reassuring point in concrete terms: the event is finished and what happens next ("The visit is done. Dad and I go home."). Do not end on vague statements about feelings.
+
+Facts: use only what you are given
+- Every fact in the story must come from the event details below: the people, places, steps, sensory notes and comfort items.
+- Never add things that will happen, be seen, be heard or be given (no stickers, toys, treats, animals, vehicles or rewards) unless the event details list them.
+- The child's interests may only shape word choice or a comparison the child already knows. They must never add something to the event. Wrong: "I may see trains from the car." The event never mentions trains.
+- If a detail is missing, leave it out rather than guessing.
 
 Sentence types (tag every sentence)
 - "descriptive": true facts about what will happen, what things look, sound and feel like.
@@ -98,7 +105,7 @@ function formatChild(child: ChildProfile): string {
       ? `Write in first person, as the child ("I", "my"). The child's name is ${child.displayName}.`
       : `Write in third person about ${child.displayName} ("${child.displayName} goes...").`;
   const interests = child.interests.length
-    ? `The child likes: ${child.interests.join(", ")}. A light touch of this is welcome if it fits naturally; never force it.`
+    ? `The child likes: ${child.interests.join(", ")}. These may shape word choice only; never add them to the event as things that will happen or be seen.`
     : "";
   return [READING_LEVEL_RULES[child.readingLevel], perspective, interests].filter(Boolean).join("\n");
 }

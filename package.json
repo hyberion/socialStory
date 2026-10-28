@@ -18,6 +18,7 @@
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "smoke": "pnpm --filter @socialstory/api smoke",
-    "write-story": "pnpm --filter @socialstory/api write-story"
+    "write-story": "pnpm --filter @socialstory/api write-story",
+    "compare-effort": "pnpm --filter @socialstory/api compare-effort"
   }
 }

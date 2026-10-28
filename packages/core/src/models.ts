@@ -55,3 +55,47 @@ export const TEXT_TASKS = {
 } as const satisfies Record<string, TextTask>;
 
 export type TextTaskName = keyof typeof TEXT_TASKS;
+
+export const REASONING_EFFORTS: readonly ReasoningEffort[] = [
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+];
+
+export function isReasoningEffort(value: string): value is ReasoningEffort {
+  return (REASONING_EFFORTS as readonly string[]).includes(value);
+}
+
+/**
+ * Standard-mode prices in US dollars per 1M tokens, from
+ * https://dev.meta.ai/docs/pricing-rate-limits (checked Oct 28, 2026).
+ * Reasoning tokens are counted inside output tokens.
+ *
+ * We deliberately do NOT use "contributor mode" (the -contributor
+ * models): it is much cheaper but lets Meta train on prompts and
+ * responses, which would include families' details.
+ */
+export const PRICES = {
+  [MODEL_IDS.spark]: { input: 1.25, cachedInput: 0.15, output: 4.25 },
+} as const;
+
+/** Dollars per generated image (Muse Image). */
+export const IMAGE_PRICE = 0.01;
+
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
+/** Estimated cost in US dollars. Ignores the cached-input discount, so it errs high. */
+export function estimateCost(model: keyof typeof PRICES, usage: TokenUsage): number {
+  const price = PRICES[model];
+  return (usage.inputTokens * price.input + usage.outputTokens * price.output) / 1_000_000;
+}
+
+export function formatDollars(amount: number): string {
+  return amount < 0.01 ? `$${amount.toFixed(4)}` : `$${amount.toFixed(3)}`;
+}

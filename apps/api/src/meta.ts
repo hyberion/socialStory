@@ -3,7 +3,7 @@ import { zodTextFormat } from "openai/helpers/zod";
 import type { Reasoning } from "openai/resources";
 import type { ResponseUsage } from "openai/resources/responses/responses";
 import type { z } from "zod";
-import { TEXT_TASKS, type TextTaskName } from "@socialstory/core";
+import { TEXT_TASKS, type ReasoningEffort, type TextTaskName } from "@socialstory/core";
 import { config } from "./config.js";
 
 /**
@@ -40,9 +40,16 @@ function toUsage(usage: ResponseUsage | undefined): Usage {
   };
 }
 
+export interface TaskOptions {
+  instructions?: string;
+  /** Override the task's usual reasoning effort (for experiments like `--effort medium`). */
+  effort?: ReasoningEffort;
+}
+
 /** Model + reasoning settings for a task, from packages/core/src/models.ts. */
-function settingsFor(task: TextTaskName) {
-  const { model, effort } = TEXT_TASKS[task];
+function settingsFor(task: TextTaskName, override?: ReasoningEffort) {
+  const { model } = TEXT_TASKS[task];
+  const effort = override ?? TEXT_TASKS[task].effort;
   // Meta accepts a few effort values the OpenAI types don't list (e.g. "max").
   return { model, reasoning: { effort } as Reasoning };
 }
@@ -54,10 +61,10 @@ function settingsFor(task: TextTaskName) {
 export async function runTextTask(
   task: TextTaskName,
   input: string,
-  options: { instructions?: string } = {},
+  options: TaskOptions = {},
 ): Promise<TextResult> {
   const response = await meta.responses.create({
-    ...settingsFor(task),
+    ...settingsFor(task, options.effort),
     input,
     instructions: options.instructions,
   });
@@ -73,10 +80,10 @@ export async function runStructuredTask<S extends z.ZodTypeAny>(
   schema: S,
   schemaName: string,
   input: string,
-  options: { instructions?: string } = {},
+  options: TaskOptions = {},
 ): Promise<StructuredResult<z.infer<S>>> {
   const response = await meta.responses.parse({
-    ...settingsFor(task),
+    ...settingsFor(task, options.effort),
     input,
     instructions: options.instructions,
     text: { format: zodTextFormat(schema, schemaName) },
