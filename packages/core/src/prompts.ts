@@ -1,0 +1,146 @@
+import type { ChildProfile, ReadingLevel } from "./profile.js";
+import type { Event } from "./event.js";
+import type { Story } from "./story.js";
+import type { Issue } from "./validate.js";
+
+/**
+ * Prompt text for the story writer. Kept in core (not the API) so the
+ * rules live next to the validator that enforces them, and so prompts
+ * can be read, tested and tuned without touching any AI plumbing.
+ */
+
+/** How much text each reading level gets (principle 1: adapt to the child). */
+const READING_LEVEL_RULES: Record<ReadingLevel, string> = {
+  "pre-verbal":
+    "The child does not read yet and will hear the story read aloud. Use one very short sentence per page (about 3 to 6 words). Use only common, concrete words. 6 to 8 pages.",
+  "early-reader":
+    "The child is an early reader. Use 1 to 3 short sentences per page, each under 10 words. Use simple, concrete words. 6 to 10 pages.",
+  reader:
+    "The child reads well. Use up to 4 sentences per page, each under 16 words. Still use plain, concrete words. 8 to 12 pages.",
+};
+
+const RULES = `You write Social Stories for autistic children, following Carol Gray's Social Story criteria.
+A Social Story gives accurate, reassuring information about what will happen. It does not tell the child how they must behave.
+
+Structure
+- A clear title.
+- Page 1 is the introduction (section "introduction"). The last page is the conclusion (section "conclusion"). Everything between is "body".
+- Body pages follow the event's steps in order. Set each body page's stepId to the step it shows; use an empty string "" for pages that show no specific step.
+- The story must answer who, what, when, where, why and how. List all six in "answers", and make sure the text really answers each one.
+
+Sentence types (tag every sentence)
+- "descriptive": true facts about what will happen, what things look, sound and feel like.
+- "perspective": what people may think or feel ("Many kids feel nervous at the doctor.").
+- "affirmative": a calm shared value ("That is okay.").
+- "coaching": a gentle option the child can choose ("I can hold Bear while I wait.").
+- Describing sentences (descriptive + perspective + affirmative) must outnumber coaching sentences at least 2 to 1. Use few coaching sentences.
+
+Voice and honesty
+- Patient, calm, literal and true. No idioms, figures of speech or jokes.
+- Never promise what the world can break. Never say it won't hurt, or that there is nothing to be scared of. Say how it really feels: "The shot pinches for a few seconds."
+- Never dictate behavior. Do not use "must", "have to", "has to", "not allowed", "good boy" or "good girl".
+- Avoid absolutes like "always" and "never". Use "usually" or "often".
+- Never dismiss feelings ("don't cry", "don't worry"). Feelings are okay.
+- Steps marked FIXED will happen no matter what. Be honest that they happen, then offer real choices around them using the child's comfort items.
+- For hard parts, describe them plainly and give the child at least one option they control.
+- Do not write in second person ("you"). Use the perspective given below.
+
+Scene briefs
+- For every page, write a short sceneBrief: what the picture on that page shows, in one plain sentence, for an illustrator. Calm scenes only: no scary faces, needles close up, or crying.`;
+
+function formatEvent(event: Event, child: ChildProfile): string {
+  const people = new Map(event.people.map((p) => [p.id, p]));
+  const places = new Map(event.places.map((p) => [p.id, p]));
+  const when = new Date(event.startsAt).toLocaleString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  const comforts = [...new Set([...event.comforts, ...child.comforts])];
+
+  const lines = [
+    `Event: ${event.title} (${event.kind})`,
+    `When: ${when}`,
+    event.purpose ? `Why it is happening: ${event.purpose}` : null,
+    "",
+    "People:",
+    ...event.people.map(
+      (p) => `- ${p.name}${p.role ? ` (${p.role})` : ""}${p.facts.length ? `: ${p.facts.join(" ")}` : ""}`,
+    ),
+    "",
+    "Places:",
+    ...event.places.map(
+      (p) => `- ${p.name}${p.sensoryNotes.length ? `. Sensory notes: ${p.sensoryNotes.join("; ")}` : ""}`,
+    ),
+    "",
+    "Steps, in order:",
+    ...event.steps.map((s) => {
+      const where = s.placeId ? ` [at ${places.get(s.placeId)?.name ?? s.placeId}]` : "";
+      const who = s.personIds.length
+        ? ` [with ${s.personIds.map((id) => people.get(id)?.name ?? id).join(", ")}]`
+        : "";
+      return `- stepId "${s.id}": ${s.description}${where}${who}${s.fixed ? " (FIXED)" : ""}`;
+    }),
+    "",
+    "Hard parts the parent expects:",
+    ...(event.hardParts.length ? event.hardParts.map((h) => `- ${h.description}`) : ["- none listed"]),
+    "",
+    `Comfort items and choices available: ${comforts.length ? comforts.join(", ") : "none listed"}`,
+  ];
+  return lines.filter((l) => l !== null).join("\n");
+}
+
+function formatChild(child: ChildProfile): string {
+  const perspective =
+    child.perspective === "first"
+      ? `Write in first person, as the child ("I", "my"). The child's name is ${child.displayName}.`
+      : `Write in third person about ${child.displayName} ("${child.displayName} goes...").`;
+  const interests = child.interests.length
+    ? `The child likes: ${child.interests.join(", ")}. A light touch of this is welcome if it fits naturally; never force it.`
+    : "";
+  return [READING_LEVEL_RULES[child.readingLevel], perspective, interests].filter(Boolean).join("\n");
+}
+
+export interface StoryPrompt {
+  instructions: string;
+  input: string;
+}
+
+/** The first request: write a story for this event and child. */
+export function buildStoryPrompt(event: Event, child: ChildProfile): StoryPrompt {
+  return {
+    instructions: `${RULES}\n\nAbout this child\n${formatChild(child)}`,
+    input: `Write a Social Story for this event.\n\n${formatEvent(event, child)}`,
+  };
+}
+
+/** A follow-up request: fix a story that failed validation. */
+export function buildRevisionPrompt(
+  event: Event,
+  child: ChildProfile,
+  story: Story,
+  issues: Issue[],
+): StoryPrompt {
+  const problems = issues
+    .filter((i) => i.severity === "error")
+    .map((i) => `- ${i.page !== undefined ? `Page ${i.page + 1}: ` : ""}${i.message}`)
+    .join("\n");
+  return {
+    instructions: `${RULES}\n\nAbout this child\n${formatChild(child)}`,
+    input: [
+      "This Social Story failed review. Fix every problem below and return the complete corrected story.",
+      "Change only what is needed to fix the problems; keep everything else the same.",
+      "",
+      "Problems:",
+      problems,
+      "",
+      "The event:",
+      formatEvent(event, child),
+      "",
+      "The story to fix (JSON):",
+      JSON.stringify(story, null, 2),
+    ].join("\n"),
+  };
+}

@@ -3,4 +3,5 @@ export * from "./event.js";
 export * from "./story.js";
 export * from "./validate.js";
 export * from "./models.js";
+export * from "./prompts.js";
 export * from "./fixtures.js";

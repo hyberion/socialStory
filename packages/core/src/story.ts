@@ -54,3 +54,37 @@ export const Story = z.object({
   answers: z.array(WhQuestion).default([]),
 });
 export type Story = z.infer<typeof Story>;
+
+/**
+ * The shape the model is asked to return. Meta's strict JSON mode needs
+ * every field present (no optional fields, no defaults, no min/max), so
+ * "not set" is an empty string here (nulls are not reliably supported).
+ * `draftToStory` converts a draft into a real Story, which applies the
+ * full Story rules.
+ */
+export const StoryDraft = z.object({
+  title: z.string(),
+  answers: z.array(WhQuestion),
+  pages: z.array(
+    z.object({
+      section: StorySection,
+      stepId: z.string(),
+      sceneBrief: z.string(),
+      sentences: z.array(Sentence),
+    }),
+  ),
+});
+export type StoryDraft = z.infer<typeof StoryDraft>;
+
+export function draftToStory(draft: StoryDraft): Story {
+  return Story.parse({
+    title: draft.title,
+    answers: draft.answers,
+    pages: draft.pages.map((p) => ({
+      section: p.section,
+      sentences: p.sentences,
+      sceneBrief: p.sceneBrief || undefined,
+      stepId: p.stepId || undefined,
+    })),
+  });
+}

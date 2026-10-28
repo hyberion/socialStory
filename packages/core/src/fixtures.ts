@@ -55,6 +55,14 @@ export const sampleEvent: Event = {
   status: "draft",
 };
 
+/**
+ * Named test events for `pnpm write-story <name>`.
+ * Add new scenarios here; the name is what you type on the command line.
+ */
+export const sampleEvents: Record<string, Event> = {
+  doctor: sampleEvent,
+};
+
 /** A story that passes validation. */
 export const sampleStory: Story = {
   title: "My Visit to Dr. Patel",

@@ -1,4 +1,8 @@
 import OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
+import type { Reasoning } from "openai/resources";
+import type { ResponseUsage } from "openai/resources/responses/responses";
+import type { z } from "zod";
 import { TEXT_TASKS, type TextTaskName } from "@socialstory/core";
 import { config } from "./config.js";
 
@@ -12,38 +16,73 @@ export const meta = new OpenAI({
   apiKey: config.MODEL_API_KEY,
 });
 
+export interface Usage {
+  inputTokens: number;
+  outputTokens: number;
+  reasoningTokens: number;
+}
+
 export interface TextResult {
   text: string;
-  usage: {
-    inputTokens: number;
-    outputTokens: number;
-    reasoningTokens: number;
+  usage: Usage;
+}
+
+export interface StructuredResult<T> {
+  data: T;
+  usage: Usage;
+}
+
+function toUsage(usage: ResponseUsage | undefined): Usage {
+  return {
+    inputTokens: usage?.input_tokens ?? 0,
+    outputTokens: usage?.output_tokens ?? 0,
+    reasoningTokens: usage?.output_tokens_details?.reasoning_tokens ?? 0,
   };
 }
 
+/** Model + reasoning settings for a task, from packages/core/src/models.ts. */
+function settingsFor(task: TextTaskName) {
+  const { model, effort } = TEXT_TASKS[task];
+  // Meta accepts a few effort values the OpenAI types don't list (e.g. "max").
+  return { model, reasoning: { effort } as Reasoning };
+}
+
 /**
- * Runs a named text task with the model and reasoning effort set in
- * packages/core/src/models.ts. Never pick models inline elsewhere.
+ * Runs a named text task and returns plain text.
+ * Never pick models inline elsewhere; go through a named task.
  */
 export async function runTextTask(
   task: TextTaskName,
   input: string,
   options: { instructions?: string } = {},
 ): Promise<TextResult> {
-  const { model, effort } = TEXT_TASKS[task];
   const response = await meta.responses.create({
-    model,
+    ...settingsFor(task),
     input,
     instructions: options.instructions,
-    reasoning: { effort },
   });
+  return { text: response.output_text, usage: toUsage(response.usage) };
+}
 
-  return {
-    text: response.output_text,
-    usage: {
-      inputTokens: response.usage?.input_tokens ?? 0,
-      outputTokens: response.usage?.output_tokens ?? 0,
-      reasoningTokens: response.usage?.output_tokens_details?.reasoning_tokens ?? 0,
-    },
-  };
+/**
+ * Runs a named task and makes the model answer as JSON matching `schema`
+ * (Meta's strict structured output). The reply is parsed and type-checked.
+ */
+export async function runStructuredTask<S extends z.ZodTypeAny>(
+  task: TextTaskName,
+  schema: S,
+  schemaName: string,
+  input: string,
+  options: { instructions?: string } = {},
+): Promise<StructuredResult<z.infer<S>>> {
+  const response = await meta.responses.parse({
+    ...settingsFor(task),
+    input,
+    instructions: options.instructions,
+    text: { format: zodTextFormat(schema, schemaName) },
+  });
+  if (!response.output_parsed) {
+    throw new Error(`Model returned no parseable ${schemaName} (status: ${response.status}).`);
+  }
+  return { data: response.output_parsed as z.infer<S>, usage: toUsage(response.usage) };
 }

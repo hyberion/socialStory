@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "smoke": "tsx src/smoke.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "write-story": "tsx src/scripts/writeStory.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
