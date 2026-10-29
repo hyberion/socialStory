@@ -64,6 +64,10 @@ Then open:
 | `pnpm dev` | Runs the API and both apps together |
 | `pnpm dev:api` / `dev:user` / `dev:player` | Runs one piece |
 | `pnpm smoke` | One Muse Spark call to verify the key |
+| `pnpm write-story [event]` | Writes and validates a story (`--effort` to override) |
+| `pnpm compare-effort [event]` | Same story at several reasoning levels, with costs |
+| `pnpm draw-story [event]` | Illustrates a written story and builds a contact sheet |
+| `pnpm photo-list [event]` | Shows the photo checklist for an event (free) |
 | `pnpm test` | Unit tests (the story validator lives here) |
 | `pnpm typecheck` | Type-checks every package |
 | `pnpm build` | Production builds |

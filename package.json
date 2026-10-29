@@ -20,6 +20,7 @@
     "smoke": "pnpm --filter @socialstory/api smoke",
     "write-story": "pnpm --filter @socialstory/api write-story",
     "compare-effort": "pnpm --filter @socialstory/api compare-effort",
-    "draw-story": "pnpm --filter @socialstory/api draw-story"
+    "draw-story": "pnpm --filter @socialstory/api draw-story",
+    "photo-list": "pnpm --filter @socialstory/api photo-list"
   }
 }

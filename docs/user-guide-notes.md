@@ -45,6 +45,16 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 
 **Key promise to explain to parents:** the story only states facts you gave it. If something is missing, it leaves it out rather than guessing. The more detail you give, the richer the story.
 
+## Photo checklist
+
+When a user adds an event, the app suggests which photos to take, so they don't forget a useful one, don't have to think up the list, and don't feel they must photograph everything. Built in `packages/core/src/photos.ts`; preview with `pnpm photo-list doctor`. **Status:** built (logic and preview command); the upload screen is planned.
+
+- **Built from the event, no AI:** the entrance of the first place, each person your child will meet, inside each place where steps happen, plus common extras for the event type (doctor, dentist, haircut, school, travel, therapy).
+- **Two tiers:** "Most helpful" (never more than 5) and "Nice to have." Photos already added drop off the list.
+- **Every item says why it helps,** and some say how to take it.
+- **Tips shown once:** every photo is optional and 3 to 5 is plenty; shoot from your child's eye height; calm everyday shots are fine; avoid other people's faces and ask before photographing staff.
+- **Never suggests photographing the hard part itself** (no needle close-ups).
+
 ## The cast sheet (pictures)
 
 Before drawing any pages, the app draws one portrait of each person: your child, whoever comes along, and the people they'll meet. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
