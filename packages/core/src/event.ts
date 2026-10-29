@@ -87,6 +87,9 @@ export const Event = z.object({
   startsAt: z.string(),
   /** Why it's happening, in kid terms: "to help my body stay healthy". */
   purpose: z.string().optional(),
+  /** Who goes with the child: "Dad", "Grandma", "Ms. Lee (teacher)". Empty = not given. */
+  companions: z.array(Person).default([]),
+  /** People the child will meet there: the doctor, the barber, the teacher. */
   people: z.array(Person).default([]),
   places: z.array(Place).default([]),
   steps: z.array(Step).min(1),

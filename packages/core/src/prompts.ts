@@ -27,13 +27,14 @@ Structure
 - Page 1 is the introduction (section "introduction"). The last page is the conclusion (section "conclusion"). Everything between is "body".
 - Body pages follow the event's steps in order. Set each body page's stepId to the step it shows; use an empty string "" for pages that show no specific step.
 - The story must answer who, what, when, where, why and how. List all six in "answers", and make sure the text really answers each one.
-- The conclusion restates the main reassuring point in concrete terms: the event is finished and what happens next ("The visit is done. Dad and I go home."). Do not end on vague statements about feelings.
+- The conclusion restates the main reassuring point: the event is finished and why it mattered ("The visit is done. The shot helps my body stay healthy."). Do not repeat the last body page; if the last step is going home, the conclusion must not say "go home" again. Do not end on vague statements about feelings.
 
 Facts: use only what you are given
 - Every fact in the story must come from the event details below: the people, places, steps, sensory notes and comfort items.
 - Never add things that will happen, be seen, be heard or be given (no stickers, toys, treats, animals, vehicles or rewards) unless the event details list them.
 - The child's interests may only shape word choice or a comparison the child already knows. They must never add something to the event. Wrong: "I may see trains from the car." The event never mentions trains.
 - If a detail is missing, leave it out rather than guessing.
+- Only name the companions listed as coming with the child. If none are listed, write only about the child: do not say "we" and do not mention family or anyone else coming.
 
 Sentence types (tag every sentence)
 - "descriptive": true facts about what will happen, what things look, sound and feel like.
@@ -53,7 +54,10 @@ Voice and honesty
 - Do not write in second person ("you"). Use the perspective given below.
 
 Scene briefs
-- For every page, write a short sceneBrief: what the picture on that page shows, in one plain sentence, for an illustrator. Calm scenes only: no scary faces, needles close up, or crying.`;
+- For every page, write a short sceneBrief: what the picture on that page shows, in one plain sentence, for an illustrator.
+- The picture must match that page's text. If the text says the room can be noisy, do not call it quiet.
+- Show only the child, the listed companions, and the listed people. Never add family members, other children or strangers.
+- Calm scenes only: no scary faces, needles close up, or crying.`;
 
 function formatEvent(event: Event, child: ChildProfile): string {
   const people = new Map(event.people.map((p) => [p.id, p]));
@@ -72,7 +76,13 @@ function formatEvent(event: Event, child: ChildProfile): string {
     `When: ${when}`,
     event.purpose ? `Why it is happening: ${event.purpose}` : null,
     "",
-    "People:",
+    `Coming with the child: ${
+      event.companions.length
+        ? event.companions.map((c) => `${c.name}${c.role ? ` (${c.role})` : ""}`).join(", ")
+        : "not given"
+    }`,
+    "",
+    "People the child will meet:",
     ...event.people.map(
       (p) => `- ${p.name}${p.role ? ` (${p.role})` : ""}${p.facts.length ? `: ${p.facts.join(" ")}` : ""}`,
     ),

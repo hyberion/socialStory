@@ -25,6 +25,7 @@ export const sampleEvent: Event = {
   kind: "doctor",
   startsAt: "2026-11-03T10:00:00-05:00",
   purpose: "to get a flu shot that helps my body stay healthy",
+  companions: [{ id: "c-dad", name: "Dad", role: "parent", facts: [] }],
   people: [
     {
       id: "p-patel",
