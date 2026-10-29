@@ -160,7 +160,7 @@ const html = `<!doctype html>
   img { width: 100%; border-radius: 10px; display: block; background: #eee8dc; }
   figcaption { margin-top: 10px; font-size: 14px; line-height: 1.5; }
   .text { font-size: 17px; margin: 6px 0; } .brief { color: #6b7478; font-style: italic; }
-  .missing { aspect-ratio: 4/3; display: grid; place-items: center; text-align: center; padding: 12px;
+  .missing { aspect-ratio: 3/2; display: grid; place-items: center; text-align: center; padding: 12px;
              background: #f3e3df; color: #8a3b2e; border-radius: 10px; font-size: 13px; }
 </style></head><body><main>
 <h1>${esc(story.title)}</h1>

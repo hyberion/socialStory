@@ -59,8 +59,11 @@ export type TextTaskName = keyof typeof TEXT_TASKS;
 /** Settings for Muse Image calls. Every image costs the same; "low" only makes it faster. */
 export interface ImageTask {
   model: string;
-  /** Aspect ratio as "WxH"; actual pixel sizes may differ. */
-  size: string;
+  /**
+   * Image shape. The Responses API image tool rejected free-form sizes
+   * ("unknown value 768x1024", Oct 28), so use only these values.
+   */
+  size: "1024x1024" | "1024x1536" | "1536x1024" | "auto";
   reasoningStrength: "low" | "high";
   note: string;
 }
@@ -69,14 +72,14 @@ export const IMAGE_TASKS = {
   /** Character reference portraits: everything else is drawn to match these, so take care. */
   castPortrait: {
     model: MODEL_IDS.image,
-    size: "768x1024",
+    size: "1024x1536",
     reasoningStrength: "high",
     note: "Anchors every later picture; worth the extra time.",
   },
   /** One story page, drawn from the cast portraits. */
   page: {
     model: MODEL_IDS.image,
-    size: "1024x768",
+    size: "1536x1024",
     reasoningStrength: "high",
     note: "Start at high; try low with a side-by-side comparison before switching.",
   },

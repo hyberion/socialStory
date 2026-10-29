@@ -55,9 +55,10 @@ body {
 }
 
 .picture {
-  aspect-ratio: 4 / 3;
+  /* Matches the 1536x1024 (3:2) page illustrations. */
+  aspect-ratio: 3 / 2;
   /* Cap the picture so words and buttons stay on screen on wide, short windows. */
-  width: min(100%, calc(42dvh * 4 / 3));
+  width: min(100%, calc(42dvh * 3 / 2));
   justify-self: center;
   border-radius: 16px;
   background: linear-gradient(160deg, #e5ece8, #ece6da);

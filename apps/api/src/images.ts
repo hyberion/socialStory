@@ -24,6 +24,9 @@ export interface GeneratedImage {
   seconds: number;
 }
 
+/** Set once Meta rejects a size, so later calls in the same run skip it. */
+let sizeRejected = false;
+
 export async function generateImage(
   task: ImageTaskName,
   prompt: string,
@@ -41,14 +44,14 @@ export async function generateImage(
   ];
 
   // Meta's image tool takes fields the OpenAI types don't know about, so this request is built loosely.
-  const request = {
+  const buildRequest = (size: string | undefined) => ({
     model: settings.model,
     store: false,
     input: [{ role: "user", content }],
     tools: [
       {
         type: "image_generation",
-        size: settings.size,
+        ...(size && !sizeRejected ? { size } : {}),
         output_format: "png",
         reasoning_strength: settings.reasoningStrength,
         enable_image_search: false,
@@ -56,8 +59,23 @@ export async function generateImage(
         enable_shell: false,
       },
     ],
-  };
-  const response = await meta.responses.create(request as never);
+  });
+
+  let response;
+  try {
+    response = await meta.responses.create(buildRequest(settings.size) as never);
+  } catch (err) {
+    // Safety net: if Meta rejects the size, retry once without it (Meta picks)
+    // and stop sending sizes for the rest of this run.
+    const e = err as { status?: number; message?: string };
+    if (e.status === 400 && !sizeRejected && e.message?.includes(settings.size)) {
+      sizeRejected = true;
+      console.warn(`  ! Meta rejected size ${settings.size}; retrying without a size (Meta will choose).`);
+      response = await meta.responses.create(buildRequest(undefined) as never);
+    } else {
+      throw err;
+    }
+  }
 
   const call = response.output.find((item) => item.type === "image_generation_call");
   if (!call || call.type !== "image_generation_call" || !call.result) {
