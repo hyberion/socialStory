@@ -13,8 +13,11 @@
  * Photos: if a cast member's photo `src` points to a file (absolute, or
  * relative to apps/api/.data/photos/), its portrait is drawn from it.
  * After adding a photo, redraw portraits with --new-cast.
+ *
+ * History: an image that gets replaced is moved to history/<date-time>/
+ * first, so the main folder always shows only the latest run.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, extname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
@@ -97,6 +100,32 @@ mkdirSync(outDir, { recursive: true });
 const started = Date.now();
 let drawn = 0;
 
+// Replaced images go to history/<date-time>/ (local time, e.g. 2026-10-29_14-43-05).
+const runStamp = (() => {
+  const d = new Date();
+  const two = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}_${two(d.getHours())}-${two(d.getMinutes())}-${two(d.getSeconds())}`;
+})();
+const historyDir = resolve(outDir, "history", runStamp);
+let archived = 0;
+
+/** Moves an existing image out of the way before it's replaced. */
+function archive(file: string) {
+  const from = resolve(outDir, file);
+  if (!existsSync(from)) return;
+  mkdirSync(historyDir, { recursive: true });
+  renameSync(from, resolve(historyDir, file));
+  archived++;
+}
+
+// A shorter story than last time leaves old pages behind; move those too.
+if (!onlyPages) {
+  for (const file of readdirSync(outDir)) {
+    const match = /^page-(\d+)\.png$/.exec(file);
+    if (match && Number(match[1]) > story.pages.length) archive(file);
+  }
+}
+
 interface Result {
   file?: string;
   seconds?: number;
@@ -107,6 +136,7 @@ async function draw(label: string, file: string, run: () => ReturnType<typeof ge
   console.log(`  ... Drawing ${label}`);
   try {
     const image = await run();
+    archive(file);
     writeFileSync(resolve(outDir, file), image.data);
     drawn++;
     console.log(`      done in ${image.seconds.toFixed(1)}s`);
@@ -129,7 +159,7 @@ for (const member of cast) {
   const path = resolve(outDir, file);
   let result: Result;
   if (existsSync(path) && !values["new-cast"]) {
-    console.log(`  ... Reusing ${member.name}'s portrait (pass --new-cast to redraw)`);
+    console.log(`  ... Reusing the saved ${member.kind === "prop" ? "drawing" : "portrait"} of ${member.name} (--new-cast redraws)`);
     result = { file };
   } else {
     const photo = loadPhoto(member);
@@ -228,5 +258,6 @@ console.log(
     ` | about ${formatDollars(drawn * IMAGE_PRICE)}` +
     (failures ? ` | ${failures} failed (shown in red on the sheet)` : ""),
 );
+if (archived) console.log(`  Moved ${archived} older image(s) to ${historyDir}`);
 console.log(`\n  Contact sheet: ${pathToFileURL(sheet).href}`);
 console.log("  (Ctrl+click the link, or paste it into your browser.)\n");
