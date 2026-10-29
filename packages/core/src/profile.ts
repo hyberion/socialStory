@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ComfortItem } from "./event.js";
 
 /**
  * Everything about how content is shaped for one player.
@@ -63,7 +64,7 @@ export const PlayerProfile = z.object({
   /** How the player looks, for consistent pictures: "short curly brown hair, green t-shirt". */
   appearance: z.string().optional(),
   /** Things that reliably comfort this player, reused across events. */
-  comforts: z.array(z.string()).default([]),
+  comforts: z.array(ComfortItem).default([]),
   /** Interests that can make content more engaging (trains, dinosaurs...). */
   interests: z.array(z.string()).default([]),
 });

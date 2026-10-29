@@ -7,4 +7,5 @@ export * from "./prompts.js";
 export * from "./cast.js";
 export * from "./art.js";
 export * from "./photos.js";
+export * from "./region.js";
 export * from "./fixtures.js";

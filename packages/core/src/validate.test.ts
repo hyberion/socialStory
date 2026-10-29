@@ -77,7 +77,7 @@ describe("validateStory", () => {
 });
 
 describe("validateStory cast check", () => {
-  const castIds = ["player", "c-dad", "p-patel"];
+  const castIds = ["player", "c-dad", "p-patel", "bear", "headphones"];
 
   it("accepts pictures that show only listed people", () => {
     expect(validateStory(sampleStory, { castIds }).ok).toBe(true);

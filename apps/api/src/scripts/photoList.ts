@@ -4,12 +4,12 @@
  * Prints the photo checklist a user would see for a sample event:
  * what to photograph, why it helps, and how to take it.
  */
-import { photoChecklist } from "@socialstory/core";
+import { photoChecklist, samplePlayer } from "@socialstory/core";
 import { pickEvent } from "./report.js";
 
 const name = process.argv[2] ?? "doctor";
 const event = pickEvent(name);
-const { items, generalTips } = photoChecklist(event);
+const { items, generalTips } = photoChecklist(event, samplePlayer);
 
 console.log(`\nPhotos to take for "${event.title}"\n`);
 for (const tip of generalTips) console.log(`  * ${tip}`);

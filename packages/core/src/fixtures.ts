@@ -1,6 +1,7 @@
 import type { PlayerProfile } from "./profile.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
+import type { UserSettings } from "./region.js";
 
 /**
  * Fake test family. Never replace these with real players' details.
@@ -15,7 +16,19 @@ export const samplePlayer: PlayerProfile = {
   sensory: { soundEnabled: true, narrationRate: 0.9, reduceMotion: true },
   reviewMode: "every-stage",
   appearance: "a seven-year-old boy with short curly brown hair and brown skin, wearing a green t-shirt and jeans",
-  comforts: ["Bear", "headphones"],
+  comforts: [
+    {
+      id: "bear",
+      name: "Bear",
+      // Brad: describe Bear however you like; this becomes his reference drawing.
+      appearance: "a small, soft, light-brown teddy bear with round ears and a faded red ribbon tied around its neck",
+    },
+    {
+      id: "headphones",
+      name: "headphones",
+      appearance: "big, soft, dark gray over-ear headphones",
+    },
+  ],
   interests: ["trains"],
 };
 
@@ -62,8 +75,13 @@ export const sampleEvent: Event = {
     { id: "h1", description: "waiting", stepId: "s2" },
     { id: "h2", description: "the shot", stepId: "s3" },
   ],
-  comforts: ["Bear"],
+  comforts: [],
   status: "draft",
+};
+
+/** The test user: lives in the US, so drivers sit on the left. */
+export const sampleUser: UserSettings = {
+  region: { country: "US", drivesOn: "right" },
 };
 
 /**
@@ -109,7 +127,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s3",
-      inPicture: ["player", "c-dad", "p-patel"],
+      inPicture: ["player", "c-dad", "p-patel", "bear"],
       sentences: [
         { text: "Dr. Patel gives me a shot in my arm.", type: "descriptive" },
         { text: "The shot pinches for a few seconds.", type: "descriptive" },

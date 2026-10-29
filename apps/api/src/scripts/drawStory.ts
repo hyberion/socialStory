@@ -9,9 +9,13 @@
  * Output: apps/api/.data/images/<event>/ (git-ignored).
  * Cast portraits are reused between runs to save money; pass --new-cast
  * to redraw them. --pages redraws only the listed page numbers.
+ *
+ * Photos: if a cast member's photo `src` points to a file (absolute, or
+ * relative to apps/api/.data/photos/), its portrait is drawn from it.
+ * After adding a photo, redraw portraits with --new-cast.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, extname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import {
@@ -23,6 +27,8 @@ import {
   castOnPage,
   formatDollars,
   samplePlayer,
+  sampleUser,
+  worldRulesFor,
   validateStory,
   type CastMember,
 } from "@socialstory/core";
@@ -61,6 +67,23 @@ if (!rawPages.every((p) => typeof p === "object" && p !== null && "inPicture" in
 }
 const story = Story.parse(saved.story);
 const cast = castFor(event, samplePlayer);
+const worldRules = worldRulesFor(sampleUser.region);
+const photosDir = resolve(dataDir, "photos");
+
+/** Loads a cast member's real photo, if they have one and the file exists. */
+function loadPhoto(member: CastMember): ReferenceImage | undefined {
+  const src = member.photo?.src;
+  if (!src) return undefined;
+  const path = isAbsolute(src) ? src : resolve(photosDir, src);
+  const mimeType = ({ ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp" } as const)[
+    extname(path).toLowerCase() as ".png"
+  ];
+  if (!existsSync(path) || !mimeType) {
+    console.warn(`  ! ${member.name}'s photo "${src}" wasn't found or isn't PNG/JPG/WEBP; drawing from the description.`);
+    return undefined;
+  }
+  return { data: readFileSync(path), mimeType };
+}
 const unknown = validateStory(story, { castIds: cast.map((m) => m.id) }).issues.filter(
   (i) => i.code === "unknown-cast",
 );
@@ -109,8 +132,9 @@ for (const member of cast) {
     console.log(`  ... Reusing ${member.name}'s portrait (pass --new-cast to redraw)`);
     result = { file };
   } else {
-    result = await draw(`${member.name}'s reference portrait`, file, () =>
-      generateImage("castPortrait", buildCastPortraitPrompt(member)),
+    const photo = loadPhoto(member);
+    result = await draw(`${member.name}'s reference ${member.kind === "prop" ? "drawing" : "portrait"}${photo ? " from photo" : ""}`, file, () =>
+      generateImage("castPortrait", buildCastPortraitPrompt(member, { fromPhoto: !!photo }), photo ? [photo] : []),
     );
   }
   castResults.set(member.id, result);
@@ -131,7 +155,7 @@ for (const [i, page] of story.pages.entries()) {
   const result = await draw(`page ${number} of ${story.pages.length}`, file, () =>
     generateImage(
       "page",
-      buildPagePrompt(page, refs),
+      buildPagePrompt(page, refs, worldRules),
       refs.map((m) => portraits.get(m.id)!),
     ),
   );

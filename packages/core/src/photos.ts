@@ -1,4 +1,6 @@
 import type { Event } from "./event.js";
+import type { PlayerProfile } from "./profile.js";
+import { comfortsFor } from "./cast.js";
 
 /**
  * A photo checklist for the user, built from the event itself, with no
@@ -25,7 +27,11 @@ export interface PhotoSuggestion {
   tip?: string;
   priority: PhotoPriority;
   /** What this photo will be attached to, so the upload lands in the right place. */
-  attachTo: { kind: "person"; id: string } | { kind: "place"; id: string } | { kind: "event" };
+  attachTo:
+    | { kind: "person"; id: string }
+    | { kind: "place"; id: string }
+    | { kind: "comfort"; id: string }
+    | { kind: "event" };
 }
 
 export interface PhotoChecklist {
@@ -109,7 +115,7 @@ function slug(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function photoChecklist(event: Event): PhotoChecklist {
+export function photoChecklist(event: Event, player: PlayerProfile): PhotoChecklist {
   const candidates: Array<Omit<PhotoSuggestion, "priority"> & { strong: boolean }> = [];
   const firstPlace = event.places[0];
 
@@ -139,7 +145,20 @@ export function photoChecklist(event: Event): PhotoChecklist {
     });
   }
 
-  // 3. Inside each place, if the steps happen there.
+  // 3. The child's comfort items: a photo keeps them looking like the real one in every picture.
+  for (const item of comfortsFor(event, player)) {
+    if (item.photo) continue;
+    candidates.push({
+      id: `comfort-${item.id}`,
+      label: `${item.name} (your child's comfort item)`,
+      why: `So ${item.name} looks like the real one in every picture.`,
+      tip: "Photograph it alone on a plain surface, like a table or a bed, in good light.",
+      attachTo: { kind: "comfort", id: item.id },
+      strong: true,
+    });
+  }
+
+  // 4. Inside each place, if the steps happen there.
   for (const place of event.places) {
     if (!event.steps.some((s) => s.placeId === place.id)) continue;
     candidates.push({
@@ -153,7 +172,7 @@ export function photoChecklist(event: Event): PhotoChecklist {
     });
   }
 
-  // 4. Common extras for this kind of event.
+  // 5. Common extras for this kind of event.
   for (const group of KIND_EXTRAS) {
     if (!matchesKind(event, group.keywords)) continue;
     for (const item of group.items) {

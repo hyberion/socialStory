@@ -15,6 +15,23 @@ export const PhotoRef = z.object({
 });
 export type PhotoRef = z.infer<typeof PhotoRef>;
 
+/**
+ * A comfort item: a stuffed animal, headphones, a blanket. Stories offer
+ * them as choices during hard moments, and pictures show them, so they
+ * need a stable look just like people do.
+ */
+export const ComfortItem = z.object({
+  /** Stable id, also its cast id in pictures: "bear". */
+  id: z.string(),
+  /** What the child calls it: "Bear". */
+  name: z.string().min(1),
+  /** How it looks: "a small light-brown teddy bear with a faded red ribbon". */
+  appearance: z.string().optional(),
+  /** A photo of the real item. Used to draw it so it matches the one at home. */
+  photo: PhotoRef.optional(),
+});
+export type ComfortItem = z.infer<typeof ComfortItem>;
+
 export const Person = z.object({
   id: z.string(),
   name: z.string().min(1),
@@ -97,7 +114,7 @@ export const Event = z.object({
   steps: z.array(Step).min(1),
   hardParts: z.array(HardPart).default([]),
   /** Comfort items for this event (merged with the player's standing comforts). */
-  comforts: z.array(z.string()).default([]),
+  comforts: z.array(ComfortItem).default([]),
   status: EventStatus.default("draft"),
   reflection: Reflection.optional(),
 });

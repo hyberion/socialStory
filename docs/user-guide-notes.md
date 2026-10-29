@@ -23,8 +23,16 @@ One profile per player (child). Every setting can be changed at any time; nothin
 | Reading speed | 0.5x to 1.5x | 0.9x | How fast the read-aloud voice speaks. Slightly slow by default. | Built (player app) |
 | Reduce motion | On, Off | On | Keeps movement on screen to a minimum. | Planned |
 | Review steps | Every stage, Script and final, Final only | Every stage | How much you check before your child sees a new story. Start with every stage; once you trust the results, you can review less. | Planned |
-| Comfort items | List | None | Things that reliably help your child (a stuffed animal, headphones, a song). Stories offer these as choices during hard moments. | Built (stories) |
+| Comfort items | List, each with a name, what it looks like, and an optional photo | None | Things that reliably help your child (a stuffed animal, headphones, a blanket). Stories offer these as choices during hard moments, and they appear in the pictures. **Add a photo of the real one** so it looks right in every picture, not like a generic toy. | Built (stories, pictures) |
 | Interests | List | None | Things your child loves. These only shape word choice. **They never add things to the event**, so the story won't promise trains that won't be there. | Built (stories) |
+
+## Your settings (the user)
+
+| Setting | Options | Default | In plain words | Status |
+| --- | --- | --- | --- | --- |
+| Where you live | Country, and which side of the road cars drive on | US (drive on the right) | So pictures match your child's world: in the US the driver sits on the left; in the UK, Australia or Japan, on the right. | Built (pictures) |
+
+Pictures also always show children in the back seat, in a car seat or booster, with seatbelts on.
 
 ## Event details
 
@@ -49,7 +57,7 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 
 When a user adds an event, the app suggests which photos to take, so they don't forget a useful one, don't have to think up the list, and don't feel they must photograph everything. Built in `packages/core/src/photos.ts`; preview with `pnpm photo-list doctor`. **Status:** built (logic and preview command); the upload screen is planned.
 
-- **Built from the event, no AI:** the entrance of the first place, each person your child will meet, inside each place where steps happen, plus common extras for the event type (doctor, dentist, haircut, school, travel, therapy).
+- **Built from the event, no AI:** the entrance of the first place, each person your child will meet, your child's comfort items, inside each place where steps happen, plus common extras for the event type (doctor, dentist, haircut, school, travel, therapy).
 - **Two tiers:** "Most helpful" (never more than 5) and "Nice to have." Photos already added drop off the list.
 - **Every item says why it helps,** and some say how to take it.
 - **Tips shown once:** every photo is optional and 3 to 5 is plenty; shoot from your child's eye height; calm everyday shots are fine; avoid other people's faces and ask before photographing staff.
@@ -57,7 +65,7 @@ When a user adds an event, the app suggests which photos to take, so they don't 
 
 ## The cast sheet (pictures)
 
-Before drawing any pages, the app draws one portrait of each person: your child, whoever comes along, and the people they'll meet. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
+Before drawing any pages, the app draws one portrait of each person (your child, whoever comes along, the people they'll meet) and one drawing of each comfort item. If you added a photo of a comfort item, its drawing is made from that photo. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
 
 Pictures can only show people you listed. If the story writer tries to put anyone else in a picture, the app rejects it automatically.
 
