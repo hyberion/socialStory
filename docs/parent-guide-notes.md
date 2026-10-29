@@ -13,9 +13,10 @@ One profile per child. Every setting can be changed at any time; nothing is lock
 | Setting | Options | Default | In plain words | Status |
 | --- | --- | --- | --- | --- |
 | Name | Free text | (required) | The name your child is called in their stories. A nickname is fine. | Built |
+| What your child looks like | Free text | None | A short description for the pictures: hair, skin tone, favorite clothes ("short curly brown hair, green t-shirt"). Keeps your child looking the same in every picture. Without it, the artist guesses. | Built (pictures) |
 | Reading level | Pre-verbal, Early reader, Reader | Early reader | How much text each page has. **Pre-verbal:** about one short line per page, meant to be read aloud. **Early reader:** 1 to 3 short sentences. **Reader:** up to 4 sentences with more detail. Pick what your child understands today; you can change it whenever they grow. | Built (stories) |
 | Story voice | First person ("I"), Third person (child's name) | First person | Whether the story is told as your child ("I go to the doctor") or about them ("Sam goes to the doctor"). Some children connect more with one than the other. | Built (stories) |
-| Picture style | Real photos, Mixed, Illustrated | Mixed | **Real photos:** your own pictures. **Illustrated:** soft drawings. **Mixed:** drawings with real faces and objects from your photos placed in. | Planned |
+| Picture style | Real photos, Mixed, Illustrated | Mixed (will become Illustrated) | **Illustrated:** soft, calm drawings in muted colors, with no text in the pictures. **Real photos:** your own pictures. **Mixed:** drawings with real faces and objects from your photos placed in. | Illustrated built (test command); others planned |
 | Sound | On, Off | On | Off means the app never makes a sound. | Built (kid app) |
 | Reading speed | 0.5x to 1.5x | 0.9x | How fast the read-aloud voice speaks. Slightly slow by default. | Built (kid app) |
 | Reduce motion | On, Off | On | Keeps movement on screen to a minimum. | Planned |
@@ -32,8 +33,8 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 | Title and type | "Visit to Dr. Patel", doctor | Names the story. | Built |
 | Date and time | When it happens. | Shown in the story; will drive the countdown. | Built |
 | Why it's happening | In words your child understands: "to help my body stay healthy." | Answers the "why" every Social Story needs. | Built |
-| Coming with your child | Who goes along: Dad, Grandma, a teacher. | The story names them ("Dad and I drive..."). **If you leave this empty, the story talks only about your child** and won't guess. | Built |
-| People they'll meet | Name, role, photo, and up to 3 friendly true facts ("has a fish tank"). | Makes the person familiar before the day. | Built (photos planned) |
+| Coming with your child | Who goes along (Dad, Grandma, a teacher), and what they look like. | The story names them ("Dad and I drive..."). **If you leave this empty, the story talks only about your child** and won't guess. | Built |
+| People they'll meet | Name, role, photo, what they look like, and up to 3 friendly true facts ("has a fish tank"). | Makes the person familiar before the day. The "looks like" line keeps them consistent in every picture. | Built (photos planned) |
 | Places | Name, photos, and what it's like: noisy, bright, smells like soap. | Sensory notes let the story describe it honestly. | Built (photos planned) |
 | Steps | What happens, in order, from leaving home to coming back. | Each step becomes a page. | Built |
 | "This step will happen no matter what" | A checkbox on a step (the shot, the haircut). | The story says so honestly, then offers your child real choices around it. It won't pretend a fixed thing is optional. | Built (stories) |
@@ -41,6 +42,14 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 | Comfort items for this event | Extra comforts just for this event. | Added to the child's usual comfort items. | Built |
 
 **Key promise to explain to parents:** the story only states facts you gave it. If something is missing, it leaves it out rather than guessing. The more detail you give, the richer the story.
+
+## The cast sheet (pictures)
+
+Before drawing any pages, the app draws one portrait of each person: your child, whoever comes along, and the people they'll meet. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
+
+Pictures can only show people you listed. If the story writer tries to put anyone else in a picture, the app rejects it automatically.
+
+Cost note (for us, not the guide): $0.01 per picture, so about $0.10 for a cast plus a 7-page story.
 
 ## Reviewing a story
 
@@ -72,6 +81,7 @@ Things parents should know about the kid app, so nothing surprises them.
 
 - Stories and pictures are made by Meta's AI models. What you enter and upload is sent to Meta to make them.
 - We use Meta's standard service, **not** the discounted mode that lets Meta train its models on what you send.
+- Pictures are made only from what you enter. The picture maker's web and image search are turned off, so it never looks up the real people or places you name online, and Meta isn't asked to keep the conversation.
 - Never required: your child's real name (a nickname works), last names, addresses or medical details beyond what the story needs.
 - **Open:** how long uploads are kept, and how a parent deletes everything. Decide before any real families use it.
 

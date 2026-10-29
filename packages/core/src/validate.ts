@@ -57,8 +57,30 @@ const BANNED_PHRASES: ReadonlyArray<{ pattern: RegExp; reason: string }> = [
 /** Gray avoids second person ("you"). We flag it as a warning, not an error. */
 const SECOND_PERSON = /\byou(r|rs|rself)?\b/i;
 
-export function validateStory(story: Story): ValidationResult {
+export interface ValidationContext {
+  /** Cast ids allowed in pictures (from castFor). When given, pictures can't show anyone else. */
+  castIds?: readonly string[];
+}
+
+export function validateStory(story: Story, context: ValidationContext = {}): ValidationResult {
   const issues: Issue[] = [];
+
+  // Pictures may only show people the parent listed (principle 6: true to the event).
+  if (context.castIds) {
+    const allowed = new Set(context.castIds);
+    story.pages.forEach((page, pageIndex) => {
+      for (const id of page.inPicture) {
+        if (!allowed.has(id)) {
+          issues.push({
+            severity: "error",
+            code: "unknown-cast",
+            message: `Picture shows "${id}", who is not in the cast. Use only: ${[...allowed].join(", ")}.`,
+            page: pageIndex,
+          });
+        }
+      }
+    });
+  }
 
   // Criterion 3: title + introduction + body + conclusion.
   const sections = new Set<StorySection>(story.pages.map((p) => p.section));

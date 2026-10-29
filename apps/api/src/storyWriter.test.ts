@@ -11,6 +11,7 @@ function asDraft(story = sampleStory): StoryDraft {
       section: p.section,
       stepId: p.stepId ?? "",
       sceneBrief: p.sceneBrief ?? "",
+      inPicture: [...p.inPicture],
       sentences: p.sentences.map((s) => ({ ...s })),
     })),
   };

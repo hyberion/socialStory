@@ -19,6 +19,7 @@
     "db:down": "docker compose down",
     "smoke": "pnpm --filter @socialstory/api smoke",
     "write-story": "pnpm --filter @socialstory/api write-story",
-    "compare-effort": "pnpm --filter @socialstory/api compare-effort"
+    "compare-effort": "pnpm --filter @socialstory/api compare-effort",
+    "draw-story": "pnpm --filter @socialstory/api draw-story"
   }
 }

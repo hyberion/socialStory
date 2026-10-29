@@ -4,8 +4,9 @@ import { Event } from "./event.js";
 import { Story, type StoryPage } from "./story.js";
 import { validateStory } from "./validate.js";
 
-function withPages(pages: StoryPage[]) {
-  return { ...sampleStory, pages };
+/** Builds a test story from hand-written pages; `inPicture` defaults to empty. */
+function withPages(pages: Array<Omit<StoryPage, "inPicture"> & { inPicture?: string[] }>) {
+  return { ...sampleStory, pages: pages.map((p) => ({ ...p, inPicture: p.inPicture ?? [] })) };
 }
 
 describe("fixtures", () => {
@@ -72,5 +73,20 @@ describe("validateStory", () => {
     const result = validateStory(story);
     expect(result.ok).toBe(true);
     expect(result.issues.map((i) => i.code)).toContain("second-person");
+  });
+});
+
+describe("validateStory cast check", () => {
+  const castIds = ["child", "c-dad", "p-patel"];
+
+  it("accepts pictures that show only listed people", () => {
+    expect(validateStory(sampleStory, { castIds }).ok).toBe(true);
+  });
+
+  it("rejects a picture showing someone the parent never listed", () => {
+    const pages = sampleStory.pages.map((p, i) => (i === 1 ? { ...p, inPicture: ["child", "mom"] } : p));
+    const result = validateStory({ ...sampleStory, pages }, { castIds });
+    expect(result.ok).toBe(false);
+    expect(result.issues.find((i) => i.code === "unknown-cast")?.page).toBe(1);
   });
 });

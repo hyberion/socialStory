@@ -60,6 +60,8 @@ export const ChildProfile = z.object({
   perspective: Perspective.default("first"),
   sensory: SensorySettings.default({}),
   reviewMode: ReviewMode.default("every-stage"),
+  /** How the child looks, for consistent pictures: "short curly brown hair, green t-shirt". */
+  appearance: z.string().optional(),
   /** Things that reliably comfort this child, reused across events. */
   comforts: z.array(z.string()).default([]),
   /** Interests that can make content more engaging (trains, dinosaurs...). */

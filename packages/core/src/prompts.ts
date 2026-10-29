@@ -2,6 +2,7 @@ import type { ChildProfile, ReadingLevel } from "./profile.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
+import { castFor } from "./cast.js";
 
 /**
  * Prompt text for the story writer. Kept in core (not the API) so the
@@ -57,6 +58,7 @@ Scene briefs
 - For every page, write a short sceneBrief: what the picture on that page shows, in one plain sentence, for an illustrator.
 - The picture must match that page's text. If the text says the room can be noisy, do not call it quiet.
 - Show only the child, the listed companions, and the listed people. Never add family members, other children or strangers.
+- For every page, set inPicture to the cast ids of everyone shown in the picture, using only ids from the picture cast list. Use an empty list for a picture of only a place or object.
 - Calm scenes only: no scary faces, needles close up, or crying.`;
 
 function formatEvent(event: Event, child: ChildProfile): string {
@@ -105,6 +107,9 @@ function formatEvent(event: Event, child: ChildProfile): string {
     ...(event.hardParts.length ? event.hardParts.map((h) => `- ${h.description}`) : ["- none listed"]),
     "",
     `Comfort items and choices available: ${comforts.length ? comforts.join(", ") : "none listed"}`,
+    "",
+    "Picture cast (ids for inPicture):",
+    ...castFor(event, child).map((m) => `- "${m.id}": ${m.name} (${m.role})`),
   ];
   return lines.filter((l) => l !== null).join("\n");
 }

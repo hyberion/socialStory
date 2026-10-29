@@ -21,6 +21,8 @@ export const Person = z.object({
   /** e.g. "doctor", "teacher", "barber". */
   role: z.string().optional(),
   photo: PhotoRef.optional(),
+  /** How they look, for consistent pictures: "black hair in a bun, white coat". */
+  appearance: z.string().optional(),
   /** One or two friendly, true facts: "Dr. Patel has a fish tank." */
   facts: z.array(z.string()).max(3).default([]),
 });

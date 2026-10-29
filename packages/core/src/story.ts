@@ -41,6 +41,8 @@ export const StoryPage = z.object({
   stepId: z.string().optional(),
   /** Brief for the illustrator: what this page's picture shows. */
   sceneBrief: z.string().optional(),
+  /** Cast ids of everyone shown in the picture (see castFor). Empty = a place or object only. */
+  inPicture: z.array(z.string()).default([]),
 });
 export type StoryPage = z.infer<typeof StoryPage>;
 
@@ -70,6 +72,7 @@ export const StoryDraft = z.object({
       section: StorySection,
       stepId: z.string(),
       sceneBrief: z.string(),
+      inPicture: z.array(z.string()),
       sentences: z.array(Sentence),
     }),
   ),
@@ -84,6 +87,7 @@ export function draftToStory(draft: StoryDraft): Story {
       section: p.section,
       sentences: p.sentences,
       sceneBrief: p.sceneBrief || undefined,
+      inPicture: p.inPicture,
       stepId: p.stepId || undefined,
     })),
   });

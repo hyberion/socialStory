@@ -56,6 +56,34 @@ export const TEXT_TASKS = {
 
 export type TextTaskName = keyof typeof TEXT_TASKS;
 
+/** Settings for Muse Image calls. Every image costs the same; "low" only makes it faster. */
+export interface ImageTask {
+  model: string;
+  /** Aspect ratio as "WxH"; actual pixel sizes may differ. */
+  size: string;
+  reasoningStrength: "low" | "high";
+  note: string;
+}
+
+export const IMAGE_TASKS = {
+  /** Character reference portraits: everything else is drawn to match these, so take care. */
+  castPortrait: {
+    model: MODEL_IDS.image,
+    size: "768x1024",
+    reasoningStrength: "high",
+    note: "Anchors every later picture; worth the extra time.",
+  },
+  /** One story page, drawn from the cast portraits. */
+  page: {
+    model: MODEL_IDS.image,
+    size: "1024x768",
+    reasoningStrength: "high",
+    note: "Start at high; try low with a side-by-side comparison before switching.",
+  },
+} as const satisfies Record<string, ImageTask>;
+
+export type ImageTaskName = keyof typeof IMAGE_TASKS;
+
 export const REASONING_EFFORTS: readonly ReasoningEffort[] = [
   "minimal",
   "low",

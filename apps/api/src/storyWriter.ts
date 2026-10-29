@@ -1,4 +1,5 @@
 import {
+  castFor,
   buildRevisionPrompt,
   buildStoryPrompt,
   draftToStory,
@@ -78,6 +79,7 @@ export async function writeStory(
   options: { maxRevisions?: number; onProgress?: ProgressMessage } = {},
 ): Promise<WriteStoryResult> {
   const maxRevisions = options.maxRevisions ?? DEFAULT_MAX_REVISIONS;
+  const castIds = castFor(event, child).map((m) => m.id);
   const progress = options.onProgress ?? (() => {});
   const attempts: Attempt[] = [];
   let totalUsage: Usage = { inputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
@@ -103,7 +105,7 @@ export async function writeStory(
       };
     } else {
       lastStory = converted.story;
-      validation = validateStory(converted.story);
+      validation = validateStory(converted.story, { castIds });
     }
     lastValidation = validation;
     attempts.push({ kind, usage, ok: validation.ok, issues: validation.issues });

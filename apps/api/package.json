@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "write-story": "tsx src/scripts/writeStory.ts",
-    "compare-effort": "tsx src/scripts/compareEffort.ts"
+    "compare-effort": "tsx src/scripts/compareEffort.ts",
+    "draw-story": "tsx src/scripts/drawStory.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",

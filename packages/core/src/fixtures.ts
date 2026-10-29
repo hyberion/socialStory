@@ -14,6 +14,7 @@ export const sampleChild: ChildProfile = {
   perspective: "first",
   sensory: { soundEnabled: true, narrationRate: 0.9, reduceMotion: true },
   reviewMode: "every-stage",
+  appearance: "a seven-year-old boy with short curly brown hair and brown skin, wearing a green t-shirt and jeans",
   comforts: ["Bear", "headphones"],
   interests: ["trains"],
 };
@@ -25,12 +26,21 @@ export const sampleEvent: Event = {
   kind: "doctor",
   startsAt: "2026-11-03T10:00:00-05:00",
   purpose: "to get a flu shot that helps my body stay healthy",
-  companions: [{ id: "c-dad", name: "Dad", role: "parent", facts: [] }],
+  companions: [
+    {
+      id: "c-dad",
+      name: "Dad",
+      role: "parent",
+      appearance: "a tall man with short curly black hair, a short beard and round glasses, wearing a blue sweater",
+      facts: [],
+    },
+  ],
   people: [
     {
       id: "p-patel",
       name: "Dr. Patel",
       role: "doctor",
+      appearance: "a woman doctor with long black hair in a low bun, wearing a white coat over a purple top",
       facts: ["Dr. Patel has a fish tank in the waiting room."],
     },
   ],
@@ -71,6 +81,7 @@ export const sampleStory: Story = {
   pages: [
     {
       section: "introduction",
+      inPicture: ["child"],
       sentences: [
         { text: "On Tuesday morning, I am going to see Dr. Patel.", type: "descriptive" },
         { text: "Dr. Patel is a doctor who helps kids stay healthy.", type: "descriptive" },
@@ -79,6 +90,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s1",
+      inPicture: ["child", "c-dad"],
       sentences: [
         { text: "Dad and I drive to the building with the blue door.", type: "descriptive" },
       ],
@@ -86,6 +98,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s2",
+      inPicture: ["child", "c-dad"],
       sentences: [
         { text: "We wait in the waiting room. It can be noisy.", type: "descriptive" },
         { text: "There is a fish tank to look at.", type: "descriptive" },
@@ -96,6 +109,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s3",
+      inPicture: ["child", "c-dad", "p-patel"],
       sentences: [
         { text: "Dr. Patel gives me a shot in my arm.", type: "descriptive" },
         { text: "The shot pinches for a few seconds.", type: "descriptive" },
@@ -104,6 +118,7 @@ export const sampleStory: Story = {
     },
     {
       section: "conclusion",
+      inPicture: ["child", "c-dad"],
       sentences: [
         { text: "Then we go home.", type: "descriptive" },
         { text: "The shot helps my body stay healthy.", type: "descriptive" },
