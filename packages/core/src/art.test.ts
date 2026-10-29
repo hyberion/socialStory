@@ -37,10 +37,13 @@ describe("art prompts", () => {
 });
 
 describe("props and region", () => {
-  it("includes comfort items in the cast as props", () => {
+  it("includes comfort items in the cast as props, with the user's description", () => {
     const bear = cast.find((m) => m.id === "bear");
+    const fixtureBear = samplePlayer.comforts.find((c) => c.id === "bear");
     expect(bear?.kind).toBe("prop");
-    expect(bear?.appearance).toContain("red ribbon");
+    // Whatever the user wrote is what the illustrator gets; the test doesn't care what Bear is.
+    expect(bear?.appearance).toBe(fixtureBear?.appearance);
+    expect(buildCastPortraitPrompt(bear!)).toContain(fixtureBear!.appearance!);
   });
 
   it("draws props as objects, and from the photo when there is one", () => {
