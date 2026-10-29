@@ -3,6 +3,8 @@ import { resolve } from "node:path";
 import {
   KIT_FILE_PATTERN,
   PublishedKit,
+  castFor,
+  castIntro,
   pageFingerprint,
   summarizeKit,
   type Event,
@@ -75,6 +77,21 @@ export function publishKit(
     };
   });
 
+  // Everyone who appears, with their approved portrait if one was drawn.
+  const companionIds = event.companions.map((c) => c.id);
+  const factsById = new Map(event.people.map((p) => [p.id, p.facts]));
+  const cast = castFor(event, player).map((member) => {
+    const file = `cast-${member.id}.png`;
+    return {
+      id: member.id,
+      kind: member.kind,
+      name: member.name,
+      intro: castIntro(member, player, companionIds),
+      facts: factsById.get(member.id) ?? [],
+      portrait: existsSync(resolve(sourceDir, file)) ? file : undefined,
+    };
+  });
+
   const kit = PublishedKit.parse({
     id,
     title: story.title,
@@ -82,6 +99,7 @@ export function publishKit(
     publishedAt: (args.now ?? new Date()).toISOString(),
     sensory: player.sensory,
     pages,
+    cast,
   });
 
   // Build the new kit in a temporary folder, then swap it in, so the player
@@ -91,9 +109,8 @@ export function publishKit(
   const tempDir = resolve(root, `.${id}-publishing`);
   rmSync(tempDir, { recursive: true, force: true });
   mkdirSync(tempDir, { recursive: true });
-  for (const page of kit.pages) {
-    if (page.image) copyFileSync(resolve(sourceDir, page.image), resolve(tempDir, page.image));
-  }
+  const files = [...kit.pages.map((p) => p.image), ...kit.cast.map((m) => m.portrait)];
+  for (const file of files) if (file) copyFileSync(resolve(sourceDir, file), resolve(tempDir, file));
   writeFileSync(resolve(tempDir, "kit.json"), JSON.stringify(kit, null, 2));
   rmSync(finalDir, { recursive: true, force: true });
   renameSync(tempDir, finalDir);

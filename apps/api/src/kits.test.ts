@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -9,7 +9,7 @@ import { kitRoutes } from "./kitRoutes.js";
 
 const PNG = Buffer.from("89504e470d0a1a0a", "hex"); // just the PNG signature; enough for tests
 
-function setup(pictures: number[]) {
+function setup(pictures: number[], portraits: string[] = []) {
   const dataDir = mkdtempSync(join(tmpdir(), "kits-"));
   const images = join(dataDir, "images", "doctor");
   mkdirSync(images, { recursive: true });
@@ -19,6 +19,7 @@ function setup(pictures: number[]) {
     writeFileSync(join(images, file), PNG);
     drawn[file] = pageFingerprint(sampleStory.pages[n - 1]!);
   }
+  for (const id of portraits) writeFileSync(join(images, `cast-${id}.png`), PNG);
   writeDrawnFrom("doctor", { pages: drawn }, dataDir);
   return dataDir;
 }
@@ -56,6 +57,21 @@ describe("publishKit", () => {
   });
 });
 
+describe("kit cast", () => {
+  it("includes everyone, with portraits where they were drawn", () => {
+    const { kit, dir } = publish(setup([1], ["player", "p-patel"]));
+    expect(kit.cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "bear", "headphones"]);
+    const patel = kit.cast.find((m) => m.id === "p-patel")!;
+    expect(patel.portrait).toBe("cast-p-patel.png");
+    expect(patel.intro).toBe("Dr. Patel is the doctor.");
+    expect(patel.facts).toEqual(["Dr. Patel has a fish tank in the waiting room."]);
+    expect(kit.cast.find((m) => m.id === "c-dad")?.portrait).toBeUndefined();
+    expect(kit.cast.find((m) => m.id === "c-dad")?.intro).toBe("Dad is coming with me.");
+    expect(kit.cast.find((m) => m.id === "bear")?.intro).toBe("Bear can come with me.");
+    expect(existsSync(join(dir, "cast-p-patel.png"))).toBe(true);
+  });
+});
+
 describe("kit routes", () => {
   const dataDir = setup([1]);
   publish(dataDir);
@@ -73,6 +89,7 @@ describe("kit routes", () => {
     expect(ok.status).toBe(200);
     expect(ok.headers.get("content-type")).toBe("image/png");
     expect((await app.request("/api/kits/doctor/kit.json")).status).toBe(404);
+    expect((await app.request("/api/kits/doctor/cast-nobody.png")).status).toBe(404);
     expect((await app.request("/api/kits/doctor/..%2F..%2Fstories%2Fdoctor.json")).status).toBe(404);
     expect((await app.request("/api/kits/..%2Fimages/page-01.png")).status).toBe(404);
   });

@@ -118,6 +118,7 @@ Things users should know about the player app, so nothing surprises them.
 | Can be added to a tablet's home screen and works without internet: stories it has opened once are saved on the device. | Built; needs deployment to try on a tablet |
 | Countdown to the day ("2 sleeps until Dr. Patel"). | Planned |
 | Day-of mode: step-by-step cards to use during the event itself. | Planned |
+| **Who's who?** A game on the shelf under each story: your child sees a portrait from the cast sheet, taps a name, and the app shows who it is ("Dr. Patel is the doctor.") plus any friendly facts you added. Any tap shows the answer the same calm way; nothing is ever marked wrong, counted or timed. Appears once at least two portraits are drawn. | Built |
 | Games built from your own photos. | Planned |
 | Games built from the story's words (match, drag the word, fill in the blank). Never scored or timed; a miss just shows the answer. | Planned (after the hackathon) |
 | A tour of the place with no people in it. | Planned (after the hackathon) |

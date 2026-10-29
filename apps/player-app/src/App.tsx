@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import type { KitSummary, PublishedKit } from "@socialstory/core";
 import { fetchKit, fetchKits } from "./api";
-import { Shelf } from "./Shelf";
+import { Shelf, type Activity } from "./Shelf";
+import { WhosWho } from "./WhosWho";
 import { StoryViewer } from "./StoryViewer";
 
 type State =
   | { kind: "loading" }
   | { kind: "shelf"; kits: KitSummary[] }
-  | { kind: "reading"; kit: PublishedKit; kits: KitSummary[] };
+  | { kind: "reading"; kit: PublishedKit; kits: KitSummary[]; activity: Activity };
 
 /**
  * Shelf -> story -> shelf. Offline, the service worker answers from the
@@ -29,16 +30,21 @@ export function App() {
   if (state.kind === "loading") return <main className="shelf empty" aria-busy="true" />;
 
   if (state.kind === "reading") {
-    return <StoryViewer kit={state.kit} onHome={() => setState({ kind: "shelf", kits: state.kits })} />;
+    const home = () => setState({ kind: "shelf", kits: state.kits });
+    return state.activity === "whos-who" ? (
+      <WhosWho kit={state.kit} onHome={home} />
+    ) : (
+      <StoryViewer kit={state.kit} onHome={home} />
+    );
   }
 
   const { kits } = state;
   return (
     <Shelf
       kits={kits}
-      onOpen={(id) =>
+      onOpen={(id, activity) =>
         fetchKit(id)
-          .then((kit) => setState({ kind: "reading", kit, kits }))
+          .then((kit) => setState({ kind: "reading", kit, kits, activity }))
           .catch((err) => console.warn("Could not open story", err))
       }
     />

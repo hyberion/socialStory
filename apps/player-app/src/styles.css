@@ -199,3 +199,60 @@ img.picture {
   font-size: 1.4rem;
   font-weight: 600;
 }
+
+/* ---- Who's who? ---- */
+
+.shelf-item {
+  display: grid;
+  gap: 12px;
+}
+
+.activity,
+.choice {
+  min-height: 72px;
+  border-radius: 20px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.activity:focus-visible,
+.choice:focus-visible {
+  outline: 4px solid var(--soft);
+  outline-offset: 2px;
+}
+
+.page.game {
+  justify-items: center;
+  text-align: center;
+}
+
+.portrait {
+  /* Portraits are 2:3 (1024x1536). */
+  aspect-ratio: 2 / 3;
+  height: min(40dvh, 420px);
+  object-fit: cover;
+  border-radius: 16px;
+  background: #eee8dc;
+}
+
+.choices {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+}
+
+/* The answer is shown with a soft color, never red for a miss. */
+.choice.this-one {
+  border-color: var(--soft);
+  background: #e3eee9;
+}
+
+.nav-spacer {
+  min-width: 72px;
+}

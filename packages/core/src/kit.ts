@@ -21,6 +21,20 @@ export const KitPage = z.object({
 });
 export type KitPage = z.infer<typeof KitPage>;
 
+/** Someone (or something) in the kit's pictures, for the "Who's who?" game. */
+export const KitCastMember = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  kind: z.enum(["person", "prop"]),
+  name: z.string().min(1),
+  /** Plain line the game says after the child answers: "Dr. Patel is the doctor." */
+  intro: z.string(),
+  /** Friendly facts from the user: "Dr. Patel has a fish tank in the waiting room." */
+  facts: z.array(z.string()).default([]),
+  /** File name of this member's approved portrait inside the kit, e.g. "cast-p-patel.png". */
+  portrait: z.string().optional(),
+});
+export type KitCastMember = z.infer<typeof KitCastMember>;
+
 export const PublishedKit = z.object({
   /** URL-safe id, e.g. "doctor". */
   id: z.string().regex(/^[a-z0-9-]+$/),
@@ -32,6 +46,8 @@ export const PublishedKit = z.object({
   /** The player's sensory settings at publish time (sound, reading speed...). */
   sensory: SensorySettings,
   pages: z.array(KitPage).min(1),
+  /** People and comfort items, with their approved portraits. */
+  cast: z.array(KitCastMember).default([]),
 });
 export type PublishedKit = z.infer<typeof PublishedKit>;
 
@@ -42,6 +58,8 @@ export const KitSummary = z.object({
   eventStartsAt: z.string(),
   publishedAt: z.string(),
   cover: z.string().optional(),
+  /** How many cast members have portraits; the "Who's who?" game needs at least two. */
+  portraits: z.number().int().default(0),
 });
 export type KitSummary = z.infer<typeof KitSummary>;
 
@@ -52,6 +70,7 @@ export function summarizeKit(kit: PublishedKit): KitSummary {
     eventStartsAt: kit.eventStartsAt,
     publishedAt: kit.publishedAt,
     cover: kit.pages.find((p) => p.image)?.image,
+    portraits: kit.cast.filter((m) => m.portrait).length,
   };
 }
 
@@ -76,4 +95,23 @@ export function pageFingerprint(page: {
     hash = Math.imul(hash, 0x01000193) >>> 0;
   }
   return hash.toString(16).padStart(8, "0");
+}
+
+/**
+ * The line the "Who's who?" game says once a member is named. Literal and
+ * warm, no quiz language. Written for the player to hear, in the story's
+ * own voice ("I", or the player's name).
+ */
+export function castIntro(
+  member: { id: string; kind: "person" | "prop"; name: string; role: string },
+  player: { displayName: string; perspective: "first" | "third" },
+  companionIds: string[],
+): string {
+  const me = player.perspective === "first" ? "me" : player.displayName;
+  if (member.id === "player") return player.perspective === "first" ? `This is me, ${member.name}!` : `This is ${member.name}!`;
+  if (member.kind === "prop") return `${member.name} can come with ${me}.`;
+  if (companionIds.includes(member.id)) return `${member.name} is coming with ${me}.`;
+  const role = member.role.trim();
+  if (!role || role === "someone the child will meet") return `${player.perspective === "first" ? "I" : player.displayName} will meet ${member.name}.`;
+  return `${member.name} is the ${role}.`;
 }
