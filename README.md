@@ -4,7 +4,7 @@
 
 This app helps autistic kids get ready for the moments that scare them: the doctor, a new school, a haircut. Parents snap a few photos and describe what's coming, and AI turns it into a personalized prep journey (a story, playful games built from the real people and places, and a countdown) that builds familiarity day by day and walks alongside the child on the day itself. Not a script for compliance, but a calm, honest preview that gives kids information and choices.
 
-Design principles, Social Story criteria and the generation pipeline: [`docs/design-principles.md`](docs/design-principles.md). Rules for coding agents: [`AGENTS.md`](AGENTS.md).
+Design principles, Social Story criteria and the generation pipeline: [`docs/design-principles.md`](docs/design-principles.md). Every parent-facing setting and what it does: [`docs/parent-guide-notes.md`](docs/parent-guide-notes.md). Rules for coding agents: [`AGENTS.md`](AGENTS.md).
 
 ## Built with
 

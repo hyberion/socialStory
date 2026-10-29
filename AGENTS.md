@@ -39,4 +39,5 @@ These override any feature request. If a change would break one, stop and flag i
 - **Schemas first:** any data that crosses an app boundary is defined as a zod schema in `packages/core` and validated at the boundary.
 - **Generation is staged and gated** (confirm Event, approve script, approve cast and set, review pages, compile). Each stage is its own background job with honest progress messages. Edits invalidate only downstream pieces.
 - **Test data only:** never use real children's photos or details in fixtures, demos or commits.
+- **Parent-facing changes update the guide notes.** If a change adds or alters anything a parent can set or will notice (a setting, an option, a default, a kid-app behavior, what data is sent where), update [`docs/parent-guide-notes.md`](docs/parent-guide-notes.md) in the same commit.
 - Keep changes small and typed. Run `pnpm typecheck` and `pnpm test` before committing.
