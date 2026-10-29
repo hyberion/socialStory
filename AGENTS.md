@@ -21,10 +21,10 @@ Keep these layers separate. Prompt text keeps saying "the child" because that is
 
 These override any feature request. If a change would break one, stop and flag it.
 
-1. **The system adapts to the child, never the reverse.** Reading level, art style, pacing, sensory settings and difficulty are always parent-adjustable. Never hard-code a single "right" level.
+1. **The system adapts to the player, never the reverse.** Reading level, art style, pacing, sensory settings and difficulty are always user-adjustable. Never hard-code a single "right" level.
 2. **Orientation, not simply obedience.** Generated content informs and offers choices. It never scripts compliance ("you must sit still"). Be honest about what's fixed, and offer real choices around it.
-3. **Dignity, no pressure.** The kid side has no streaks, scores, penalties, timers that judge, or engagement tricks. The child can stop, skip or replay anything.
-4. **Sensory-safe kid UI.** Muted colors, no flashing, no autoplaying or surprise sounds, the same layout every time.
+3. **Dignity, no pressure.** The player app has no streaks, scores, penalties, timers that judge, or engagement tricks. The player can stop, skip or replay anything.
+4. **Sensory-safe player UI.** Muted colors, no flashing, no autoplaying or surprise sounds, the same layout every time.
 5. **The user approves before the player sees anything.** Nothing generated reaches the player app without passing the approval gates.
 6. **Literal, true language.** No idioms, no promises the world can break ("it won't hurt").
 
@@ -43,7 +43,7 @@ These override any feature request. If a change would break one, stop and flag i
 
 - **Secrets:** the Meta key lives only in `.env` (git-ignored) and is read only by `apps/api`. Never import it into a front-end app, never log it, never commit it.
 - **Meta Model API:** base URL `https://api.meta.ai/v1`, via the `openai` npm SDK. The SDK does not read `MODEL_API_KEY` on its own; always pass `apiKey` explicitly (see `apps/api/src/meta.ts`).
-- **Pick models and reasoning effort through `packages/core/src/models.ts`**, never inline. Reasoning tokens are billed as output. Story writing defaults to **low** on purpose (Oct 28 test: same pass rate as high at 40% of the cost and half the wait); the validator, revise loop and parent approval are the quality net. Don't raise defaults without a measured comparison (`pnpm compare-effort`). Users can request a higher-effort rewrite per story from an allow-list (`low`, `medium`, `high`); never expose `xhigh` or `max`.
+- **Pick models and reasoning effort through `packages/core/src/models.ts`**, never inline. Reasoning tokens are billed as output. Story writing defaults to **low** on purpose (Oct 28 test: same pass rate as high at 40% of the cost and half the wait); the validator, revise loop and user approval are the quality net. Don't raise defaults without a measured comparison (`pnpm compare-effort`). Users can request a higher-effort rewrite per story from an allow-list (`low`, `medium`, `high`); never expose `xhigh` or `max`.
 - **Never use contributor-mode models** (`*-contributor`). They let Meta train on prompts and responses, which would include families' details.
 - **Schemas first:** any data that crosses an app boundary is defined as a zod schema in `packages/core` and validated at the boundary.
 - **Generation is staged and gated** (confirm Event, approve script, approve cast and set, review pages, compile). Each stage is its own background job with honest progress messages. Edits invalidate only downstream pieces.
