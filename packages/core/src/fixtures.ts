@@ -21,7 +21,7 @@ export const samplePlayer: PlayerProfile = {
       id: "bear",
       name: "Bear",
       // Brad: describe Bear however you like; this becomes his reference drawing.
-      appearance: "a small, soft, light-brown teddy bear with round ears and a faded red ribbon tied around its neck",
+      appearance: "a small, fluffy, white bunny with a light grey patch on it's stomach with slightly bent ears and a faded red bow tie around it's neck",
     },
     {
       id: "headphones",
