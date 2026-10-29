@@ -69,7 +69,7 @@ Kits are built in five gated stages, cheapest first, so mistakes get caught whil
 2. **Approve the script.** Text only, already validated against Gray's criteria. Most revision happens here because text edits are free.
 3. **Approve the cast and set.** A reference sheet of the child, key people and places in the chosen art style. Locks the look so every page stays consistent.
 4. **Review pages and cutouts.** Page images and SAM cutouts stream in; any single page can be regenerated.
-5. **Compile and publish.** Games, countdown and day-of cards are assembled from approved pieces and pushed to the kid app.
+5. **Compile and publish.** Games, countdown and day-of cards are assembled from approved pieces and pushed to the player app.
 
 Rules:
 

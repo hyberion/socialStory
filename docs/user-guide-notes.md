@@ -1,14 +1,16 @@
-# Parent guide notes
+# User guide notes
 
-Running reference for the eventual parent, caregiver and teacher instructions: every setting, what it means and what it does. Not the guide itself yet; the "In plain words" column is draft wording for it.
+Running reference for the eventual user instructions (users are parents, caregivers and teachers; players are the children): every setting, what it means and what it does. Not the guide itself yet; the "In plain words" column is draft wording for it.
 
-**Rule:** any commit that adds or changes something a parent can set or will notice also updates this file.
+**Rule:** any commit that adds or changes something a user can set or will notice also updates this file.
+
+The "In plain words" text is written the way users will read it: "you" and "your child," not "user" and "player."
 
 Status: **Built** = in the code now. **Planned** = decided, not built yet. **Idea** = not decided.
 
-## Child profile
+## Player profile
 
-One profile per child. Every setting can be changed at any time; nothing is locked in at setup. Defined in `packages/core/src/profile.ts`.
+One profile per player (child). Every setting can be changed at any time; nothing is locked in at setup. Defined in `packages/core/src/profile.ts`.
 
 | Setting | Options | Default | In plain words | Status |
 | --- | --- | --- | --- | --- |
@@ -17,8 +19,8 @@ One profile per child. Every setting can be changed at any time; nothing is lock
 | Reading level | Pre-verbal, Early reader, Reader | Early reader | How much text each page has. **Pre-verbal:** about one short line per page, meant to be read aloud. **Early reader:** 1 to 3 short sentences. **Reader:** up to 4 sentences with more detail. Pick what your child understands today; you can change it whenever they grow. | Built (stories) |
 | Story voice | First person ("I"), Third person (child's name) | First person | Whether the story is told as your child ("I go to the doctor") or about them ("Sam goes to the doctor"). Some children connect more with one than the other. | Built (stories) |
 | Picture style | Real photos, Mixed, Illustrated | Mixed (will become Illustrated) | **Illustrated:** soft, calm drawings in muted colors, with no text in the pictures. **Real photos:** your own pictures. **Mixed:** drawings with real faces and objects from your photos placed in. | Illustrated built (test command); others planned |
-| Sound | On, Off | On | Off means the app never makes a sound. | Built (kid app) |
-| Reading speed | 0.5x to 1.5x | 0.9x | How fast the read-aloud voice speaks. Slightly slow by default. | Built (kid app) |
+| Sound | On, Off | On | Off means the app never makes a sound. | Built (player app) |
+| Reading speed | 0.5x to 1.5x | 0.9x | How fast the read-aloud voice speaks. Slightly slow by default. | Built (player app) |
 | Reduce motion | On, Off | On | Keeps movement on screen to a minimum. | Planned |
 | Review steps | Every stage, Script and final, Final only | Every stage | How much you check before your child sees a new story. Start with every stage; once you trust the results, you can review less. | Planned |
 | Comfort items | List | None | Things that reliably help your child (a stuffed animal, headphones, a song). Stories offer these as choices during hard moments. | Built (stories) |
@@ -64,7 +66,7 @@ Behind the scenes (worth one sentence in the guide): every story is checked agai
 
 ## What your child sees
 
-Things parents should know about the kid app, so nothing surprises them.
+Things users should know about the player app, so nothing surprises them.
 
 | Behavior | Status |
 | --- | --- |

@@ -10,8 +10,8 @@
   "scripts": {
     "dev": "pnpm --parallel --filter \"./apps/*\" dev",
     "dev:api": "pnpm --filter @socialstory/api dev",
-    "dev:parent": "pnpm --filter @socialstory/parent-web dev",
-    "dev:kid": "pnpm --filter @socialstory/kid-app dev",
+    "dev:user": "pnpm --filter @socialstory/user-web dev",
+    "dev:player": "pnpm --filter @socialstory/player-app dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",

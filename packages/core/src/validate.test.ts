@@ -77,14 +77,14 @@ describe("validateStory", () => {
 });
 
 describe("validateStory cast check", () => {
-  const castIds = ["child", "c-dad", "p-patel"];
+  const castIds = ["player", "c-dad", "p-patel"];
 
   it("accepts pictures that show only listed people", () => {
     expect(validateStory(sampleStory, { castIds }).ok).toBe(true);
   });
 
-  it("rejects a picture showing someone the parent never listed", () => {
-    const pages = sampleStory.pages.map((p, i) => (i === 1 ? { ...p, inPicture: ["child", "mom"] } : p));
+  it("rejects a picture showing someone the user never listed", () => {
+    const pages = sampleStory.pages.map((p, i) => (i === 1 ? { ...p, inPicture: ["player", "mom"] } : p));
     const result = validateStory({ ...sampleStory, pages }, { castIds });
     expect(result.ok).toBe(false);
     expect(result.issues.find((i) => i.code === "unknown-cast")?.page).toBe(1);

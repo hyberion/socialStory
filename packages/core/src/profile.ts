@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 /**
- * Everything about how content is shaped for one child.
- * Principle 1: the system adapts to the child. Every field here is
- * parent-adjustable at any time; nothing assumes a "right" level.
+ * Everything about how content is shaped for one player.
+ * Principle 1: the system adapts to the player. Every field here is
+ * user-adjustable at any time; nothing assumes a "right" level.
  */
 
 export const ReadingLevel = z.enum([
@@ -17,7 +17,7 @@ export const ReadingLevel = z.enum([
 export type ReadingLevel = z.infer<typeof ReadingLevel>;
 
 export const ArtStyle = z.enum([
-  /** Real photos the parent uploaded. */
+  /** Real photos the user uploaded. */
   "photo",
   /** Illustrated scenes with real faces and objects cut in (SAM). */
   "hybrid",
@@ -40,9 +40,9 @@ export const SensorySettings = z.object({
 });
 export type SensorySettings = z.infer<typeof SensorySettings>;
 
-/** Which review gates a parent sees before a kit is published. */
+/** Which review gates a user sees before a kit is published. */
 export const ReviewMode = z.enum([
-  /** Review every stage (default for first-time parents). */
+  /** Review every stage (default for first-time users). */
   "every-stage",
   /** Approve the script, then only the finished kit. */
   "script-and-final",
@@ -51,20 +51,20 @@ export const ReviewMode = z.enum([
 ]);
 export type ReviewMode = z.infer<typeof ReviewMode>;
 
-export const ChildProfile = z.object({
+export const PlayerProfile = z.object({
   id: z.string(),
-  /** What the child is called in stories. */
+  /** What the player is called in stories. */
   displayName: z.string().min(1),
   readingLevel: ReadingLevel.default("early-reader"),
   artStyle: ArtStyle.default("hybrid"),
   perspective: Perspective.default("first"),
   sensory: SensorySettings.default({}),
   reviewMode: ReviewMode.default("every-stage"),
-  /** How the child looks, for consistent pictures: "short curly brown hair, green t-shirt". */
+  /** How the player looks, for consistent pictures: "short curly brown hair, green t-shirt". */
   appearance: z.string().optional(),
-  /** Things that reliably comfort this child, reused across events. */
+  /** Things that reliably comfort this player, reused across events. */
   comforts: z.array(z.string()).default([]),
   /** Interests that can make content more engaging (trains, dinosaurs...). */
   interests: z.array(z.string()).default([]),
 });
-export type ChildProfile = z.infer<typeof ChildProfile>;
+export type PlayerProfile = z.infer<typeof PlayerProfile>;

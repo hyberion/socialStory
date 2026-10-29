@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { sampleChild, sampleEvent, sampleStory } from "./fixtures.js";
+import { samplePlayer, sampleEvent, sampleStory } from "./fixtures.js";
 import { castFor } from "./cast.js";
 import { buildCastPortraitPrompt, buildPagePrompt, castOnPage } from "./art.js";
 
-const cast = castFor(sampleEvent, sampleChild);
+const cast = castFor(sampleEvent, samplePlayer);
 
 describe("castFor", () => {
-  it("lists the child, companions and people, in that order", () => {
-    expect(cast.map((m) => m.id)).toEqual(["child", "c-dad", "p-patel"]);
+  it("lists the player, companions and people, in that order", () => {
+    expect(cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel"]);
     expect(cast[0]!.name).toBe("Sam");
   });
 });

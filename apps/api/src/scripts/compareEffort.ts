@@ -10,7 +10,7 @@
  *   pnpm compare-effort doctor                (low, medium, high)
  *   pnpm compare-effort doctor medium high
  */
-import { formatDollars, sampleChild } from "@socialstory/core";
+import { formatDollars, samplePlayer } from "@socialstory/core";
 import { makeMetaDraftGenerator } from "../generators.js";
 import { writeStory } from "../storyWriter.js";
 import {
@@ -41,7 +41,7 @@ for (const effort of levels) {
   console.log(`\n================ ${effort.toUpperCase()} reasoning ================`);
   const started = Date.now();
   try {
-    const result = await writeStory(event, sampleChild, makeMetaDraftGenerator({ effort }), {
+    const result = await writeStory(event, samplePlayer, makeMetaDraftGenerator({ effort }), {
       onProgress: (m) => console.log(`  ... ${m}`),
     });
     const seconds = (Date.now() - started) / 1000;

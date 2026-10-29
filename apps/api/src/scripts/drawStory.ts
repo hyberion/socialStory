@@ -22,7 +22,7 @@ import {
   castFor,
   castOnPage,
   formatDollars,
-  sampleChild,
+  samplePlayer,
   validateStory,
   type CastMember,
 } from "@socialstory/core";
@@ -60,7 +60,7 @@ if (!rawPages.every((p) => typeof p === "object" && p !== null && "inPicture" in
   process.exit(1);
 }
 const story = Story.parse(saved.story);
-const cast = castFor(event, sampleChild);
+const cast = castFor(event, samplePlayer);
 const unknown = validateStory(story, { castIds: cast.map((m) => m.id) }).issues.filter(
   (i) => i.code === "unknown-cast",
 );

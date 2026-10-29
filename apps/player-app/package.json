@@ -1,13 +1,13 @@
 {
-  "name": "@socialstory/parent-web",
+  "name": "@socialstory/player-app",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Parent web app: describe events, upload photos, review and approve.",
+  "description": "Player app: calm, predictable, installable PWA that works offline.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 5174",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
@@ -22,6 +22,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "typescript": "^5.9.3",
     "vite": "^7.1.10",
+    "vite-plugin-pwa": "^1.1.0",
     "vitest": "^3.2.4"
   }
 }

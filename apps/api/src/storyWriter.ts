@@ -5,7 +5,7 @@ import {
   draftToStory,
   StoryDraft,
   validateStory,
-  type ChildProfile,
+  type PlayerProfile,
   type Event,
   type Issue,
   type Story,
@@ -74,18 +74,18 @@ function toStoryOrIssue(draft: StoryDraft): { story: Story } | { issue: Issue } 
 
 export async function writeStory(
   event: Event,
-  child: ChildProfile,
+  player: PlayerProfile,
   generate: GenerateDraft,
   options: { maxRevisions?: number; onProgress?: ProgressMessage } = {},
 ): Promise<WriteStoryResult> {
   const maxRevisions = options.maxRevisions ?? DEFAULT_MAX_REVISIONS;
-  const castIds = castFor(event, child).map((m) => m.id);
+  const castIds = castFor(event, player).map((m) => m.id);
   const progress = options.onProgress ?? (() => {});
   const attempts: Attempt[] = [];
   let totalUsage: Usage = { inputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
 
   let kind: Attempt["kind"] = "write";
-  let prompt = buildStoryPrompt(event, child);
+  let prompt = buildStoryPrompt(event, player);
   let lastStory: Story | undefined;
   let lastValidation: ValidationResult | undefined;
 
@@ -119,10 +119,10 @@ export async function writeStory(
     // Ask for a fix. If we never got a usable story, start over instead.
     if (lastStory) {
       kind = "revise";
-      prompt = buildRevisionPrompt(event, child, lastStory, validation.issues);
+      prompt = buildRevisionPrompt(event, player, lastStory, validation.issues);
     } else {
       kind = "write";
-      prompt = buildStoryPrompt(event, child);
+      prompt = buildStoryPrompt(event, player);
     }
   }
 

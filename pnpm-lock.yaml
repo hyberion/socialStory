@@ -42,7 +42,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@22.20.5)(terser@5.51.2)(tsx@4.23.15)
 
-  apps/kid-app:
+  apps/player-app:
     dependencies:
       '@socialstory/core':
         specifier: workspace:*
@@ -76,7 +76,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@22.20.5)(terser@5.51.2)(tsx@4.23.15)
 
-  apps/parent-web:
+  apps/user-web:
     dependencies:
       '@socialstory/core':
         specifier: workspace:*

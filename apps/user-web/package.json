@@ -1,13 +1,13 @@
 {
-  "name": "@socialstory/kid-app",
+  "name": "@socialstory/user-web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Kid app: calm, predictable, installable PWA that works offline.",
+  "description": "User web app (parents, caregivers, teachers): describe events, upload photos, review and approve.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 5174",
+    "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
@@ -22,7 +22,6 @@
     "@vitejs/plugin-react": "^5.0.4",
     "typescript": "^5.9.3",
     "vite": "^7.1.10",
-    "vite-plugin-pwa": "^1.1.0",
     "vitest": "^3.2.4"
   }
 }

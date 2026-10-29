@@ -1,4 +1,4 @@
-import type { ChildProfile, ReadingLevel } from "./profile.js";
+import type { PlayerProfile, ReadingLevel } from "./profile.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
@@ -10,7 +10,7 @@ import { castFor } from "./cast.js";
  * can be read, tested and tuned without touching any AI plumbing.
  */
 
-/** How much text each reading level gets (principle 1: adapt to the child). */
+/** How much text each reading level gets (principle 1: adapt to the player). */
 const READING_LEVEL_RULES: Record<ReadingLevel, string> = {
   "pre-verbal":
     "The child does not read yet and will hear the story read aloud. Use one very short sentence per page (about 3 to 6 words). Use only common, concrete words. 6 to 8 pages.",
@@ -61,7 +61,7 @@ Scene briefs
 - For every page, set inPicture to the cast ids of everyone shown in the picture, using only ids from the picture cast list. Use an empty list for a picture of only a place or object.
 - Calm scenes only: no scary faces, needles close up, or crying.`;
 
-function formatEvent(event: Event, child: ChildProfile): string {
+function formatEvent(event: Event, player: PlayerProfile): string {
   const people = new Map(event.people.map((p) => [p.id, p]));
   const places = new Map(event.places.map((p) => [p.id, p]));
   const when = new Date(event.startsAt).toLocaleString("en-US", {
@@ -71,7 +71,7 @@ function formatEvent(event: Event, child: ChildProfile): string {
     hour: "numeric",
     minute: "2-digit",
   });
-  const comforts = [...new Set([...event.comforts, ...child.comforts])];
+  const comforts = [...new Set([...event.comforts, ...player.comforts])];
 
   const lines = [
     `Event: ${event.title} (${event.kind})`,
@@ -103,26 +103,26 @@ function formatEvent(event: Event, child: ChildProfile): string {
       return `- stepId "${s.id}": ${s.description}${where}${who}${s.fixed ? " (FIXED)" : ""}`;
     }),
     "",
-    "Hard parts the parent expects:",
+    "Hard parts to expect:",
     ...(event.hardParts.length ? event.hardParts.map((h) => `- ${h.description}`) : ["- none listed"]),
     "",
     `Comfort items and choices available: ${comforts.length ? comforts.join(", ") : "none listed"}`,
     "",
     "Picture cast (ids for inPicture):",
-    ...castFor(event, child).map((m) => `- "${m.id}": ${m.name} (${m.role})`),
+    ...castFor(event, player).map((m) => `- "${m.id}": ${m.name} (${m.role})`),
   ];
   return lines.filter((l) => l !== null).join("\n");
 }
 
-function formatChild(child: ChildProfile): string {
+function formatPlayer(player: PlayerProfile): string {
   const perspective =
-    child.perspective === "first"
-      ? `Write in first person, as the child ("I", "my"). The child's name is ${child.displayName}.`
-      : `Write in third person about ${child.displayName} ("${child.displayName} goes...").`;
-  const interests = child.interests.length
-    ? `The child likes: ${child.interests.join(", ")}. These may shape word choice only; never add them to the event as things that will happen or be seen.`
+    player.perspective === "first"
+      ? `Write in first person, as the child ("I", "my"). The child's name is ${player.displayName}.`
+      : `Write in third person about ${player.displayName} ("${player.displayName} goes...").`;
+  const interests = player.interests.length
+    ? `The child likes: ${player.interests.join(", ")}. These may shape word choice only; never add them to the event as things that will happen or be seen.`
     : "";
-  return [READING_LEVEL_RULES[child.readingLevel], perspective, interests].filter(Boolean).join("\n");
+  return [READING_LEVEL_RULES[player.readingLevel], perspective, interests].filter(Boolean).join("\n");
 }
 
 export interface StoryPrompt {
@@ -130,18 +130,18 @@ export interface StoryPrompt {
   input: string;
 }
 
-/** The first request: write a story for this event and child. */
-export function buildStoryPrompt(event: Event, child: ChildProfile): StoryPrompt {
+/** The first request: write a story for this event and player. */
+export function buildStoryPrompt(event: Event, player: PlayerProfile): StoryPrompt {
   return {
-    instructions: `${RULES}\n\nAbout this child\n${formatChild(child)}`,
-    input: `Write a Social Story for this event.\n\n${formatEvent(event, child)}`,
+    instructions: `${RULES}\n\nAbout this child\n${formatPlayer(player)}`,
+    input: `Write a Social Story for this event.\n\n${formatEvent(event, player)}`,
   };
 }
 
 /** A follow-up request: fix a story that failed validation. */
 export function buildRevisionPrompt(
   event: Event,
-  child: ChildProfile,
+  player: PlayerProfile,
   story: Story,
   issues: Issue[],
 ): StoryPrompt {
@@ -150,7 +150,7 @@ export function buildRevisionPrompt(
     .map((i) => `- ${i.page !== undefined ? `Page ${i.page + 1}: ` : ""}${i.message}`)
     .join("\n");
   return {
-    instructions: `${RULES}\n\nAbout this child\n${formatChild(child)}`,
+    instructions: `${RULES}\n\nAbout this child\n${formatPlayer(player)}`,
     input: [
       "This Social Story failed review. Fix every problem below and return the complete corrected story.",
       "Change only what is needed to fix the problems; keep everything else the same.",
@@ -159,7 +159,7 @@ export function buildRevisionPrompt(
       problems,
       "",
       "The event:",
-      formatEvent(event, child),
+      formatEvent(event, player),
       "",
       "The story to fix (JSON):",
       JSON.stringify(story, null, 2),

@@ -23,7 +23,7 @@ export function App() {
     <main className="page">
       <header>
         <h1>socialStory</h1>
-        <p className="muted">Parent app · scaffold</p>
+        <p className="muted">User app · scaffold</p>
       </header>
 
       <section className="card">

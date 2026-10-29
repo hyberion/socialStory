@@ -2,25 +2,25 @@
 # automatically. Replace the two hostnames with your real (sub)domains,
 # both pointed at the droplet's IP with A records.
 
-parent.example.com {
+user.example.com {
 	encode gzip
 	handle /api/* {
 		reverse_proxy api:8787
 	}
 	handle {
-		root * /srv/parent-web
+		root * /srv/user-web
 		try_files {path} /index.html
 		file_server
 	}
 }
 
-kid.example.com {
+play.example.com {
 	encode gzip
 	handle /api/* {
 		reverse_proxy api:8787
 	}
 	handle {
-		root * /srv/kid-app
+		root * /srv/player-app
 		try_files {path} /index.html
 		file_server
 	}

@@ -1,13 +1,13 @@
-import type { ChildProfile } from "./profile.js";
+import type { PlayerProfile } from "./profile.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 
 /**
- * Fake test family. Never replace these with real children's details.
+ * Fake test family. Never replace these with real players' details.
  */
 
-export const sampleChild: ChildProfile = {
-  id: "child-sam",
+export const samplePlayer: PlayerProfile = {
+  id: "player-sam",
   displayName: "Sam",
   readingLevel: "early-reader",
   artStyle: "hybrid",
@@ -21,7 +21,7 @@ export const sampleChild: ChildProfile = {
 
 export const sampleEvent: Event = {
   id: "event-dr-patel",
-  childId: "child-sam",
+  playerId: "player-sam",
   title: "Visit to Dr. Patel",
   kind: "doctor",
   startsAt: "2026-11-03T10:00:00-05:00",
@@ -81,7 +81,7 @@ export const sampleStory: Story = {
   pages: [
     {
       section: "introduction",
-      inPicture: ["child"],
+      inPicture: ["player"],
       sentences: [
         { text: "On Tuesday morning, I am going to see Dr. Patel.", type: "descriptive" },
         { text: "Dr. Patel is a doctor who helps kids stay healthy.", type: "descriptive" },
@@ -90,7 +90,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s1",
-      inPicture: ["child", "c-dad"],
+      inPicture: ["player", "c-dad"],
       sentences: [
         { text: "Dad and I drive to the building with the blue door.", type: "descriptive" },
       ],
@@ -98,7 +98,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s2",
-      inPicture: ["child", "c-dad"],
+      inPicture: ["player", "c-dad"],
       sentences: [
         { text: "We wait in the waiting room. It can be noisy.", type: "descriptive" },
         { text: "There is a fish tank to look at.", type: "descriptive" },
@@ -109,7 +109,7 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s3",
-      inPicture: ["child", "c-dad", "p-patel"],
+      inPicture: ["player", "c-dad", "p-patel"],
       sentences: [
         { text: "Dr. Patel gives me a shot in my arm.", type: "descriptive" },
         { text: "The shot pinches for a few seconds.", type: "descriptive" },
@@ -118,7 +118,7 @@ export const sampleStory: Story = {
     },
     {
       section: "conclusion",
-      inPicture: ["child", "c-dad"],
+      inPicture: ["player", "c-dad"],
       sentences: [
         { text: "Then we go home.", type: "descriptive" },
         { text: "The shot helps my body stay healthy.", type: "descriptive" },

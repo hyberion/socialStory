@@ -9,7 +9,7 @@ import {
  * Checks a story against the parts of Gray's criteria (and our own
  * principles) that can be checked mechanically. A failing story goes
  * back to the writer model with the issues attached; it never reaches
- * the parent as-is.
+ * the user as-is.
  */
 
 export type Severity = "error" | "warning";
@@ -65,7 +65,7 @@ export interface ValidationContext {
 export function validateStory(story: Story, context: ValidationContext = {}): ValidationResult {
   const issues: Issue[] = [];
 
-  // Pictures may only show people the parent listed (principle 6: true to the event).
+  // Pictures may only show people the user listed (principle 6: true to the event).
   if (context.castIds) {
     const allowed = new Set(context.castIds);
     story.pages.forEach((page, pageIndex) => {

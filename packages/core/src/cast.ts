@@ -1,8 +1,8 @@
-import type { ChildProfile } from "./profile.js";
+import type { PlayerProfile } from "./profile.js";
 import type { Event } from "./event.js";
 
 /**
- * Everyone who can appear in an event's pictures: the child, the
+ * Everyone who can appear in an event's pictures: the player, the
  * companions coming along, and the people they'll meet. Each gets a
  * stable id; story pages list these ids in `inPicture`, and the
  * illustrator sends only those characters' reference portraits.
@@ -14,12 +14,12 @@ export interface CastMember {
   appearance?: string;
 }
 
-/** The child's cast id. Always present. */
-export const CHILD_CAST_ID = "child";
+/** The player's cast id. Always present. */
+export const PLAYER_CAST_ID = "player";
 
-export function castFor(event: Event, child: ChildProfile): CastMember[] {
+export function castFor(event: Event, player: PlayerProfile): CastMember[] {
   return [
-    { id: CHILD_CAST_ID, name: child.displayName, role: "the child", appearance: child.appearance },
+    { id: PLAYER_CAST_ID, name: player.displayName, role: "the child", appearance: player.appearance },
     ...event.companions.map((c) => ({
       id: c.id,
       name: c.name,

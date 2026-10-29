@@ -22,7 +22,7 @@ export interface TextTask {
 }
 
 export const TEXT_TASKS = {
-  /** Parent's voice notes or form -> structured Event. */
+  /** The user's voice notes or form -> structured Event. */
   extractEvent: {
     model: MODEL_IDS.spark,
     effort: "low",

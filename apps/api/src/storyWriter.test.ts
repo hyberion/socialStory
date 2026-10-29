@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sampleChild, sampleEvent, sampleStory, type StoryDraft } from "@socialstory/core";
+import { samplePlayer, sampleEvent, sampleStory, type StoryDraft } from "@socialstory/core";
 import { writeStory, type GenerateDraft } from "./storyWriter.js";
 
 /** Turns a Story fixture into the draft shape the model returns. */
@@ -41,7 +41,7 @@ function badDraft(): StoryDraft {
 describe("writeStory", () => {
   it("returns on the first try when the story passes", async () => {
     const model = fakeModel(asDraft());
-    const result = await writeStory(sampleEvent, sampleChild, model.generate);
+    const result = await writeStory(sampleEvent, samplePlayer, model.generate);
     expect(result.validation.ok).toBe(true);
     expect(result.attempts).toHaveLength(1);
     expect(model.calls[0]!.kind).toBe("write");
@@ -49,7 +49,7 @@ describe("writeStory", () => {
 
   it("sends failing stories back with the specific problems", async () => {
     const model = fakeModel(badDraft(), asDraft());
-    const result = await writeStory(sampleEvent, sampleChild, model.generate);
+    const result = await writeStory(sampleEvent, samplePlayer, model.generate);
     expect(result.validation.ok).toBe(true);
     expect(result.attempts.map((a) => a.kind)).toEqual(["write", "revise"]);
     expect(model.calls[1]!.input).toContain("I must sit still.");
@@ -58,7 +58,7 @@ describe("writeStory", () => {
 
   it("stops at the revision limit instead of looping forever", async () => {
     const model = fakeModel(badDraft(), badDraft(), badDraft(), badDraft());
-    const result = await writeStory(sampleEvent, sampleChild, model.generate, { maxRevisions: 2 });
+    const result = await writeStory(sampleEvent, samplePlayer, model.generate, { maxRevisions: 2 });
     expect(result.validation.ok).toBe(false);
     expect(result.attempts).toHaveLength(3);
     expect(model.calls).toHaveLength(3);
@@ -66,14 +66,14 @@ describe("writeStory", () => {
 
   it("adds up token usage across attempts", async () => {
     const model = fakeModel(badDraft(), asDraft());
-    const result = await writeStory(sampleEvent, sampleChild, model.generate);
+    const result = await writeStory(sampleEvent, samplePlayer, model.generate);
     expect(result.totalUsage).toEqual({ inputTokens: 20, outputTokens: 40, reasoningTokens: 10 });
   });
 
   it("reports progress in plain language", async () => {
     const messages: string[] = [];
     const model = fakeModel(badDraft(), asDraft());
-    await writeStory(sampleEvent, sampleChild, model.generate, { onProgress: (m) => messages.push(m) });
+    await writeStory(sampleEvent, samplePlayer, model.generate, { onProgress: (m) => messages.push(m) });
     expect(messages).toEqual([
       "Writing the story",
       "Checking it against the story guidelines",
@@ -87,7 +87,7 @@ describe("writeStory", () => {
     const tooShort = asDraft();
     tooShort.pages = tooShort.pages.slice(0, 1);
     const model = fakeModel(tooShort, asDraft());
-    const result = await writeStory(sampleEvent, sampleChild, model.generate);
+    const result = await writeStory(sampleEvent, samplePlayer, model.generate);
     expect(result.attempts[0]!.issues[0]!.code).toBe("bad-shape");
     expect(model.calls.map((c) => c.kind)).toEqual(["write", "write"]);
     expect(result.validation.ok).toBe(true);

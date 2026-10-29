@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { sampleChild, sampleStory } from "@socialstory/core";
+import { samplePlayer, sampleStory } from "@socialstory/core";
 
 /**
- * The kid-facing story reader. Rules it follows (see AGENTS.md):
+ * The player-facing story reader. Rules it follows (see AGENTS.md):
  * - same layout on every page, big targets, no menus or settings
- * - nothing plays on its own; narration only when the child taps it
+ * - nothing plays on its own; narration only when the player taps it
  * - no scores, streaks, timers or penalties; back and replay always work
  */
 export function StoryViewer() {
   const story = sampleStory;
-  const { sensory } = sampleChild;
+  const { sensory } = samplePlayer;
   const [index, setIndex] = useState(0);
   const page = story.pages[index]!;
   const isFirst = index === 0;

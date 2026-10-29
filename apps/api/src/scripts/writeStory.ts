@@ -10,7 +10,7 @@
  *   pnpm write-story doctor --effort medium
  */
 import { parseArgs } from "node:util";
-import { sampleChild, TEXT_TASKS } from "@socialstory/core";
+import { samplePlayer, TEXT_TASKS } from "@socialstory/core";
 import { makeMetaDraftGenerator } from "../generators.js";
 import { writeStory, type WriteStoryResult } from "../storyWriter.js";
 import { pickEffort, pickEvent, printRequestError, printStory, printVerdict, saveResult } from "./report.js";
@@ -25,14 +25,14 @@ const event = pickEvent(name);
 const effort = values.effort ? pickEffort(values.effort) : undefined;
 
 console.log(
-  `\nWriting a story for "${event.title}" (${sampleChild.displayName}, ${sampleChild.readingLevel})` +
+  `\nWriting a story for "${event.title}" (${samplePlayer.displayName}, ${samplePlayer.readingLevel})` +
     ` at ${effort ?? TEXT_TASKS.writeStory.effort} reasoning\n`,
 );
 const started = Date.now();
 
 let result: WriteStoryResult;
 try {
-  result = await writeStory(event, sampleChild, makeMetaDraftGenerator({ effort }), {
+  result = await writeStory(event, samplePlayer, makeMetaDraftGenerator({ effort }), {
     onProgress: (m) => console.log(`  ... ${m}`),
   });
 } catch (err) {

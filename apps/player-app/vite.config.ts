@@ -27,7 +27,7 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true,
-    // Listen on all interfaces so a tablet on your network can open the kid app.
+    // Listen on all interfaces so a tablet on your network can open the player app.
     host: true,
     proxy: { "/api": "http://localhost:8787" },
   },

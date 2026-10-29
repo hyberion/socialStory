@@ -4,7 +4,7 @@
 
 This app helps autistic kids get ready for the moments that scare them: the doctor, a new school, a haircut. Parents snap a few photos and describe what's coming, and AI turns it into a personalized prep journey (a story, playful games built from the real people and places, and a countdown) that builds familiarity day by day and walks alongside the child on the day itself. Not a script for compliance, but a calm, honest preview that gives kids information and choices.
 
-Design principles, Social Story criteria and the generation pipeline: [`docs/design-principles.md`](docs/design-principles.md). Every parent-facing setting and what it does: [`docs/parent-guide-notes.md`](docs/parent-guide-notes.md). Rules for coding agents: [`AGENTS.md`](AGENTS.md).
+Design principles, Social Story criteria and the generation pipeline: [`docs/design-principles.md`](docs/design-principles.md). Every user-facing setting and what it does: [`docs/user-guide-notes.md`](docs/user-guide-notes.md). Rules for coding agents: [`AGENTS.md`](AGENTS.md).
 
 ## Built with
 
@@ -19,8 +19,8 @@ Design principles, Social Story criteria and the generation pipeline: [`docs/des
 ```
 apps/
   api/          Backend; the only place that calls the Meta Model API
-  parent-web/   Parent app: describe, upload, review, approve
-  kid-app/      Kid app: installable PWA, works offline
+  user-web/     User app (parents, caregivers, teachers): describe, upload, review, approve
+  player-app/   Player app (the child): installable PWA, works offline
 packages/
   core/         Shared schemas, Gray-criteria validator, model config
 docs/           Design principles
@@ -53,8 +53,8 @@ Then open:
 
 | URL | What |
 | --- | --- |
-| http://localhost:5173 | Parent app (shows a system check) |
-| http://localhost:5174 | Kid app (sample story reader) |
+| http://localhost:5173 | User app (shows a system check) |
+| http://localhost:5174 | Player app (sample story reader) |
 | http://localhost:8787/api/health | API health check |
 
 ## Scripts
@@ -62,7 +62,7 @@ Then open:
 | Command | Does |
 | --- | --- |
 | `pnpm dev` | Runs the API and both apps together |
-| `pnpm dev:api` / `dev:parent` / `dev:kid` | Runs one piece |
+| `pnpm dev:api` / `dev:user` / `dev:player` | Runs one piece |
 | `pnpm smoke` | One Muse Spark call to verify the key |
 | `pnpm test` | Unit tests (the story validator lives here) |
 | `pnpm typecheck` | Type-checks every package |

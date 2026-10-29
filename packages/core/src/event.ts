@@ -1,16 +1,16 @@
 import { z } from "zod";
 
 /**
- * An Event is the core object: something coming up that the child
+ * An Event is the core object: something coming up that the player
  * needs to get ready for. Everything the app generates is built from it.
  */
 
-/** A stored photo the parent uploaded (the file itself lives in object storage). */
+/** A stored photo the user uploaded (the file itself lives in object storage). */
 export const PhotoRef = z.object({
   id: z.string(),
   /** Storage key or URL. */
   src: z.string(),
-  /** Parent's short description, also used as the SAM prompt hint. */
+  /** The user's short description, also used as the SAM prompt hint. */
   caption: z.string().optional(),
 });
 export type PhotoRef = z.infer<typeof PhotoRef>;
@@ -33,7 +33,7 @@ export const Place = z.object({
   name: z.string().min(1),
   /** Outside, entrance, the room where it happens. */
   photos: z.array(PhotoRef).default([]),
-  /** Sensory notes the parent knows: "loud", "smells like soap", "bright lights". */
+  /** Sensory notes the user knows: "loud", "smells like soap", "bright lights". */
   sensoryNotes: z.array(z.string()).default([]),
 });
 export type Place = z.infer<typeof Place>;
@@ -51,7 +51,7 @@ export type Step = z.infer<typeof Step>;
 
 export const HardPart = z.object({
   id: z.string(),
-  /** What the parent expects to be tough: "the waiting room", "the shot". */
+  /** What the user expects to be tough: "the waiting room", "the shot". */
   description: z.string().min(1),
   stepId: z.string().optional(),
 });
@@ -80,7 +80,7 @@ export type Reflection = z.infer<typeof Reflection>;
 
 export const Event = z.object({
   id: z.string(),
-  childId: z.string(),
+  playerId: z.string(),
   /** "Visit to Dr. Patel" */
   title: z.string().min(1),
   /** "doctor", "school", "haircut", "travel", ... free text on purpose. */
@@ -89,14 +89,14 @@ export const Event = z.object({
   startsAt: z.string(),
   /** Why it's happening, in kid terms: "to help my body stay healthy". */
   purpose: z.string().optional(),
-  /** Who goes with the child: "Dad", "Grandma", "Ms. Lee (teacher)". Empty = not given. */
+  /** Who goes with the player: "Dad", "Grandma", "Ms. Lee (teacher)". Empty = not given. */
   companions: z.array(Person).default([]),
-  /** People the child will meet there: the doctor, the barber, the teacher. */
+  /** People the player will meet there: the doctor, the barber, the teacher. */
   people: z.array(Person).default([]),
   places: z.array(Place).default([]),
   steps: z.array(Step).min(1),
   hardParts: z.array(HardPart).default([]),
-  /** Comfort items for this event (merged with the child's standing comforts). */
+  /** Comfort items for this event (merged with the player's standing comforts). */
   comforts: z.array(z.string()).default([]),
   status: EventStatus.default("draft"),
   reflection: Reflection.optional(),
