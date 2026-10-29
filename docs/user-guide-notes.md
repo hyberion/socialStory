@@ -24,6 +24,8 @@ One profile per player (child). Every setting can be changed at any time; nothin
 | Reduce motion | On, Off | On | Keeps movement on screen to a minimum. | Planned |
 | Review steps | Every stage, Script and final, Final only | Every stage | How much you check before your child sees a new story. Start with every stage; once you trust the results, you can review less. | Planned |
 | Comfort items | List, each with a name, what it looks like, and an optional photo | None | Things that reliably help your child (a stuffed animal, headphones, a blanket). Stories offer these as choices during hard moments, and they appear in the pictures. **Add a photo of the real one** so it looks right in every picture, not like a generic toy. | Built (stories, pictures) |
+| Ways in | Read, Listen, Interact; pick any, ranked | Read, then Listen | How your child takes in a story best. **Read:** words first. **Listen:** the story is read aloud first. **Interact:** gentle games made from the story (matching words to pictures, dragging the right word in, filling in a blank if your child types). Most children are a mix, so you can pick more than one and choose which comes first. | Planned (after the hackathon) |
+| Place tour | On, Off | On when you've added place photos | A walk-through of the place with no people in it: "This is the building. This is the waiting room." Lets your child get to know the place on its own first. Uses your own photos where you have them. | Planned (after the hackathon) |
 | Interests | List | None | Things your child loves. These only shape word choice. **They never add things to the event**, so the story won't promise trains that won't be there. | Built (stories) |
 
 ## Your settings (the user)
@@ -62,6 +64,8 @@ When a user adds an event, the app suggests which photos to take, so they don't 
 - **Every item says why it helps,** and some say how to take it.
 - **Tips shown once:** every photo is optional and 3 to 5 is plenty; shoot from your child's eye height; calm everyday shots are fine; avoid other people's faces and ask before photographing staff.
 - **Never suggests photographing the hard part itself** (no needle close-ups).
+
+**Photo letter:** a short note you can print or show on your phone when asking to take pictures: what the photos are for, that only you and the app use them, and that they're never posted or shared. Draft in [`photo-letter.md`](photo-letter.md). **Status:** draft text written; in-app version planned (after the hackathon).
 
 ## Fixing pictures
 
@@ -115,6 +119,8 @@ Things users should know about the player app, so nothing surprises them.
 | Countdown to the day ("2 sleeps until Dr. Patel"). | Planned |
 | Day-of mode: step-by-step cards to use during the event itself. | Planned |
 | Games built from your own photos. | Planned |
+| Games built from the story's words (match, drag the word, fill in the blank). Never scored or timed; a miss just shows the answer. | Planned (after the hackathon) |
+| A tour of the place with no people in it. | Planned (after the hackathon) |
 
 ## Privacy (the guide needs a plain section on this)
 

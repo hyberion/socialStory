@@ -107,6 +107,21 @@ The user gets full control of every word and every picture before anything is as
 
 - Each page gets a checkmark. Approved pages are locked, so later redraws never touch them. Publish when everything is checked.
 
+## Ways in: formats, games and the place tour (after the hackathon)
+
+Principle 1 applied to format: the same approved story can reach the player in whichever way works for them, and the user picks, per player, which ways they get and which comes first. The goal is as many routes to familiarity as possible, with both the new situation and the new place.
+
+- **Read:** the text-first reader (built).
+- **Listen:** narration first; pages can turn with the voice. Uses the existing sound and reading-speed settings.
+- **Interact:** the story stays the anchor, and games are made from it as a second layer: match the word to the picture, drag the right word into the sentence, fill in the blank (typed, for players who type), plus the photo-cutout games. Same rules as everything else on the player side: no scores, no timers, no wrong-answer buzzers; a miss just shows the answer calmly.
+- **Place tour:** a separate walk-through of the place with no people and no hard parts. "This is the building. This is the door. This is the waiting room. This is the room where Dr. Patel works." Built from the user's own place photos first (the most accurate pictures we will ever have), with drawn versions for missing rooms. Lets the player get used to the place on its own before adding people and what happens there.
+
+Format preferences are a ranked, multi-select list (most players are a mix), and every format is made from the same approved, published kit, so nothing reaches the player that the user didn't approve.
+
+## Photo letter
+
+A short "why I'm taking pictures" note the user can print or show on their phone to staff and other adults at the place. It explains what the photos are for, who sees them and what we will never do with them, so asking permission is easier for the user. Draft text: [`photo-letter.md`](photo-letter.md). Rule: the letter's promises must match what the app actually does; if the app's data handling changes, the letter changes with it.
+
 ## Decisions and open questions
 
 Decided:
@@ -118,6 +133,9 @@ Decided:
 - Stack: React front ends, Postgres, Docker, GitHub for code and deploys, a VPS (DigitalOcean droplet or Hostinger). Backend is TypeScript (Node + Hono) so the Event schema and validator are shared with the apps.
 - Cost and business model are out of scope for now.
 - Code gets written inside the hackathon window (Oct 26 noon to Nov 4, 9 PM ET).
+- Story checker warns, never blocks: the user has the final say.
+- Redraw shows two options side by side.
+- After the hackathon: per-player format preferences (read, listen, interact), story-based games, a people-free place tour, and the photo letter.
 
 Open:
 
