@@ -34,7 +34,8 @@ These override any feature request. If a change would break one, stop and flag i
 
 - **Secrets:** the Meta key lives only in `.env` (git-ignored) and is read only by `apps/api`. Never import it into a front-end app, never log it, never commit it.
 - **Meta Model API:** base URL `https://api.meta.ai/v1`, via the `openai` npm SDK. The SDK does not read `MODEL_API_KEY` on its own; always pass `apiKey` explicitly (see `apps/api/src/meta.ts`).
-- **Pick models and reasoning effort through `packages/core/src/models.ts`**, never inline. Simple extraction and tagging run at low effort; story writing runs at high effort. Reasoning tokens are billed.
+- **Pick models and reasoning effort through `packages/core/src/models.ts`**, never inline. Reasoning tokens are billed as output. Story writing defaults to **low** on purpose (Oct 28 test: same pass rate as high at 40% of the cost and half the wait); the validator, revise loop and parent approval are the quality net. Don't raise defaults without a measured comparison (`pnpm compare-effort`). Parents can request a higher-effort rewrite per story from an allow-list (`low`, `medium`, `high`); never expose `xhigh` or `max`.
+- **Never use contributor-mode models** (`*-contributor`). They let Meta train on prompts and responses, which would include families' details.
 - **Schemas first:** any data that crosses an app boundary is defined as a zod schema in `packages/core` and validated at the boundary.
 - **Generation is staged and gated** (confirm Event, approve script, approve cast and set, review pages, compile). Each stage is its own background job with honest progress messages. Edits invalidate only downstream pieces.
 - **Test data only:** never use real children's photos or details in fixtures, demos or commits.

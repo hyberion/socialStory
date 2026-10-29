@@ -78,6 +78,13 @@ Rules:
 - Progress is honest and staged ("Drawing the waiting room, 3 of 6"), results stream in as they finish, and parents can leave and get notified when it's ready.
 - Each stage is its own background job (pg-boss in Postgres) that writes status rows the UI follows.
 
+**Script approval options.** Stories are written at low reasoning by default: in the Oct 28 test, low passed Gray's criteria on the first try at $0.014 and 11 seconds, versus $0.033 and 24 seconds at high, with similar quality. If the parent isn't happy with a script, the approval screen offers:
+
+- **Write it again:** same level, a fresh attempt. Quality varies run to run, so a reroll often fixes it.
+- **Take more care with this one:** high reasoning, with an honest note on the extra wait (about 30 seconds instead of 10).
+
+Parents never see "reasoning effort" or token counts. The API accepts only an allow-list of levels, never xhigh or max. A quality-versus-speed preference for teacher and therapist accounts, with cost shown, is a post-hackathon idea.
+
 ## Decisions and open questions
 
 Decided:
