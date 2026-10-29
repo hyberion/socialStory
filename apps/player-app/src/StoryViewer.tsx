@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
-import { samplePlayer, sampleStory } from "@socialstory/core";
+import type { PublishedKit } from "@socialstory/core";
+import { kitFileUrl } from "./api";
 
 /**
  * The player-facing story reader. Rules it follows (see AGENTS.md):
  * - same layout on every page, big targets, no menus or settings
  * - nothing plays on its own; narration only when the player taps it
  * - no scores, streaks, timers or penalties; back and replay always work
+ * Sensory settings come from the kit, so they match what the user approved.
  */
-export function StoryViewer() {
-  const story = sampleStory;
-  const { sensory } = samplePlayer;
+export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () => void }) {
+  const { sensory } = kit;
   const [index, setIndex] = useState(0);
-  const page = story.pages[index]!;
+  const page = kit.pages[index]!;
   const isFirst = index === 0;
-  const isLast = index === story.pages.length - 1;
+  const isLast = index === kit.pages.length - 1;
 
   const canSpeak = sensory.soundEnabled && "speechSynthesis" in window;
 
@@ -30,10 +31,24 @@ export function StoryViewer() {
 
   return (
     <main className="reader">
-      <h1 className="title">{story.title}</h1>
+      <header className="top">
+        {onHome ? (
+          <button className="nav small" onClick={onHome} aria-label="All my stories">
+            ⌂
+          </button>
+        ) : (
+          <span />
+        )}
+        <h1 className="title">{kit.title}</h1>
+        <span />
+      </header>
 
       <section className="page" aria-live="polite">
-        <div className="picture" aria-hidden="true" />
+        {page.image ? (
+          <img className="picture" src={kitFileUrl(kit.id, page.image)} alt={page.imageAlt ?? ""} />
+        ) : (
+          <div className="picture" aria-hidden="true" />
+        )}
         <div className="words">
           {page.sentences.map((s, i) => (
             <p key={i}>{s.text}</p>
@@ -46,8 +61,8 @@ export function StoryViewer() {
           ←
         </button>
 
-        <div className="dots" aria-label={`Page ${index + 1} of ${story.pages.length}`}>
-          {story.pages.map((_, i) => (
+        <div className="dots" aria-label={`Page ${index + 1} of ${kit.pages.length}`}>
+          {kit.pages.map((_, i) => (
             <span key={i} className={i === index ? "dot on" : "dot"} />
           ))}
         </div>

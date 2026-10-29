@@ -93,6 +93,8 @@ Cost note (for us, not the guide): $0.01 per picture, so about $0.10 for a cast 
 | Write it again | A fresh version. Each attempt comes out a little different, so this often fixes it. Takes about 10 seconds. | Planned |
 | Take more care with this one | The writer spends more time on it. Takes about 30 seconds instead of 10. | Planned |
 
+| Publish | Sends the approved story and pictures to your child's app as one locked copy. Later edits or redraws don't change what your child sees until you publish again. If a page has no picture yet, or its picture was drawn before you changed the words, you'll get a warning, but you can still publish: you have the final say. | Built as a command (`pnpm publish-kit`); the button is planned |
+
 Behind the scenes (worth one sentence in the guide): every story is checked against the Social Story guidelines before you see it, and fixed automatically if it breaks one.
 
 ## What your child sees
@@ -101,11 +103,15 @@ Things users should know about the player app, so nothing surprises them.
 
 | Behavior | Status |
 | --- | --- |
+| A shelf of their stories, as big picture covers. The soonest event comes first. | Built |
+| A home button on every page goes back to the shelf. | Built |
+| If nothing is published yet (or the app can't reach the server and has nothing saved), your child sees "Your stories will be here soon," never an error. | Built |
+| Uses the reading speed and sound settings that were set when you published. | Built |
 | Same layout on every page; buttons never move. | Built |
 | Nothing plays on its own. The read-aloud voice only speaks when your child taps the speaker. | Built |
 | No scores, streaks, timers or "you missed a day." | Built |
 | The last page loops back to the start, so your child can read it again as often as they like. | Built |
-| Can be added to a tablet's home screen and works without internet (after setup). | Planned (needs deployment) |
+| Can be added to a tablet's home screen and works without internet: stories it has opened once are saved on the device. | Built; needs deployment to try on a tablet |
 | Countdown to the day ("2 sleeps until Dr. Patel"). | Planned |
 | Day-of mode: step-by-step cards to use during the event itself. | Planned |
 | Games built from your own photos. | Planned |

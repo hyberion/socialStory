@@ -18,8 +18,8 @@
  * first, so the main folder always shows only the latest run.
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, extname, isAbsolute, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { extname, isAbsolute, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import {
   IMAGE_PRICE,
@@ -33,9 +33,12 @@ import {
   sampleUser,
   worldRulesFor,
   validateStory,
+  pageFingerprint,
   type CastMember,
 } from "@socialstory/core";
 import { generateImage, type ReferenceImage } from "../images.js";
+import { readDrawnFrom, writeDrawnFrom } from "../kits.js";
+import { DATA_DIR } from "../paths.js";
 import { pickEvent, printRequestError } from "./report.js";
 
 const { positionals, values } = parseArgs({
@@ -48,8 +51,7 @@ const { positionals, values } = parseArgs({
 
 const name = positionals[0] ?? "doctor";
 const event = pickEvent(name);
-const here = dirname(fileURLToPath(import.meta.url));
-const dataDir = resolve(here, "../../.data");
+const dataDir = DATA_DIR;
 const storyFile = resolve(dataDir, "stories", `${name}.json`);
 const outDir = resolve(dataDir, "images", name);
 
@@ -174,6 +176,9 @@ for (const member of cast) {
 // ---- 2. Pages ---------------------------------------------------------------
 
 const pageResults: Array<Result & { refs: CastMember[]; skipped?: boolean }> = [];
+// Remember what each picture was drawn from, so publishing can spot pictures
+// whose words changed afterwards.
+const drawnFrom = readDrawnFrom(name, dataDir);
 for (const [i, page] of story.pages.entries()) {
   const number = i + 1;
   const file = `page-${String(number).padStart(2, "0")}.png`;
@@ -189,8 +194,10 @@ for (const [i, page] of story.pages.entries()) {
       refs.map((m) => portraits.get(m.id)!),
     ),
   );
+  if (result.file) drawnFrom.pages[file] = pageFingerprint(page);
   pageResults.push({ ...result, refs });
 }
+writeDrawnFrom(name, drawnFrom, dataDir);
 
 // ---- 3. Contact sheet --------------------------------------------------------
 

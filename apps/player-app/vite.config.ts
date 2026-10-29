@@ -21,6 +21,20 @@ export default defineConfig({
       workbox: {
         // Cache the app shell so it opens in a waiting room with no signal.
         globPatterns: ["**/*.{js,css,html,svg,png,webp}"],
+        // Stories: try the network first so a republished kit shows up,
+        // and fall back to the last copy seen when there's no signal.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith("/api/kits"),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "kits",
+              networkTimeoutSeconds: 4,
+              expiration: { maxEntries: 300 },
+            },
+          },
+        ],
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],

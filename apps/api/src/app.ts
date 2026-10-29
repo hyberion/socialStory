@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 import { sampleStory, validateStory } from "@socialstory/core";
 import { config } from "./config.js";
 import { runTextTask } from "./meta.js";
+import { kitRoutes } from "./kitRoutes.js";
 
 export const app = new Hono().basePath("/api");
 
@@ -21,6 +22,8 @@ app.get("/dev/smoke", async (c) => {
   const result = await runTextTask("smoke", "Say hello in five words.");
   return c.json(result);
 });
+
+app.route("/kits", kitRoutes());
 
 app.onError((err, c) => {
   console.error(err);
