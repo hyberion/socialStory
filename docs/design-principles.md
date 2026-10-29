@@ -85,6 +85,28 @@ Rules:
 
 Parents never see "reasoning effort" or token counts. The API accepts only an allow-list of levels, never xhigh or max. A quality-versus-speed preference for teacher and therapist accounts, with cost shown, is a post-hackathon idea.
 
+## Review and edit pass
+
+The user gets full control of every word and every picture before anything is assembled. AI drafts; the user decides.
+
+**Story (stage 2)**
+
+- Every sentence is editable in place, down to the word.
+- Drag to reorder sentences within a page or move them between pages; drag to reorder pages; add or delete sentences and pages. Reordering is free (no AI).
+- "Rewrite this page" with an optional note ("mention the fish more") rewrites one page, not the whole story. "Write it again" and "Take more care" still apply to the whole story.
+- The checker runs live and shows gentle notes when an edit breaks a rule ("must", the 2:1 ratio, pages out of step order). Open question: warn only, or block?
+- Changing a page's words, or moving a sentence onto it, marks its picture "may not match anymore," with Redraw or Keep.
+
+**Pictures (stage 4) and cast sheet (stage 3)**
+
+- Per picture: Keep, Redraw (fresh attempt), or Fix this with a note ("make Sam face forward"), using Muse Image editing so only the requested change happens.
+- Every version is kept, so the user can flip back. Open question: one new picture per redraw, or two side by side to choose from?
+- The same controls apply to cast portraits; a fixed portrait carries into every later page.
+
+**Approval**
+
+- Each page gets a checkmark. Approved pages are locked, so later redraws never touch them. Publish when everything is checked.
+
 ## Decisions and open questions
 
 Decided:

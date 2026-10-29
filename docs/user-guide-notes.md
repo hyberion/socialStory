@@ -63,6 +63,17 @@ When a user adds an event, the app suggests which photos to take, so they don't 
 - **Tips shown once:** every photo is optional and 3 to 5 is plenty; shoot from your child's eye height; calm everyday shots are fine; avoid other people's faces and ask before photographing staff.
 - **Never suggests photographing the hard part itself** (no needle close-ups).
 
+## Fixing pictures
+
+| Option | In plain words | Status |
+| --- | --- | --- |
+| Keep | This picture is good. | Planned |
+| Redraw | Try a fresh version of this picture. | Planned |
+| Fix this | Describe what's wrong ("make Sam face forward") and only that part changes. | Planned |
+| Earlier versions | Every version is saved, so you can go back if a change makes it worse. | Planned |
+
+If you change a page's words, its picture is marked "may not match anymore" so you can redraw it or keep it.
+
 ## The cast sheet (pictures)
 
 Before drawing any pages, the app draws one portrait of each person (your child, whoever comes along, the people they'll meet) and one drawing of each comfort item. If you added a photo of a comfort item, its drawing is made from that photo. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
@@ -75,8 +86,10 @@ Cost note (for us, not the guide): $0.01 per picture, so about $0.10 for a cast 
 
 | Option | In plain words | Status |
 | --- | --- | --- |
-| Approve | Your child can now see this story. Nothing reaches your child before you approve it. | Planned |
-| Edit | Change any words yourself. | Planned |
+| Approve | Your child can now see this story. Nothing reaches your child before you approve it. Each page gets its own checkmark; approved pages are locked. | Planned |
+| Edit | Change any word yourself, right on the page. | Planned |
+| Reorder | Drag sentences or whole pages into a different order, move a sentence to another page, or add and delete lines. Instant, and free. | Planned |
+| Rewrite this page | Rewrites just one page, with an optional note like "mention the fish more." | Planned |
 | Write it again | A fresh version. Each attempt comes out a little different, so this often fixes it. Takes about 10 seconds. | Planned |
 | Take more care with this one | The writer spends more time on it. Takes about 30 seconds instead of 10. | Planned |
 
