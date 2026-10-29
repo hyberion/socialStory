@@ -23,6 +23,7 @@ export function worldRulesFor(region: Region): string[] {
   const driverSide = region.drivesOn === "right" ? "LEFT" : "RIGHT";
   return [
     `Cars drive on the ${region.drivesOn} side of the road. In any car, the driver sits on the ${driverSide} side with the steering wheel on the ${driverSide.toLowerCase()}.`,
-    "Children ride in the back seat, in a car seat or booster seat. Everyone in a car wears a fastened seatbelt.",
+    "Children ride in the back seat, in a forward-facing car seat or booster seat. Everyone in a car wears a fastened seatbelt.",
+    "Everyone in a car faces the front of the car, the same direction as the driver. Never draw a child sitting backwards; to show a child's face, draw the car from the side or from the front.",
   ];
 }

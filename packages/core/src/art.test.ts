@@ -66,6 +66,8 @@ describe("props and region", () => {
     expect(us).toContain("the driver sits on the LEFT side");
     expect(uk).toContain("the driver sits on the RIGHT side");
     expect(us).toContain("Children ride in the back seat");
+    // Oct 29: Sam was drawn facing backwards so his face pointed at the viewer.
+    expect(us).toContain("Never draw a child sitting backwards");
   });
 
   it("sends the region rules with every page", () => {
