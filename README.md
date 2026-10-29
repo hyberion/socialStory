@@ -66,7 +66,7 @@ Then open:
 | `pnpm smoke` | One Muse Spark call to verify the key |
 | `pnpm write-story [event]` | Writes and validates a story (`--effort` to override) |
 | `pnpm compare-effort [event]` | Same story at several reasoning levels, with costs |
-| `pnpm draw-story [event]` | Illustrates a written story and builds a contact sheet |
+| `pnpm draw-story [event]` | Illustrates a written story and builds a contact sheet. Replaced images move to `history/<date-time>/`. `--pages 2,5` redraws only those pages; `--new-cast` redraws the portraits |
 | `pnpm photo-list [event]` | Shows the photo checklist for an event (free) |
 | `pnpm test` | Unit tests (the story validator lives here) |
 | `pnpm typecheck` | Type-checks every package |
