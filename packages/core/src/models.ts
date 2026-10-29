@@ -31,8 +31,8 @@ export const TEXT_TASKS = {
   /** Event + profile -> Social Story script. The core creative task. */
   writeStory: {
     model: MODEL_IDS.spark,
-    effort: "high",
-    note: "Must satisfy Gray criteria and tone rules; worth the reasoning.",
+    effort: "low",
+    note: "Low passed Gray criteria on the first try at 40% of high's cost (Oct 28 test); validator and revise loop catch misses.",
   },
   /** Rewrite a story that failed validation, given the issues. */
   reviseStory: {
