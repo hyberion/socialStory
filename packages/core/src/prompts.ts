@@ -58,6 +58,7 @@ Scene briefs
 - For every page, write a short sceneBrief: what the picture on that page shows, in one plain sentence, for an illustrator.
 - The picture must match that page's text. If the text says the room can be noisy, do not call it quiet.
 - Show only the child, the listed companions, and the listed people. Never add family members, other children or strangers.
+- The sceneBrief must name, by their exact names, everyone and every comfort item shown, and no one else. Name only who is really there in that moment: the doctor is not in the car, and people the child will meet appear only where the steps say they are.
 - For every page, set inPicture to the cast ids of everyone and every comfort item shown in the picture, using only ids from the picture cast list. Use an empty list for a picture of only a place.
 - Comfort items belong to the child. When the text says the child holds or uses one, the picture shows the child holding or using it, and its id goes in inPicture. Never show a different toy or object in its place.
 - Calm scenes only: no scary faces, needles close up, or crying.`;

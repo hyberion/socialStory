@@ -100,6 +100,7 @@ export const sampleStory: Story = {
     {
       section: "introduction",
       inPicture: ["player"],
+      sceneBrief: "Sam at home in the morning, looking at a calendar.",
       sentences: [
         { text: "On Tuesday morning, I am going to see Dr. Patel.", type: "descriptive" },
         { text: "Dr. Patel is a doctor who helps kids stay healthy.", type: "descriptive" },
@@ -109,6 +110,7 @@ export const sampleStory: Story = {
       section: "body",
       stepId: "s1",
       inPicture: ["player", "c-dad"],
+      sceneBrief: "Dad drives the car and Sam rides in the back seat, toward a building with a blue door.",
       sentences: [
         { text: "Dad and I drive to the building with the blue door.", type: "descriptive" },
       ],
@@ -117,6 +119,7 @@ export const sampleStory: Story = {
       section: "body",
       stepId: "s2",
       inPicture: ["player", "c-dad"],
+      sceneBrief: "Sam and Dad sit together in the waiting room near a fish tank.",
       sentences: [
         { text: "We wait in the waiting room. It can be noisy.", type: "descriptive" },
         { text: "There is a fish tank to look at.", type: "descriptive" },
@@ -128,6 +131,7 @@ export const sampleStory: Story = {
       section: "body",
       stepId: "s3",
       inPicture: ["player", "c-dad", "p-patel", "bear"],
+      sceneBrief: "Dr. Patel talks with Sam, who sits with Dad and holds Bear.",
       sentences: [
         { text: "Dr. Patel gives me a shot in my arm.", type: "descriptive" },
         { text: "The shot pinches for a few seconds.", type: "descriptive" },
@@ -137,6 +141,7 @@ export const sampleStory: Story = {
     {
       section: "conclusion",
       inPicture: ["player", "c-dad"],
+      sceneBrief: "Sam and Dad walk out of the building together.",
       sentences: [
         { text: "Then we go home.", type: "descriptive" },
         { text: "The shot helps my body stay healthy.", type: "descriptive" },

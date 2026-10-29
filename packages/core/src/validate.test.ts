@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { sampleEvent, sampleStory } from "./fixtures.js";
+import { samplePlayer, sampleEvent, sampleStory } from "./fixtures.js";
 import { Event } from "./event.js";
 import { Story, type StoryPage } from "./story.js";
 import { validateStory } from "./validate.js";
+import { castFor } from "./cast.js";
 
 /** Builds a test story from hand-written pages; `inPicture` defaults to empty. */
 function withPages(pages: Array<Omit<StoryPage, "inPicture"> & { inPicture?: string[] }>) {
@@ -88,5 +89,46 @@ describe("validateStory cast check", () => {
     const result = validateStory({ ...sampleStory, pages }, { castIds });
     expect(result.ok).toBe(false);
     expect(result.issues.find((i) => i.code === "unknown-cast")?.page).toBe(1);
+  });
+});
+
+describe("validateStory picture matching", () => {
+  const cast = castFor(sampleEvent, samplePlayer);
+
+  it("accepts the sample story, where every picture matches its description", () => {
+    const result = validateStory(sampleStory, { cast });
+    expect(result.issues.filter((i) => i.code === "picture-mismatch")).toEqual([]);
+  });
+
+  it("rejects Dr. Patel riding in the car when the description doesn't put her there (Oct 29 bug)", () => {
+    const pages = sampleStory.pages.map((p, i) =>
+      i === 1 ? { ...p, inPicture: ["player", "c-dad", "p-patel", "headphones"] } : p,
+    );
+    const issues = validateStory({ ...sampleStory, pages }, { cast }).issues.filter(
+      (i) => i.code === "picture-mismatch",
+    );
+    expect(issues.map((i) => i.message).join(" ")).toContain("Dr. Patel");
+    expect(issues.map((i) => i.message).join(" ")).toContain("headphones");
+    expect(issues.every((i) => i.page === 1)).toBe(true);
+  });
+
+  it("rejects a description that names Bear when Bear isn't in the picture list", () => {
+    const pages = sampleStory.pages.map((p, i) =>
+      i === 2 ? { ...p, sceneBrief: "Sam and Dad wait near the fish tank. Sam holds Bear." } : p,
+    );
+    const issue = validateStory({ ...sampleStory, pages }, { cast }).issues.find(
+      (i) => i.code === "picture-mismatch",
+    );
+    expect(issue?.message).toContain('mentions Bear, but "bear" is not in inPicture');
+  });
+
+  it("matches names whole, so 'Sam' doesn't match 'Samantha'", () => {
+    const pages = sampleStory.pages.map((p, i) =>
+      i === 0 ? { ...p, sceneBrief: "A calendar on Samantha's wall." } : p,
+    );
+    const issue = validateStory({ ...sampleStory, pages }, { cast }).issues.find(
+      (i) => i.code === "picture-mismatch" && i.page === 0,
+    );
+    expect(issue?.message).toContain("Picture lists Sam");
   });
 });

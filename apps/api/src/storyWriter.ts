@@ -79,7 +79,8 @@ export async function writeStory(
   options: { maxRevisions?: number; onProgress?: ProgressMessage } = {},
 ): Promise<WriteStoryResult> {
   const maxRevisions = options.maxRevisions ?? DEFAULT_MAX_REVISIONS;
-  const castIds = castFor(event, player).map((m) => m.id);
+  const cast = castFor(event, player);
+  const castIds = cast.map((m) => m.id);
   const progress = options.onProgress ?? (() => {});
   const attempts: Attempt[] = [];
   let totalUsage: Usage = { inputTokens: 0, outputTokens: 0, reasoningTokens: 0 };
@@ -105,7 +106,7 @@ export async function writeStory(
       };
     } else {
       lastStory = converted.story;
-      validation = validateStory(converted.story, { castIds });
+      validation = validateStory(converted.story, { castIds, cast });
     }
     lastValidation = validation;
     attempts.push({ kind, usage, ok: validation.ok, issues: validation.issues });

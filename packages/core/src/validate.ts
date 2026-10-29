@@ -60,6 +60,17 @@ const SECOND_PERSON = /\byou(r|rs|rself)?\b/i;
 export interface ValidationContext {
   /** Cast ids allowed in pictures (from castFor). When given, pictures can't show anyone else. */
   castIds?: readonly string[];
+  /**
+   * The cast with names (from castFor). When given, each page's picture list
+   * must match its picture description both ways: everyone listed is named
+   * in the description, and everyone named is listed.
+   */
+  cast?: ReadonlyArray<{ id: string; name: string }>;
+}
+
+function mentions(text: string, name: string): boolean {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z])${escaped}([^a-z]|$)`, "i").test(text);
 }
 
 export function validateStory(story: Story, context: ValidationContext = {}): ValidationResult {
@@ -75,6 +86,33 @@ export function validateStory(story: Story, context: ValidationContext = {}): Va
             severity: "error",
             code: "unknown-cast",
             message: `Picture shows "${id}", who is not in the cast. Use only: ${[...allowed].join(", ")}.`,
+            page: pageIndex,
+          });
+        }
+      }
+    });
+  }
+
+  // The picture list and the picture description must agree (Oct 29: a car page
+  // described "Sam and Dad driving" but listed Dr. Patel, so she rode along).
+  if (context.cast) {
+    story.pages.forEach((page, pageIndex) => {
+      const brief = page.sceneBrief ?? "";
+      for (const member of context.cast!) {
+        const listed = page.inPicture.includes(member.id);
+        const named = mentions(brief, member.name);
+        if (listed && !named) {
+          issues.push({
+            severity: "error",
+            code: "picture-mismatch",
+            message: `Picture lists ${member.name} ("${member.id}"), but the picture description doesn't mention them. Remove them from inPicture or describe where they are.`,
+            page: pageIndex,
+          });
+        } else if (named && !listed) {
+          issues.push({
+            severity: "error",
+            code: "picture-mismatch",
+            message: `Picture description mentions ${member.name}, but "${member.id}" is not in inPicture. Add them, or take them out of the description.`,
             page: pageIndex,
           });
         }
