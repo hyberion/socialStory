@@ -5,12 +5,18 @@ import { castFor, validateStory } from "@socialstory/core";
 import { DATA_DIR, imagesDir } from "./paths.js";
 import { draftContext, keepPicture, listDrafts, loadDraft, loadStory, rewritePage, saveDraft, type RewritePage } from "./drafts.js";
 import { publishKit } from "./kits.js";
+import { writeStory, type GenerateDraft } from "./storyWriter.js";
 
 /**
  * The user app's editing routes. `rewrite` is passed in so tests run
  * without a Meta key.
  */
-export function draftRoutes(options: { rewrite: RewritePage; dataDir?: string }) {
+export function draftRoutes(options: {
+  rewrite: RewritePage;
+  /** Story writer for "Write it again" (care=false) and "Take more care" (care=true). */
+  writer: (care: boolean) => GenerateDraft;
+  dataDir?: string;
+}) {
   const dataDir = options.dataDir ?? DATA_DIR;
   const routes = new Hono();
 
@@ -57,6 +63,22 @@ export function draftRoutes(options: { rewrite: RewritePage; dataDir?: string })
       options.rewrite,
     );
     return c.json(page);
+  });
+
+  /**
+   * "Write it again" / "Take more care": a whole new story. The old one goes
+   * to history. Pictures stay on their page numbers and get flagged where
+   * the new picture descriptions differ, so the user decides what to redraw.
+   */
+  routes.post("/:id/regenerate", async (c) => {
+    const id = c.req.param("id");
+    const ctx = draftContext(id);
+    const old = loadStory(id, dataDir);
+    if (!ctx || !old) return c.json({ error: "No story with that id" }, 404);
+    const { care } = (await c.req.json().catch(() => ({}))) as { care?: boolean };
+    const result = await writeStory(ctx.event, ctx.player, options.writer(!!care));
+    saveDraft(id, { story: result.story, origins: result.story.pages.map((_, i) => (i < old.pages.length ? i : null)) }, dataDir);
+    return c.json(loadDraft(id, dataDir));
   });
 
   /** Publishes the saved story. The checker warns but never blocks: the user decides. */

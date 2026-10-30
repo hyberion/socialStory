@@ -74,7 +74,7 @@ describe("saveDraft", () => {
 describe("keepPicture", () => {
   it("marks a picture as fitting the page's new words", () => {
     const { dataDir } = setup();
-    const changed = { ...pages[1]!, sentences: [{ text: "Dad and I ride to the doctor.", type: "descriptive" as const }] };
+    const changed = { ...pages[1]!, sceneBrief: "Sam and Dad wave from beside the blue car." };
     const story = { ...sampleStory, pages: pages.map((p, i) => (i === 1 ? changed : p)) };
     saveDraft("doctor", { story, origins: [0, 1, 2, 3, 4] }, dataDir);
     expect(loadDraft("doctor", dataDir)!.drawnFrom["page-02.png"]).not.toBe(pageFingerprint(changed));
@@ -98,10 +98,26 @@ describe("rewritePage", () => {
   });
 });
 
+/** A writer that returns the sample story with a new title, so the route can be tested without Meta. */
+const fakeWriter = () => async () => ({
+  data: { title: "A fresh version", answers: sampleStory.answers, pages: sampleStory.pages.map((p) => ({ section: p.section, stepId: p.stepId ?? "", sceneBrief: p.sceneBrief ?? "", inPicture: p.inPicture, sentences: p.sentences })) },
+  usage: { inputTokens: 0, outputTokens: 0, reasoningTokens: 0 },
+});
+
 describe("draft routes", () => {
+  it("writes the story again, keeping the old one in history", async () => {
+    const { dataDir, picture } = setup();
+    const app = new Hono().route("/api/drafts", draftRoutes({ rewrite: async () => { throw new Error("unused"); }, writer: fakeWriter, dataDir }));
+    const res = await app.request("/api/drafts/doctor/regenerate", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    expect(res.status).toBe(200);
+    expect(((await res.json()) as { story: { title: string } }).story.title).toBe("A fresh version");
+    expect(picture(1)).toBe("picture of original page 1");
+    expect(readdirSync(join(dataDir, "stories", "history"))).toHaveLength(1);
+  });
+
   it("loads, saves and publishes", async () => {
     const { dataDir } = setup();
-    const app = new Hono().route("/api/drafts", draftRoutes({ rewrite: async () => { throw new Error("unused"); }, dataDir }));
+    const app = new Hono().route("/api/drafts", draftRoutes({ rewrite: async () => { throw new Error("unused"); }, writer: fakeWriter, dataDir }));
     expect(await (await app.request("/api/drafts")).json()).toEqual(["doctor"]);
     const draft = (await (await app.request("/api/drafts/doctor")).json()) as { story: { title: string } };
     expect(draft.story.title).toBe(sampleStory.title);

@@ -4,6 +4,7 @@ import { sampleStory, validateStory } from "@socialstory/core";
 import { config } from "./config.js";
 import { runTextTask } from "./meta.js";
 import { kitRoutes } from "./kitRoutes.js";
+import { makeMetaDraftGenerator } from "./generators.js";
 import { draftRoutes } from "./draftRoutes.js";
 import { runStructuredTask } from "./meta.js";
 import { PageDraft } from "@socialstory/core";
@@ -33,6 +34,8 @@ app.route("/kits", kitRoutes());
 app.route(
   "/drafts",
   draftRoutes({
+    // "Take more care" uses high effort: about 30 seconds instead of 10.
+    writer: (care) => makeMetaDraftGenerator(care ? { effort: "high" } : {}),
     rewrite: async (prompt) =>
       (await runStructuredTask("rewritePage", PageDraft, "story_page", prompt.input, { instructions: prompt.instructions })).data,
   }),

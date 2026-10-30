@@ -148,3 +148,9 @@ input, textarea, select {
 .note-input { flex: 1; min-width: 200px; }
 .handle { user-select: none; -webkit-user-select: none; }
 body.dragging-sentence { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+.title-label { font-size: 0.85rem; color: var(--muted); }
+.toolbar { flex-wrap: wrap; }
+.rewrite-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; padding: 10px; border: 1px solid var(--accent); border-radius: 10px; }
+.small-note { flex-basis: 100%; margin: 0; font-size: 0.85rem; }
+.note p { margin: 0 0 8px; }
+.editor-head .link { justify-self: start; }

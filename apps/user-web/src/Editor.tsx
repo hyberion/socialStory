@@ -21,7 +21,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
   SentenceType,
-  pageFingerprint,
+  pictureOutOfDate,
   validateStory,
   type Issue,
   type StorySection,
@@ -59,6 +59,7 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
   const [busy, setBusy] = useState<string>();
   const [error, setError] = useState<string>();
   const [published, setPublished] = useState<PublishResult>();
+  const [confirmRegenerate, setConfirmRegenerate] = useState<boolean>();
 
   function load(view: DraftView) {
     setDraft(view);
@@ -135,6 +136,15 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
     }
   }
 
+  async function regenerate(care: boolean) {
+    setConfirmRegenerate(undefined);
+    const view = await run(
+      care ? "Writing a new version, taking more care (about 30 seconds)…" : "Writing a new version (about 10 seconds)…",
+      () => api.regenerate(id, care),
+    );
+    if (view) load(view);
+  }
+
   async function publish() {
     if (!(await save())) return;
     const result = await run("Publishing…", () => api.publish(id));
@@ -148,10 +158,11 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
     <main className="page wide">
       <header className="editor-head">
         <button className="link" onClick={onBack}>← All stories</button>
+        <label className="title-label" htmlFor="story-title">Story title ✎</label>
         <input
+          id="story-title"
           className="title-input"
           value={edit.title}
-          aria-label="Story title"
           onChange={(e) => update((s) => ({ ...s, title: e.target.value }))}
         />
         <p className="muted">
@@ -162,10 +173,25 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
 
       <div className="toolbar">
         <span className={dirty ? "status unsaved" : "status"}>{busy ?? (dirty ? "Unsaved changes" : "All changes saved")}</span>
+        <button onClick={() => setConfirmRegenerate(false)} disabled={!!busy}>Write it again</button>
+        <button onClick={() => setConfirmRegenerate(true)} disabled={!!busy}>Take more care</button>
         <button onClick={save} disabled={!dirty || !!busy}>Save</button>
         <button className="primary" onClick={publish} disabled={!!busy}>Publish to the shelf</button>
       </div>
 
+      {confirmRegenerate !== undefined && (
+        <div className="note">
+          <p>
+            {confirmRegenerate
+              ? "Write a whole new story, taking more care (about 30 seconds)."
+              : "Write a whole new story (about 10 seconds)."}{" "}
+            This replaces every page, including your edits. Your current version is kept in history, and the pictures stay
+            until you redraw them.
+          </p>
+          <button className="primary" onClick={() => regenerate(confirmRegenerate)}>Write the new version</button>{" "}
+          <button onClick={() => setConfirmRegenerate(undefined)}>Cancel</button>
+        </div>
+      )}
       {error && <p className="note bad">{error}</p>}
       {published && (
         <div className="note good">
@@ -402,12 +428,13 @@ function PageCard(props: {
   const { id, page, index, count, draft, issues, busy, list, onChange } = props;
   const [note, setNote] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showRewrite, setShowRewrite] = useState(false);
 
   // A page's picture is the one drawn for the saved page it came from.
   const file = page.origin === null ? undefined : pageFile(page.origin);
   const version = file ? draft.pictures[file] : undefined;
   const drawnFor = file ? draft.drawnFrom[file] : undefined;
-  const stale = !!version && !!drawnFor && drawnFor !== pageFingerprint(toPage(page));
+  const stale = !!version && pictureOutOfDate(drawnFor, toPage(page));
 
   return (
     <section className="card page-card">
@@ -421,6 +448,7 @@ function PageCard(props: {
           {(["introduction", "body", "conclusion"] as const).map((s) => <option key={s} value={s}>{SECTION_LABELS[s]}</option>)}
         </select>
         <span className="spacer" />
+        <button className="small" onClick={() => setShowRewrite((v) => !v)} disabled={busy}>✎ Rewrite this page…</button>
         <button className="icon" onClick={() => props.onMove(-1)} disabled={index === 0} aria-label="Move page up">↑</button>
         <button className="icon" onClick={() => props.onMove(1)} disabled={index === count - 1} aria-label="Move page down">↓</button>
         {confirmDelete ? (
@@ -433,6 +461,25 @@ function PageCard(props: {
         )}
       </div>
 
+      {showRewrite && (
+        <div className="rewrite-row">
+          <input
+            className="note-input"
+            autoFocus
+            placeholder='Optional note, e.g. "mention the fish more"'
+            value={note}
+            maxLength={300}
+            onChange={(e) => setNote(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (props.onRewrite(note), setShowRewrite(false))}
+          />
+          <button className="primary" onClick={() => { props.onRewrite(note); setShowRewrite(false); }} disabled={busy}>
+            Rewrite
+          </button>
+          <button onClick={() => setShowRewrite(false)}>Cancel</button>
+          <p className="muted small-note">Only this page changes. About 5 seconds. Your note guides the writer but can't add facts the event doesn't have.</p>
+        </div>
+      )}
+
       <div className="page-body">
         <div className="thumb">
           {version ? (
@@ -442,7 +489,7 @@ function PageCard(props: {
           )}
           {stale && (
             <div className="stale">
-              <span>The words changed since this picture was drawn. It may not match.</span>
+              <span>The picture description or who's in it changed since this was drawn. It may not match.</span>
               <button className="small" onClick={props.onKeep} disabled={busy}>Keep it</button>
             </div>
           )}
@@ -480,15 +527,7 @@ function PageCard(props: {
       {issues.map((i, n) => <p key={n} className="warn">⚠ {i.message}</p>)}
 
       <div className="page-actions">
-        <input
-          className="note-input"
-          placeholder='Optional note, e.g. "mention the fish more"'
-          value={note}
-          maxLength={300}
-          onChange={(e) => setNote(e.target.value)}
-        />
-        <button onClick={() => props.onRewrite(note)} disabled={busy}>Rewrite this page</button>
-        <button className="small" onClick={props.onAddBelow}>+ Page below</button>
+        <button className="small" onClick={props.onAddBelow}>+ Add a page below</button>
       </div>
     </section>
   );

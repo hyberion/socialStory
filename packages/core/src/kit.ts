@@ -80,23 +80,37 @@ export function summarizeKit(kit: PublishedKit): KitSummary {
 export const KIT_FILE_PATTERN = /^(page-\d{2}|cast-[a-z0-9-]+)\.png$/;
 
 /**
- * A short fingerprint of what a page's picture was drawn from: its words,
- * picture description and who's in it. If the fingerprint changes, the
- * picture may no longer match. (FNV-1a; no Node crypto, so it runs in the
- * browser too.)
+ * A short fingerprint of what a page's picture was drawn from: the picture
+ * description and who's in it (the words only when there's no description,
+ * because then the words are what the illustrator saw). If it changes, the
+ * picture may no longer match.
+ *
+ * v2 (Oct 30): v1 also hashed the words, so adding "She is a new person to
+ * me." flagged a picture that still fit. Old v1 values are ignored rather
+ * than flagged. (FNV-1a; no Node crypto, so it runs in the browser too.)
  */
 export function pageFingerprint(page: {
   sentences: Array<{ text: string }>;
   sceneBrief?: string;
   inPicture: string[];
 }): string {
-  const source = JSON.stringify([page.sentences.map((s) => s.text), page.sceneBrief ?? "", [...page.inPicture].sort()]);
+  const drawnFrom = page.sceneBrief?.trim() ? page.sceneBrief.trim() : page.sentences.map((s) => s.text.trim()).join(" ");
+  const source = JSON.stringify([drawnFrom, [...page.inPicture].sort()]);
   let hash = 0x811c9dc5;
   for (let i = 0; i < source.length; i++) {
     hash ^= source.charCodeAt(i);
     hash = Math.imul(hash, 0x01000193) >>> 0;
   }
-  return hash.toString(16).padStart(8, "0");
+  return `v2:${hash.toString(16).padStart(8, "0")}`;
+}
+
+/** True when a picture was drawn for a different picture description or cast than the page has now. */
+export function pictureOutOfDate(
+  drawnFor: string | undefined,
+  page: Parameters<typeof pageFingerprint>[0],
+): boolean {
+  if (!drawnFor?.startsWith("v2:")) return false; // unknown or older format: don't guess
+  return drawnFor !== pageFingerprint(page);
 }
 
 /**

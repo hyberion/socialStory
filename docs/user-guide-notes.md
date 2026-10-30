@@ -95,11 +95,11 @@ Cost note (for us, not the guide): $0.01 per picture, so about $0.10 for a cast 
 | Edit | Change any word yourself, right on the page. You can also change what the picture shows and who's in it. | Built |
 | Reorder | Drag a sentence (⠿) to a new spot, even onto another page. Move whole pages with ↑ ↓. Add or delete sentences and pages. Instant, and free. **Pictures stay with their pages** when pages move; a deleted page's picture is kept in history, never thrown away. | Built |
 | Rewrite this page | Rewrites just one page, with an optional note like "mention the fish more." Takes a few seconds; your other pages aren't touched. The note guides the writer but can't add facts the event doesn't have. | Built |
-| Write it again | A fresh version. Each attempt comes out a little different, so this often fixes it. Takes about 10 seconds. | Planned |
-| Take more care with this one | The writer spends more time on it. Takes about 30 seconds instead of 10. | Planned |
+| Write it again | A whole new story. Each attempt comes out a little different, so this often fixes it. Takes about 10 seconds. Replaces your edits, but the current version is kept in history; pictures stay until you redraw them. | Built |
+| Take more care with this one | Same as Write it again, but the writer spends more time on it. Takes about 30 seconds instead of 10. | Built |
 
 | Story check while you edit | Gentle notes appear as you type when something breaks a Social Story guideline ("must", too many choices compared with describing, a picture list that doesn't match its description). **They warn, never block:** you have the final say. | Built |
-| "This picture may not match" | Appears when you change a page's words after its picture was drawn. **Keep it** if it still fits. (Redraw comes with the picture editor.) | Built (Keep); Redraw planned |
+| "This picture may not match" | Appears when you change what a page's picture shows, or who's in it, after the picture was drawn. Changing only the words doesn't trigger it. **Keep it** if it still fits. (Redraw comes with the picture editor.) | Built (Keep); Redraw planned |
 | Sentence kinds | Each sentence is labeled: **What happens**, **Feelings**, **It's okay**, or **A choice**. The check uses these to keep choices to about one for every two of the others. | Built |
 | Publish | Sends the approved story and pictures to your child's app as one locked copy. Later edits or redraws don't change what your child sees until you publish again. If a page has no picture yet, or its picture was drawn before you changed the words, you'll get a warning, but you can still publish: you have the final say. | Built: the **Publish to the shelf** button (saves first), or `pnpm publish-kit` |
 

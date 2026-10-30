@@ -34,6 +34,8 @@ export const api = {
   keep: (id: string, page: number) => call<DraftView>(`${base(id)}/pages/${page}/keep`, { method: "POST" }),
   rewrite: (id: string, story: Story, page: number, note: string) =>
     call<StoryPage>(`${base(id)}/pages/${page}/rewrite`, { method: "POST", body: JSON.stringify({ story, note }) }),
+  regenerate: (id: string, care: boolean) =>
+    call<DraftView>(`${base(id)}/regenerate`, { method: "POST", body: JSON.stringify({ care }) }),
   publish: (id: string) => call<PublishResult>(`${base(id)}/publish`, { method: "POST" }),
   imageUrl: (id: string, file: string, version?: number) =>
     `${base(id)}/images/${file}${version ? `?v=${version}` : ""}`,

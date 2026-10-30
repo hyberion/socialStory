@@ -48,10 +48,10 @@ describe("publishKit", () => {
     expect(warnings.map((w) => w.page)).toEqual([2, 3, 4]);
   });
 
-  it("warns when a page's words changed after its picture was drawn", () => {
+  it("warns when a page's picture description changed after its picture was drawn", () => {
     const dataDir = setup([1, 2, 3, 4, 5]);
     const pages = sampleStory.pages.map((p, i) =>
-      i === 1 ? { ...p, sentences: [{ text: "We ride the bus.", type: "descriptive" as const }] } : p,
+      i === 1 ? { ...p, sceneBrief: "Sam and Dad wait at the bus stop." } : i === 2 ? { ...p, sentences: [...p.sentences, { text: "She is a new person to me.", type: "descriptive" as const }] } : p,
     );
     const { warnings } = publish(dataDir, { ...sampleStory, pages });
     expect(warnings).toHaveLength(1);

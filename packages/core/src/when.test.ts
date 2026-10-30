@@ -22,3 +22,20 @@ describe("when", () => {
     expect(daysInMonth(2028, 2)).toBe(29);
   });
 });
+
+import { pageFingerprint, pictureOutOfDate } from "./kit.js";
+
+describe("pictureOutOfDate (Oct 30: added words flagged every picture)", () => {
+  const page = { sentences: [{ text: "We wait." }], sceneBrief: "Sam waits by the fish tank.", inPicture: ["player"] };
+  const drawn = pageFingerprint(page);
+  it("ignores word changes when the picture description is the same", () => {
+    expect(pictureOutOfDate(drawn, { ...page, sentences: [{ text: "We wait." }, { text: "She is a new person to me." }] })).toBe(false);
+  });
+  it("flags a changed description or cast", () => {
+    expect(pictureOutOfDate(drawn, { ...page, sceneBrief: "Sam waits outside." })).toBe(true);
+    expect(pictureOutOfDate(drawn, { ...page, inPicture: ["player", "c-dad"] })).toBe(true);
+  });
+  it("doesn't guess about old-format fingerprints", () => {
+    expect(pictureOutOfDate("1a60ea38", page)).toBe(false);
+  });
+});

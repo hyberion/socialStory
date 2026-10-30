@@ -5,7 +5,7 @@ import {
   PublishedKit,
   castFor,
   castIntro,
-  pageFingerprint,
+  pictureOutOfDate,
   summarizeKit,
   type Event,
   type KitSummary,
@@ -63,10 +63,10 @@ export function publishKit(
     const hasImage = existsSync(resolve(sourceDir, file));
     if (!hasImage) {
       warnings.push({ page: i, message: `Page ${i + 1} has no picture yet; it will show words only.` });
-    } else if (drawn.pages[file] && drawn.pages[file] !== pageFingerprint(page)) {
+    } else if (pictureOutOfDate(drawn.pages[file], page)) {
       warnings.push({
         page: i,
-        message: `Page ${i + 1}'s picture was drawn for different words. Redraw it (draw-story --pages ${i + 1}) or keep it.`,
+        message: `Page ${i + 1}'s picture was drawn for a different picture description. Redraw it (draw-story --pages ${i + 1}) or keep it.`,
       });
     }
     return {
