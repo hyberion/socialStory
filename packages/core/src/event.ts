@@ -95,6 +95,22 @@ export const Reflection = z.object({
 });
 export type Reflection = z.infer<typeof Reflection>;
 
+/**
+ * How the player gets there. Pictures show vehicles from the outside only
+ * (Oct 29: four rules later, the model still couldn't draw a car interior
+ * correctly), so the look matters: it becomes a cast member with its own
+ * reference drawing.
+ */
+export const Transport = z.object({
+  mode: z.enum(["car", "bus", "train", "walk", "other"]),
+  /** What the story and pictures call it, used exactly: "the blue car". */
+  name: z.string().min(1),
+  /** "a small light blue hatchback". Keeps it looking the same on every page. */
+  appearance: z.string().optional(),
+  photo: PhotoRef.optional(),
+});
+export type Transport = z.infer<typeof Transport>;
+
 export const Event = z.object({
   id: z.string(),
   playerId: z.string(),
@@ -111,6 +127,8 @@ export const Event = z.object({
   /** People the player will meet there: the doctor, the barber, the teacher. */
   people: z.array(Person).default([]),
   places: z.array(Place).default([]),
+  /** How the player gets there. Optional; "walk" adds nothing to the pictures. */
+  transport: Transport.optional(),
   steps: z.array(Step).min(1),
   hardParts: z.array(HardPart).default([]),
   /** Comfort items for this event (merged with the player's standing comforts). */

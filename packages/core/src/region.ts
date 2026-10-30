@@ -22,8 +22,10 @@ export type UserSettings = z.infer<typeof UserSettings>;
 export function worldRulesFor(region: Region): string[] {
   const driverSide = region.drivesOn === "right" ? "LEFT" : "RIGHT";
   return [
-    `Cars drive on the ${region.drivesOn} side of the road. In any car, the driver sits on the ${driverSide} side with the steering wheel on the ${driverSide.toLowerCase()}.`,
-    "Children ride in the back seat, in a forward-facing car seat or booster seat. Everyone in a car wears a fastened seatbelt.",
-    "Everyone in a car faces the front of the car, the same direction as the driver. Never draw a child sitting backwards; to show a child's face, draw the car from the side or from the front.",
+    // Oct 29: after four seating rules the model still put the booster on the
+    // middle divider and dropped the passenger seat. So we never draw inside.
+    "Never draw the inside of a car, bus or other vehicle. Show vehicles only from the outside: people walking to it, standing beside it, or the vehicle on the road or parked.",
+    `Cars drive on the ${region.drivesOn} side of the road. The steering wheel is on the ${driverSide.toLowerCase()} side of the car (the driver's door is on the ${driverSide} side).`,
+    "Children get into the back seat of a car, never the front.",
   ];
 }

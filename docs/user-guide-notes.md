@@ -34,7 +34,7 @@ One profile per player (child). Every setting can be changed at any time; nothin
 | --- | --- | --- | --- | --- |
 | Where you live | Country, and which side of the road cars drive on | US (drive on the right) | So pictures match your child's world: in the US the driver sits on the left; in the UK, Australia or Japan, on the right. | Built (pictures) |
 
-Pictures also always show children in the back seat, in a car seat or booster, with seatbelts on.
+Pictures never show the inside of a car or bus. Travel is shown from outside: walking to the car, standing beside it, or the car on the road or parked at the place. (AI pictures of car interiors kept getting the seats wrong, and a wrong picture is worse than none.) The story's words can still say "we drive."
 
 ## Event details
 
@@ -48,6 +48,7 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 | Coming with your child | Who goes along (Dad, Grandma, a teacher), and what they look like. | The story names them ("Dad and I drive..."). **If you leave this empty, the story talks only about your child** and won't guess. | Built |
 | People they'll meet | Name, role, photo, what they look like, and up to 3 friendly true facts ("has a fish tank"). | Makes the person familiar before the day. The "looks like" line keeps them consistent in every picture. | Built (photos planned) |
 | Places | Name, photos, and what it's like: noisy, bright, smells like soap. | Sensory notes let the story describe it honestly. | Built (photos planned) |
+| Getting there | How your child travels (car, bus, train, walking), what you call it ("the blue car") and what it looks like. | Your car gets its own reference drawing, so it's the same car on every page. Pictures show it from outside only. | Built |
 | Steps | What happens, in order, from leaving home to coming back. | Each step becomes a page. | Built |
 | "This step will happen no matter what" | A checkbox on a step (the shot, the haircut). | The story says so honestly, then offers your child real choices around it. It won't pretend a fixed thing is optional. | Built (stories) |
 | Hard parts | What you expect to be tough: waiting, the shot, clippers. | The story describes these plainly and gives your child at least one option they control. | Built (stories) |

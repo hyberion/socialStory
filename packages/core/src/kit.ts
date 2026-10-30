@@ -70,7 +70,7 @@ export function summarizeKit(kit: PublishedKit): KitSummary {
     eventStartsAt: kit.eventStartsAt,
     publishedAt: kit.publishedAt,
     cover: kit.pages.find((p) => p.image)?.image,
-    portraits: kit.cast.filter((m) => m.portrait).length,
+    portraits: kit.cast.filter((m) => m.portrait && m.id !== "transport").length,
   };
 }
 
@@ -109,6 +109,9 @@ export function castIntro(
 ): string {
   const me = player.perspective === "first" ? "me" : player.displayName;
   if (member.id === "player") return player.perspective === "first" ? `This is me, ${member.name}!` : `This is ${member.name}!`;
+  if (member.id === "transport") {
+    return `${member.name.charAt(0).toUpperCase()}${member.name.slice(1)} takes ${me} there.`;
+  }
   if (member.kind === "prop") return `${member.name} can come with ${me}.`;
   if (companionIds.includes(member.id)) return `${member.name} is coming with ${me}.`;
   const role = member.role.trim();

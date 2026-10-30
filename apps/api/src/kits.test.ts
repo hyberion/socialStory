@@ -60,7 +60,7 @@ describe("publishKit", () => {
 describe("kit cast", () => {
   it("includes everyone, with portraits where they were drawn", () => {
     const { kit, dir } = publish(setup([1], ["player", "p-patel"]));
-    expect(kit.cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "bear", "headphones"]);
+    expect(kit.cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "bear", "headphones", "transport"]);
     const patel = kit.cast.find((m) => m.id === "p-patel")!;
     expect(patel.portrait).toBe("cast-p-patel.png");
     expect(patel.intro).toBe("Dr. Patel is the doctor.");
@@ -68,6 +68,7 @@ describe("kit cast", () => {
     expect(kit.cast.find((m) => m.id === "c-dad")?.portrait).toBeUndefined();
     expect(kit.cast.find((m) => m.id === "c-dad")?.intro).toBe("Dad is coming with me.");
     expect(kit.cast.find((m) => m.id === "bear")?.intro).toBe("Bear can come with me.");
+    expect(kit.cast.find((m) => m.id === "transport")?.intro).toBe("The blue car takes me there.");
     expect(existsSync(join(dir, "cast-p-patel.png"))).toBe(true);
   });
 });

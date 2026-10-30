@@ -20,6 +20,8 @@ export interface CastMember {
 
 /** The player's cast id. Always present. */
 export const PLAYER_CAST_ID = "player";
+/** The vehicle's cast id, when the event says how the player gets there. */
+export const TRANSPORT_CAST_ID = "transport";
 
 /** The player's standing comfort items plus this event's, without duplicates (by id). */
 export function comfortsFor(event: Event, player: PlayerProfile): ComfortItem[] {
@@ -55,5 +57,17 @@ export function castFor(event: Event, player: PlayerProfile): CastMember[] {
       appearance: item.appearance,
       photo: item.photo,
     })),
+    ...(event.transport && event.transport.mode !== "walk"
+      ? [
+          {
+            id: TRANSPORT_CAST_ID,
+            kind: "prop" as const,
+            name: event.transport.name,
+            role: "how the child gets there (shown from outside only)",
+            appearance: event.transport.appearance,
+            photo: event.transport.photo,
+          },
+        ]
+      : []),
   ];
 }

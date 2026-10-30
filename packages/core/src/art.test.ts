@@ -8,7 +8,7 @@ const cast = castFor(sampleEvent, samplePlayer);
 
 describe("castFor", () => {
   it("lists the player, companions, people and comfort items, in that order", () => {
-    expect(cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "bear", "headphones"]);
+    expect(cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "bear", "headphones", "transport"]);
     expect(cast[0]!.name).toBe("Sam");
   });
 });
@@ -63,17 +63,18 @@ describe("props and region", () => {
   it("puts the driver on the left in the US and on the right in the UK", () => {
     const us = worldRulesFor({ country: "US", drivesOn: "right" }).join(" ");
     const uk = worldRulesFor({ country: "GB", drivesOn: "left" }).join(" ");
-    expect(us).toContain("the driver sits on the LEFT side");
-    expect(uk).toContain("the driver sits on the RIGHT side");
-    expect(us).toContain("Children ride in the back seat");
-    // Oct 29: Sam was drawn facing backwards so his face pointed at the viewer.
-    expect(us).toContain("Never draw a child sitting backwards");
+    expect(us).toContain("steering wheel is on the left");
+    expect(uk).toContain("steering wheel is on the right");
+    expect(us).toContain("back seat of a car, never the front");
+    // Oct 29: car interiors kept coming out wrong (backwards child, booster on
+    // the divider, no passenger seat), so pictures stay outside vehicles.
+    expect(us).toContain("Never draw the inside of a car");
   });
 
   it("sends the region rules with every page", () => {
     const page = sampleStory.pages[1]!;
     const prompt = buildPagePrompt(page, castOnPage(page, cast), worldRulesFor(sampleUser.region));
     expect(prompt).toContain("Real-world details:");
-    expect(prompt).toContain("steering wheel on the left");
+    expect(prompt).toContain("steering wheel is on the left");
   });
 });

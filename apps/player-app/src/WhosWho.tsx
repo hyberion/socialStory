@@ -24,11 +24,13 @@ function choicesFor(member: KitCastMember, cast: KitCastMember[], round: number)
  * same calm way, with a friendly fact. Sound only from the speaker button.
  */
 export function WhosWho({ kit, onHome }: { kit: PublishedKit; onHome: () => void }) {
-  const players = useMemo(() => kit.cast.filter((m) => m.portrait), [kit]);
+  // "Who is this?" doesn't fit the car, so it sits this game out.
+  const answerable = useMemo(() => kit.cast.filter((m) => m.id !== "transport"), [kit]);
+  const players = useMemo(() => answerable.filter((m) => m.portrait), [answerable]);
   const [index, setIndex] = useState(0);
   const [tapped, setTapped] = useState<string | undefined>();
   const member = players[index]!;
-  const choices = useMemo(() => choicesFor(member, kit.cast, index), [member, kit.cast, index]);
+  const choices = useMemo(() => choicesFor(member, answerable, index), [member, answerable, index]);
   const revealed = tapped !== undefined;
   const isLast = index === players.length - 1;
   const canSpeak = kit.sensory.soundEnabled && "speechSynthesis" in window;

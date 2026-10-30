@@ -78,7 +78,7 @@ describe("validateStory", () => {
 });
 
 describe("validateStory cast check", () => {
-  const castIds = ["player", "c-dad", "p-patel", "bear", "headphones"];
+  const castIds = ["player", "c-dad", "p-patel", "bear", "headphones", "transport"];
 
   it("accepts pictures that show only listed people", () => {
     expect(validateStory(sampleStory, { castIds }).ok).toBe(true);
@@ -120,6 +120,19 @@ describe("validateStory picture matching", () => {
       (i) => i.code === "picture-mismatch",
     );
     expect(issue?.message).toContain('mentions Bear, but "bear" is not in inPicture');
+  });
+
+  it("rejects pictures set inside a vehicle, but allows the car from outside (Oct 29)", () => {
+    const at = (brief: string) =>
+      validateStory(
+        { ...sampleStory, pages: sampleStory.pages.map((p, i) => (i === 1 ? { ...p, sceneBrief: brief } : p)) },
+        {},
+      ).issues.filter((i) => i.code === "vehicle-inside");
+    expect(at("Dad drives the car and Sam rides in the back seat.")).toHaveLength(1);
+    expect(at("Sam sits inside the blue car with Bear.")).toHaveLength(1);
+    expect(at("Sam and Dad walk to the blue car, parked on a quiet street.")).toEqual([]);
+    expect(at("The blue car is parked outside the building with the blue door.")).toEqual([]);
+    expect(at("Sam and Dad sit in the waiting room.")).toEqual([]);
   });
 
   it("matches names whole, so 'Sam' doesn't match 'Samantha'", () => {

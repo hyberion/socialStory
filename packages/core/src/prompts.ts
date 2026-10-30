@@ -61,6 +61,8 @@ Scene briefs
 - The sceneBrief must name, by their exact names, everyone and every comfort item shown, and no one else. Name only who is really there in that moment: the doctor is not in the car, and people the child will meet appear only where the steps say they are.
 - For every page, set inPicture to the cast ids of everyone and every comfort item shown in the picture, using only ids from the picture cast list. Use an empty list for a picture of only a place.
 - Comfort items belong to the child. When the text says the child holds or uses one, the picture shows the child holding or using it, and its id goes in inPicture. Never show a different toy or object in its place.
+- Never set a picture inside a car, bus or other vehicle. Show travel from the outside: walking to the vehicle, standing beside it, or the vehicle on the road or parked at the place. The text can still say "we drive"; only the picture stays outside.
+- If the vehicle is in the picture, name it by its exact cast name and put its id in inPicture.
 - Calm scenes only: no scary faces, needles close up, or crying.`;
 
 function formatEvent(event: Event, player: PlayerProfile): string {
@@ -104,6 +106,8 @@ function formatEvent(event: Event, player: PlayerProfile): string {
         : "";
       return `- stepId "${s.id}": ${s.description}${where}${who}${s.fixed ? " (FIXED)" : ""}`;
     }),
+    "",
+    event.transport ? `Getting there: ${event.transport.mode}, called "${event.transport.name}"` : null,
     "",
     "Hard parts to expect:",
     ...(event.hardParts.length ? event.hardParts.map((h) => `- ${h.description}`) : ["- none listed"]),

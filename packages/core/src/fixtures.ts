@@ -65,6 +65,8 @@ export const sampleEvent: Event = {
       sensoryNotes: ["the waiting room can be noisy"],
     },
   ],
+  // Brad: describe the car however you like; it gets its own reference drawing.
+  transport: { mode: "car", name: "the blue car", appearance: "a small light blue hatchback car" },
   steps: [
     { id: "s1", description: "We drive to the building with the blue door.", personIds: [], fixed: false },
     { id: "s2", description: "We wait in the waiting room.", placeId: "pl-office", personIds: [], fixed: false },
@@ -109,8 +111,8 @@ export const sampleStory: Story = {
     {
       section: "body",
       stepId: "s1",
-      inPicture: ["player", "c-dad"],
-      sceneBrief: "Dad drives the car and Sam rides in the back seat, toward a building with a blue door.",
+      inPicture: ["player", "c-dad", "transport"],
+      sceneBrief: "Sam and Dad walk to the blue car, parked on a quiet street.",
       sentences: [
         { text: "Dad and I drive to the building with the blue door.", type: "descriptive" },
       ],

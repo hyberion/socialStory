@@ -68,6 +68,9 @@ export interface ValidationContext {
   cast?: ReadonlyArray<{ id: string; name: string }>;
 }
 
+const VEHICLE_INSIDE =
+  /\b(inside|in|into|within)\s+(the|a|an|our|his|her|their|dad's|mom's)?\s*(\w+\s+)?(car|bus|van|truck|taxi|train|vehicle)\b|\b(back|front|passenger|driver's|car)\s+seat\b|\b(drives|driving|rides|riding|sits|sitting)\b[^.]*\b(car|bus|van|taxi)\b/i;
+
 function mentions(text: string, name: string): boolean {
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(`(^|[^a-z])${escaped}([^a-z]|$)`, "i").test(text);
@@ -119,6 +122,19 @@ export function validateStory(story: Story, context: ValidationContext = {}): Va
       }
     });
   }
+
+  // Pictures never go inside a vehicle (the model can't draw car interiors).
+  story.pages.forEach((page, pageIndex) => {
+    if (VEHICLE_INSIDE.test(page.sceneBrief ?? "")) {
+      issues.push({
+        severity: "error",
+        code: "vehicle-inside",
+        message:
+          "The picture is set inside a vehicle. Show it from outside instead: walking to it, standing beside it, or the vehicle on the road or parked.",
+        page: pageIndex,
+      });
+    }
+  });
 
   // Criterion 3: title + introduction + body + conclusion.
   const sections = new Set<StorySection>(story.pages.map((p) => p.section));
