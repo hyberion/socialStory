@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { PublishedKit } from "@socialstory/core";
+import { dateWords, timeWords, wallClock } from "@socialstory/core";
 import { kitFileUrl } from "./api";
+import { TimeCard } from "./TimeCard";
 
 /**
  * The player-facing story reader. Rules it follows (see AGENTS.md):
@@ -24,7 +26,9 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
   function readAloud() {
     if (!canSpeak) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(page.sentences.map((s) => s.text).join(" "));
+    const t = page.when ? wallClock(page.when) : undefined;
+    const when = t ? [`${dateWords(t)}.`, `${timeWords(t)}.`] : [];
+    const utterance = new SpeechSynthesisUtterance([...page.sentences.map((s) => s.text), ...when].join(" "));
     utterance.rate = sensory.narrationRate;
     window.speechSynthesis.speak(utterance);
   }
@@ -44,11 +48,14 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
       </header>
 
       <section className="page" aria-live="polite">
-        {page.image ? (
-          <img className="picture" src={kitFileUrl(kit.id, page.image)} alt={page.imageAlt ?? ""} />
-        ) : (
-          <div className="picture" aria-hidden="true" />
-        )}
+        <div className={page.when ? "lead with-time" : "lead"}>
+          {page.image ? (
+            <img className="picture" src={kitFileUrl(kit.id, page.image)} alt={page.imageAlt ?? ""} />
+          ) : (
+            <div className="picture" aria-hidden="true" />
+          )}
+          {page.when && <TimeCard when={page.when} />}
+        </div>
         <div className="words">
           {page.sentences.map((s, i) => (
             <p key={i}>{s.text}</p>

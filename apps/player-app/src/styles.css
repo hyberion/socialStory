@@ -256,3 +256,65 @@ img.picture {
 .nav-spacer {
   min-width: 72px;
 }
+
+/* ---- Calendar and clock (page 1) ---- */
+
+.lead {
+  display: grid;
+  justify-items: center;
+}
+
+.lead.with-time {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.lead.with-time .picture {
+  width: 100%;
+  max-height: 42dvh;
+}
+
+.time-card {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+
+.time-pictures {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.calendar {
+  width: min(100%, 180px);
+}
+
+.clock {
+  width: min(100%, 120px);
+}
+
+.time-card figcaption {
+  display: grid;
+  gap: 2px;
+}
+
+.time-date {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.time-time {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .lead.with-time {
+    grid-template-columns: 1fr;
+  }
+}

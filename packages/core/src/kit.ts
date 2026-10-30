@@ -18,6 +18,8 @@ export const KitPage = z.object({
   image: z.string().optional(),
   /** Plain description of the picture, for screen readers. */
   imageAlt: z.string().optional(),
+  /** When set, the player shows a calendar with this date circled and a clock at this time (ISO). */
+  when: z.string().optional(),
 });
 export type KitPage = z.infer<typeof KitPage>;
 

@@ -137,7 +137,7 @@ describe("validateStory picture matching", () => {
 
   it("matches names whole, so 'Sam' doesn't match 'Samantha'", () => {
     const pages = sampleStory.pages.map((p, i) =>
-      i === 0 ? { ...p, sceneBrief: "A calendar on Samantha's wall." } : p,
+      i === 0 ? { ...p, inPicture: ["player"], sceneBrief: "A calendar on Samantha's wall." } : p,
     );
     const issue = validateStory({ ...sampleStory, pages }, { cast }).issues.find(
       (i) => i.code === "picture-mismatch" && i.page === 0,

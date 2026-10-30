@@ -112,6 +112,7 @@ Things users should know about the player app, so nothing surprises them.
 | A home button on every page goes back to the shelf. | Built |
 | If nothing is published yet (or the app can't reach the server and has nothing saved), your child sees "Your stories will be here soon," never an error. | Built |
 | Uses the reading speed and sound settings that were set when you published. | Built |
+| The first page shows who the visit is with (Dr. Patel, on her own), next to a calendar with the day circled, a clock showing the time, and the date and time written out ("Tuesday, November 3, 10:00 in the morning"). The calendar and clock are drawn by the app, not the AI, so they're always exactly right. The read-aloud voice says the date and time too. | Built |
 | Same layout on every page; buttons never move. | Built |
 | Nothing plays on its own. The read-aloud voice only speaks when your child taps the speaker. | Built |
 | No scores, streaks, timers or "you missed a day." | Built |

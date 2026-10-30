@@ -74,6 +74,8 @@ export function publishKit(
       sentences: page.sentences,
       image: hasImage ? file : undefined,
       imageAlt: page.sceneBrief,
+      // The introduction answers "when", so it carries the calendar and clock.
+      when: i === 0 ? event.startsAt : undefined,
     };
   });
 

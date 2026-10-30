@@ -101,8 +101,8 @@ export const sampleStory: Story = {
   pages: [
     {
       section: "introduction",
-      inPicture: ["player"],
-      sceneBrief: "Sam at home in the morning, looking at a calendar.",
+      inPicture: ["p-patel"],
+      sceneBrief: "Dr. Patel smiles in her office.",
       sentences: [
         { text: "On Tuesday morning, I am going to see Dr. Patel.", type: "descriptive" },
         { text: "Dr. Patel is a doctor who helps kids stay healthy.", type: "descriptive" },

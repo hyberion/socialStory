@@ -55,6 +55,7 @@ Voice and honesty
 - Do not write in second person ("you"). Use the perspective given below.
 
 Scene briefs
+- Page 1 (the introduction) shows who the event is with: the first person the child will meet, alone, calm and friendly, at their place (for example Dr. Patel in her office). Do not show the child or companions on page 1. If no people are listed, page 1 shows the place. The app adds a calendar and clock beside this picture, so do not draw them.
 - For every page, write a short sceneBrief: what the picture on that page shows, in one plain sentence, for an illustrator.
 - The picture must match that page's text. If the text says the room can be noisy, do not call it quiet.
 - Show only the child, the listed companions, and the listed people. Never add family members, other children or strangers.

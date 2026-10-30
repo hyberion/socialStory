@@ -34,6 +34,8 @@ describe("publishKit", () => {
     expect(warnings).toEqual([]);
     expect(kit.pages).toHaveLength(sampleStory.pages.length);
     expect(kit.pages[0]?.image).toBe("page-01.png");
+    expect(kit.pages[0]?.when).toBe(sampleEvent.startsAt);
+    expect(kit.pages[1]?.when).toBeUndefined();
     expect(kit.sensory).toEqual(samplePlayer.sensory);
     expect(loadKit("doctor", dataDir)?.title).toBe(sampleStory.title);
     expect(listKits(dataDir).map((k) => k.cover)).toEqual(["page-01.png"]);
