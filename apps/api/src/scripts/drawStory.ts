@@ -26,6 +26,7 @@ import {
   Story,
   buildCastPortraitPrompt,
   buildPagePrompt,
+  pageSetting,
   castFor,
   castOnPage,
   formatDollars,
@@ -190,7 +191,7 @@ for (const [i, page] of story.pages.entries()) {
   const result = await draw(`page ${number} of ${story.pages.length}`, file, () =>
     generateImage(
       "page",
-      buildPagePrompt(page, refs, worldRules),
+      buildPagePrompt(page, refs, worldRules, pageSetting(page, event)),
       refs.map((m) => portraits.get(m.id)!),
     ),
   );

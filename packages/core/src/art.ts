@@ -1,3 +1,4 @@
+import type { Event } from "./event.js";
 import type { CastMember } from "./cast.js";
 import type { StoryPage } from "./story.js";
 
@@ -58,11 +59,29 @@ export function buildCastPortraitPrompt(member: CastMember, options: { fromPhoto
  * portraits are attached, in the same order as the attached images.
  * `worldRules` come from the user's region (see worldRulesFor).
  */
-export function buildPagePrompt(page: StoryPage, references: CastMember[], worldRules: string[] = []): string {
+/**
+ * Where a page happens, from its step: "Inside Dr. Patel's office. We wait in
+ * the waiting room." Oct 29: the waiting page came out outdoors because the
+ * picture prompt never said where it was.
+ */
+export function pageSetting(page: StoryPage, event: Event): string | undefined {
+  const step = page.stepId ? event.steps.find((s) => s.id === page.stepId) : undefined;
+  if (!step) return undefined;
+  const place = step.placeId ? event.places.find((p) => p.id === step.placeId) : undefined;
+  return place ? `Indoors, inside ${place.name}. This moment: ${step.description}` : undefined;
+}
+
+export function buildPagePrompt(
+  page: StoryPage,
+  references: CastMember[],
+  worldRules: string[] = [],
+  setting?: string,
+): string {
   const scene = page.sceneBrief ?? page.sentences.map((s) => s.text).join(" ");
   const people = references.filter((m) => m.kind === "person");
   const props = references.filter((m) => m.kind === "prop");
   const lines = [`Illustrate this scene for one page of a children's story: ${scene}`];
+  if (setting) lines.push(`Setting: ${setting} Draw the scene there, not outside.`);
 
   if (references.length) {
     lines.push(

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { samplePlayer, sampleEvent, sampleStory, sampleUser } from "./fixtures.js";
 import { castFor } from "./cast.js";
-import { buildCastPortraitPrompt, buildPagePrompt, castOnPage } from "./art.js";
+import { buildCastPortraitPrompt, buildPagePrompt, castOnPage, pageSetting } from "./art.js";
 import { worldRulesFor } from "./region.js";
 
 const cast = castFor(sampleEvent, samplePlayer);
@@ -69,6 +69,15 @@ describe("props and region", () => {
     // Oct 29: car interiors kept coming out wrong (backwards child, booster on
     // the divider, no passenger seat), so pictures stay outside vehicles.
     expect(us).toContain("Never draw the inside of a car");
+  });
+
+  it("tells the illustrator where a page happens (Oct 29: waiting room drawn outdoors)", () => {
+    const waiting = sampleStory.pages[2]!;
+    const setting = pageSetting(waiting, sampleEvent);
+    expect(setting).toBe("Indoors, inside Dr. Patel's office. This moment: We wait in the waiting room.");
+    expect(buildPagePrompt(waiting, [], [], setting)).toContain("Setting: Indoors, inside Dr. Patel's office.");
+    // The car page has no place, so no indoor setting.
+    expect(pageSetting(sampleStory.pages[1]!, sampleEvent)).toBeUndefined();
   });
 
   it("sends the region rules with every page", () => {
