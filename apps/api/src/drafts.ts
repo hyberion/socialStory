@@ -9,8 +9,10 @@ import {
   pageFingerprint,
   sampleEvents,
   samplePlayer,
+  type DetailLevel,
   type Event,
   type PlayerProfile,
+  type ReadingLevel,
   type StoryPage,
 } from "@socialstory/core";
 import { pageFile, readDrawnFrom, writeDrawnFrom } from "./kits.js";
@@ -58,6 +60,7 @@ export interface DraftView {
   id: string;
   story: Story;
   event: { title: string; startsAt: string };
+  player: { name: string; readingLevel: ReadingLevel; detailLevel: DetailLevel };
   cast: Array<{ id: string; name: string; kind: "person" | "prop" }>;
   /** Picture file -> last-modified time (for cache-busting URLs). */
   pictures: Record<string, number>;
@@ -80,6 +83,7 @@ export function loadDraft(id: string, dataDir = DATA_DIR): DraftView | undefined
     id,
     story,
     event: { title: ctx.event.title, startsAt: ctx.event.startsAt },
+    player: { name: ctx.player.displayName, readingLevel: ctx.player.readingLevel, detailLevel: ctx.player.detailLevel },
     cast: castFor(ctx.event, ctx.player).map((m) => ({ id: m.id, name: m.name, kind: m.kind })),
     pictures,
     drawnFrom: readDrawnFrom(id, dataDir).pages,

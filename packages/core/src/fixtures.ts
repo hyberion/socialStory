@@ -12,6 +12,7 @@ export const samplePlayer: PlayerProfile = {
   id: "player-sam",
   displayName: "Sam",
   readingLevel: "early-reader",
+  detailLevel: "standard",
   artStyle: "hybrid",
   perspective: "first",
   sensory: { soundEnabled: true, narrationRate: 0.9, reduceMotion: true },
@@ -167,7 +168,7 @@ export const sampleStory: Story = {
       inPicture: ["player", "c-dad", "transport"],
       sceneBrief: "Sam and Dad walk to the blue car, parked on a quiet street.",
       sentences: [
-        { text: "Dad and I drive to the building with the blue door.", type: "descriptive" },
+        { text: "Dad and I drive to the blue door.", type: "descriptive" },
       ],
     },
     {
@@ -176,8 +177,7 @@ export const sampleStory: Story = {
       inPicture: ["player", "c-dad"],
       sceneBrief: "Sam and Dad sit together in the waiting room near a fish tank.",
       sentences: [
-        { text: "We wait in the waiting room. It can be noisy.", type: "descriptive" },
-        { text: "There is a fish tank to look at.", type: "descriptive" },
+        { text: "We wait near a fish tank.", type: "descriptive" },
         { text: "Waiting can feel long. That is okay.", type: "affirmative" },
         { text: "I can wear my headphones while I wait.", type: "coaching" },
       ],

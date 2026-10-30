@@ -1,3 +1,5 @@
+import type { ReadingLevel } from "./profile.js";
+import { READING_LIMITS, countWords, splitSentences } from "./reading.js";
 import {
   DESCRIBING_TYPES,
   WhQuestion,
@@ -66,6 +68,8 @@ export interface ValidationContext {
    * in the description, and everyone named is listed.
    */
   cast?: ReadonlyArray<{ id: string; name: string }>;
+  /** When given, pages must keep to this reading level's limits (sentences per page, words per sentence). */
+  readingLevel?: ReadingLevel;
 }
 
 const VEHICLE_INSIDE =
@@ -135,6 +139,43 @@ export function validateStory(story: Story, context: ValidationContext = {}): Va
       });
     }
   });
+
+  // The writer must keep to the reading level it was given (Gray criterion 4: format fits the child).
+  if (context.readingLevel) {
+    const limits = READING_LIMITS[context.readingLevel];
+    story.pages.forEach((page, pageIndex) => {
+      if (page.sentences.length > limits.maxSentencesPerPage) {
+        issues.push({
+          severity: "error",
+          code: "reading-level",
+          message: `Page has ${page.sentences.length} sentences; this reading level allows ${limits.maxSentencesPerPage}. Split the page or shorten it.`,
+          page: pageIndex,
+        });
+      }
+      for (const s of page.sentences) {
+        for (const part of splitSentences(s.text)) {
+          const words = countWords(part);
+          if (words > limits.maxWords) {
+            issues.push({
+              // A word or two over is a note; more than that sends it back for a rewrite.
+              severity: words > limits.maxWords + 2 ? "error" : "warning",
+              code: "reading-level",
+              message: `"${part}" has ${words} words; this reading level allows ${limits.maxWords}. Shorten it or split it in two.`,
+              page: pageIndex,
+            });
+          }
+        }
+      }
+    });
+    const [min, max] = limits.pages;
+    if (story.pages.length < min || story.pages.length > max) {
+      issues.push({
+        severity: "warning",
+        code: "reading-level",
+        message: `The story has ${story.pages.length} pages; this reading level usually has ${min} to ${max}.`,
+      });
+    }
+  }
 
   // Criterion 3: title + introduction + body + conclusion.
   const sections = new Set<StorySection>(story.pages.map((p) => p.section));

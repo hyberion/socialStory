@@ -87,7 +87,7 @@ export function draftRoutes(options: {
     const ctx = draftContext(id);
     const story = loadStory(id, dataDir);
     if (!ctx || !story) return c.json({ error: "No story with that id" }, 404);
-    const check = validateStory(story, { cast: castFor(ctx.event, ctx.player) });
+    const check = validateStory(story, { cast: castFor(ctx.event, ctx.player), readingLevel: ctx.player.readingLevel });
     const { kit, warnings } = publishKit({ id, event: ctx.event, player: ctx.player, story }, dataDir);
     return c.json({
       publishedAt: kit.publishedAt,

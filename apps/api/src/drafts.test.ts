@@ -127,8 +127,9 @@ describe("draft routes", () => {
       body: JSON.stringify({ story: { ...sampleStory, title: "New title" }, origins: [0, 1, 2, 3, 4] }),
     });
     expect(put.status).toBe(200);
-    const published = (await (await app.request("/api/drafts/doctor/publish", { method: "POST" })).json()) as { warnings: unknown[] };
-    expect(published.warnings).toEqual([]);
+    const published = (await (await app.request("/api/drafts/doctor/publish", { method: "POST" })).json()) as { warnings: Array<{ message: string }> };
+    // Only the gentle page-count note: the 5-page sample is short for an early reader.
+    expect(published.warnings.map((w) => w.message)).toEqual(["The story has 5 pages; this reading level usually has 6 to 10."]);
     expect(existsSync(join(dataDir, "published", "doctor", "kit.json"))).toBe(true);
     expect((await app.request("/api/drafts/doctor/images/..%2F..%2Fstories%2Fdoctor.json")).status).toBe(404);
   });

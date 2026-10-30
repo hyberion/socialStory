@@ -14,8 +14,27 @@ export const ReadingLevel = z.enum([
   "early-reader",
   /** Full sentences, more detail per page. */
   "reader",
+  /** Longer pages for strong readers, older kids and teens; never babyish. */
+  "fluent-reader",
 ]);
 export type ReadingLevel = z.infer<typeof ReadingLevel>;
+
+/**
+ * How much information a story gives, separate from how many words it uses.
+ * Lets a strong reader get a simple story, or an early reader a detailed one,
+ * and lets stories grow with the player.
+ */
+export const DetailLevel = z.enum([
+  /** Just the steps in order, one idea per page, plus the coping choices. */
+  "essentials",
+  /** Steps, how things look, sound and feel, and coping choices. */
+  "standard",
+  /** Adds why things happen and what other people are doing or thinking. */
+  "more",
+  /** Adds honest what-ifs, choices at more steps, and a more grown-up tone. */
+  "full",
+]);
+export type DetailLevel = z.infer<typeof DetailLevel>;
 
 export const ArtStyle = z.enum([
   /** Real photos the user uploaded. */
@@ -57,6 +76,7 @@ export const PlayerProfile = z.object({
   /** What the player is called in stories. */
   displayName: z.string().min(1),
   readingLevel: ReadingLevel.default("early-reader"),
+  detailLevel: DetailLevel.default("standard"),
   artStyle: ArtStyle.default("hybrid"),
   perspective: Perspective.default("first"),
   sensory: SensorySettings.default({}),

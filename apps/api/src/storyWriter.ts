@@ -106,7 +106,7 @@ export async function writeStory(
       };
     } else {
       lastStory = converted.story;
-      validation = validateStory(converted.story, { castIds, cast });
+      validation = validateStory(converted.story, { castIds, cast, readingLevel: player.readingLevel });
     }
     lastValidation = validation;
     attempts.push({ kind, usage, ok: validation.ok, issues: validation.issues });

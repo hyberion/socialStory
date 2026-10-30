@@ -23,7 +23,7 @@ if (!existsSync(storyFile)) {
 const story = Story.parse(JSON.parse(readFileSync(storyFile, "utf8")).story);
 
 // The checker warns, never blocks: the user has the final say.
-const check = validateStory(story, { cast: castFor(event, samplePlayer) });
+const check = validateStory(story, { cast: castFor(event, samplePlayer), readingLevel: samplePlayer.readingLevel });
 const { kit, warnings, dir } = publishKit({ id: name, event, player: samplePlayer, story });
 
 console.log(`\n  Published "${kit.title}" (${kit.pages.length} pages, ${kit.pages.filter((p) => p.image).length} pictures)`);

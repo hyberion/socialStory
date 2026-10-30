@@ -1,9 +1,10 @@
-import type { Story, StoryPage } from "@socialstory/core";
+import type { DetailLevel, ReadingLevel, Story, StoryPage } from "@socialstory/core";
 
 export interface DraftView {
   id: string;
   story: Story;
   event: { title: string; startsAt: string };
+  player: { name: string; readingLevel: ReadingLevel; detailLevel: DetailLevel };
   cast: Array<{ id: string; name: string; kind: "person" | "prop" }>;
   pictures: Record<string, number>;
   drawnFrom: Record<string, string>;

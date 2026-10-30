@@ -1,4 +1,5 @@
-import type { PlayerProfile, ReadingLevel } from "./profile.js";
+import type { DetailLevel, PlayerProfile, ReadingLevel } from "./profile.js";
+import { READING_LIMITS } from "./reading.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
@@ -10,14 +11,31 @@ import { castFor, comfortsFor } from "./cast.js";
  * can be read, tested and tuned without touching any AI plumbing.
  */
 
-/** How much text each reading level gets (principle 1: adapt to the player). */
-const READING_LEVEL_RULES: Record<ReadingLevel, string> = {
-  "pre-verbal":
-    "The child does not read yet and will hear the story read aloud. Use one very short sentence per page (about 3 to 6 words). Use only common, concrete words. 6 to 8 pages.",
-  "early-reader":
-    "The child is an early reader. Use 1 to 3 short sentences per page, each under 10 words. Use simple, concrete words. 6 to 10 pages.",
-  reader:
-    "The child reads well. Use up to 4 sentences per page, each under 16 words. Still use plain, concrete words. 8 to 12 pages.",
+/** How much text each reading level gets (principle 1: adapt to the player). Numbers come from READING_LIMITS. */
+const READING_LEVEL_INTRO: Record<ReadingLevel, string> = {
+  "pre-verbal": "The child does not read yet and will hear the story read aloud. Use only common, concrete words.",
+  "early-reader": "The child is an early reader. Use simple, concrete words.",
+  reader: "The child reads well. Still use plain, concrete words.",
+  "fluent-reader":
+    "The child reads fluently and may be older or a teenager. Use plain, precise words and a respectful, matter-of-fact tone. Nothing babyish.",
+};
+
+function readingLevelRule(level: ReadingLevel): string {
+  const l = READING_LIMITS[level];
+  const sentences = l.maxSentencesPerPage === 1 ? "one sentence per page" : `1 to ${l.maxSentencesPerPage} sentences per page`;
+  return `${READING_LEVEL_INTRO[level]} Use ${sentences}, each at most ${l.maxWords} words. ${l.pages[0]} to ${l.pages[1]} pages. These limits are checked.`;
+}
+
+/** How much information the story gives, separate from how many words (principle 1). */
+const DETAIL_RULES: Record<DetailLevel, string> = {
+  essentials:
+    "Detail: essentials only. Give the steps in order, one idea per page, and the coping choices for hard parts. Leave out extra description.",
+  standard:
+    "Detail: standard. Give each step, how things look, sound and feel (use the sensory notes), and coping choices for hard parts.",
+  more:
+    "Detail: more. Also explain why things happen, using only reasons in the event details (the purpose, people's roles); if no reason is given, describe what happens without inventing one. Also say what other people are doing or may be thinking.",
+  full:
+    "Detail: full picture. Also include honest, general what-ifs (\"Sometimes the doctor is running late. Then we wait a little longer.\") each with a choice the child controls, offer choices at more steps, and use a more grown-up, matter-of-fact tone. Keep the 2 to 1 describing-to-coaching balance.",
 };
 
 const RULES = `You write Social Stories for autistic children, following Carol Gray's Social Story criteria.
@@ -129,7 +147,9 @@ function formatPlayer(player: PlayerProfile): string {
   const interests = player.interests.length
     ? `The child likes: ${player.interests.join(", ")}. These may shape word choice only; never add them to the event as things that will happen or be seen.`
     : "";
-  return [READING_LEVEL_RULES[player.readingLevel], perspective, interests].filter(Boolean).join("\n");
+  return [readingLevelRule(player.readingLevel), DETAIL_RULES[player.detailLevel], perspective, interests]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export interface StoryPrompt {

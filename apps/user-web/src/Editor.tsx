@@ -22,6 +22,11 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   SentenceType,
   pictureOutOfDate,
+  readability,
+  READING_LIMITS,
+  READING_LEVEL_LABELS,
+  DETAIL_LEVEL_LABELS,
+  type Story,
   validateStory,
   type Issue,
   type StorySection,
@@ -81,7 +86,8 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
 
   const story = useMemo(() => (edit ? toStory(edit) : undefined), [edit]);
   const check = useMemo(
-    () => (story && draft ? validateStory(story, { cast: draft.cast }) : undefined),
+    () =>
+      story && draft ? validateStory(story, { cast: draft.cast, readingLevel: draft.player.readingLevel }) : undefined,
     [story, draft],
   );
   const emptyPage = edit?.pages.findIndex((p) => !p.sentences.some((s) => s.text.trim())) ?? -1;
@@ -202,7 +208,7 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
         </div>
       )}
 
-      <Checker issues={storyIssues} stats={check.stats} />
+      <Checker issues={storyIssues} stats={check.stats} story={story} player={draft.player} />
 
       <Pages
         edit={edit}
@@ -246,10 +252,31 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
 }
 
 /** Story-wide notes, plus the describing-to-choices balance. */
-function Checker({ issues, stats }: { issues: Issue[]; stats: { describing: number; coaching: number } }) {
+function Checker({
+  issues,
+  stats,
+  story,
+  player,
+}: {
+  issues: Issue[];
+  stats: { describing: number; coaching: number };
+  story: Story;
+  player: DraftView["player"];
+}) {
   const balanced = stats.coaching === 0 || stats.describing >= stats.coaching * 2;
+  const limits = READING_LIMITS[player.readingLevel];
+  const estimate = readability(story);
   return (
     <section className="card checker">
+      <p>
+        <strong>Written for {player.name}:</strong> {READING_LEVEL_LABELS[player.readingLevel]} (up to{" "}
+        {limits.maxSentencesPerPage} sentence{limits.maxSentencesPerPage === 1 ? "" : "s"} a page, {limits.maxWords} words
+        each) · {DETAIL_LEVEL_LABELS[player.detailLevel]} detail
+      </p>
+      <p className="muted-line">
+        Reads at {estimate.label}. A rough guide only: short stories make any reading formula shaky, and it measures the
+        words, not understanding.
+      </p>
       <p>
         <strong>Balance:</strong> {stats.describing} describing, {stats.coaching} choices{" "}
         <span className={balanced ? "good" : "warn"}>

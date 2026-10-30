@@ -154,3 +154,4 @@ body.dragging-sentence { user-select: none; -webkit-user-select: none; cursor: g
 .small-note { flex-basis: 100%; margin: 0; font-size: 0.85rem; }
 .note p { margin: 0 0 8px; }
 .editor-head .link { justify-self: start; }
+.muted-line { color: var(--muted); font-size: 0.9rem; }

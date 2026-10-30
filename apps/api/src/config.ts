@@ -28,6 +28,8 @@ const Env = z.object({
     .min(1, "is empty. Add your Meta key to .env."),
   MODEL_API_BASE_URL: z.string().url().default("https://api.meta.ai/v1"),
   DATABASE_URL: z.string().optional(),
+  /** Read-along narration. Optional: without it the player falls back to the device voice. */
+  ELEVENLABS_API_KEY: z.string().optional(),
 });
 
 const parsed = Env.safeParse(process.env);
