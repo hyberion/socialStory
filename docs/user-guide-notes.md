@@ -137,6 +137,8 @@ Things users should know about the player app, so nothing surprises them.
 | Countdown to the day ("2 sleeps until Dr. Patel"). | Planned |
 | Day-of mode: step-by-step cards to use during the event itself. | Planned |
 | **Who's who?** A game on the shelf under each story: your child sees a portrait from the cast sheet, taps a name, and the app shows who it is ("Dr. Patel is the doctor.") plus any friendly facts you added. Any tap shows the answer the same calm way; nothing is ever marked wrong, counted or timed. Appears once at least two portraits are drawn. | Built |
+| **Read-along:** a real recorded voice (you choose from a few calm voices) reads each page, highlighting each word as it's spoken. Recorded once when you publish, so it sounds exactly the same every time and works offline. You can listen before publishing. | Planned (hackathon stretch) |
+| **Word help:** your child taps a word to see a short, kid-sized meaning and how to say it ("doctor: a person whose job is to help keep my body healthy. DOK-ter"), and can hear it said slowly. You choose which words get help in the editor. | Planned (hackathon) |
 | Games built from your own photos. | Planned |
 | Games built from the story's words (match, drag the word, fill in the blank). Never scored or timed; a miss just shows the answer. | Planned (after the hackathon) |
 | A tour of the place with no people in it. | Planned (after the hackathon) |

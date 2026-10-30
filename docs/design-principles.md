@@ -141,6 +141,19 @@ One model covers every case: everything belongs to an **organization**, and adul
 - Before any school pilot: COPPA (under-13 data), FERPA (school records), district student-data privacy agreements, and school photo consent (ties to the photo letter). Worth a lawyer's hour.
 - Database tables carry an organization id from the start, even while there's only one family.
 
+## Read-along narration and word help
+
+Meta has no text-to-speech model (Muse Voice Transcribe is speech to text only), so narration comes from ElevenLabs.
+
+- **Voices:** a curated set of 4 to 6 calm voices, each with a preview. The user picks per child.
+- **Consistency comes from recording once, not prompting:** at publish time each sentence is rendered with a fixed voice, fixed settings (high stability, the child's reading speed) and one house style ("calm, warm, unhurried"). The user can listen before publishing; the child hears the identical recording on every replay, offline too. Only changed sentences re-render. Expressive performance tags are a later option for teachers, because more expression also means more take-to-take variation.
+- **Read-along:** the word being spoken is highlighted, using the character timings ElevenLabs returns with the audio.
+- **Fallback:** the device's own voice, only when there's no recording (it sounds different on every device).
+
+**Word help:** tap a word (no hover; tablets can't) for a card with the word, a child-sized literal definition in the story's voice ("doctor: a person whose job is to help keep my body healthy"), a children's-dictionary respelling (DOK-ter, loud part in capitals), and a say-it-slowly button. Tapping a person's name also shows their portrait. Spark suggests the words likely to be new at the child's reading level; the editor's "Word help" list lets the user add, edit or remove them. Definitions follow the story rules: literal, true, never circular. Tappable words get a subtle dotted underline the user can turn off.
+
+**Hackathon priority (Oct 30):** voice input (Muse Voice Transcribe, real-time only: audio streams over a live connection, push-to-talk) and read-along narration are both goals. If time runs short, narration is cut first, because voice input is what the hackathon rules reward. Word help is scheduled alongside the SAM feature.
+
 ## Decisions and open questions
 
 Decided:
