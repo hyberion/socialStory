@@ -10,4 +10,5 @@ export * from "./photos.js";
 export * from "./region.js";
 export * from "./kit.js";
 export * from "./when.js";
+export * from "./templates.js";
 export * from "./fixtures.js";

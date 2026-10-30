@@ -1,3 +1,4 @@
+import { EVENT_TEMPLATES, eventFromTemplate } from "./templates.js";
 import type { PlayerProfile } from "./profile.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
@@ -56,6 +57,13 @@ export const sampleEvent: Event = {
       appearance: "a woman doctor with long black hair in a low bun, wearing a white coat over a purple top",
       facts: ["Dr. Patel has a fish tank in the waiting room."],
     },
+    {
+      id: "p-nurse",
+      name: "Nurse Kim",
+      role: "nurse",
+      appearance: "a young man nurse with short straight black hair, wearing light green scrubs",
+      facts: [],
+    },
   ],
   places: [
     {
@@ -64,13 +72,24 @@ export const sampleEvent: Event = {
       photos: [],
       sensoryNotes: ["the waiting room can be noisy"],
     },
+    {
+      id: "pl-exam",
+      name: "the exam room",
+      photos: [],
+      sensoryNotes: ["the bed has crinkly paper on it", "the lights are bright"],
+    },
   ],
   // Brad: describe the car however you like; it gets its own reference drawing.
   transport: { mode: "car", name: "the blue car", appearance: "a small light blue hatchback car" },
   steps: [
     { id: "s1", description: "We drive to the building with the blue door.", personIds: [], fixed: false },
+    { id: "s1b", description: "We check in at the front desk.", placeId: "pl-office", personIds: [], fixed: false },
     { id: "s2", description: "We wait in the waiting room.", placeId: "pl-office", personIds: [], fixed: false },
-    { id: "s3", description: "Dr. Patel gives me a shot.", placeId: "pl-office", personIds: ["p-patel"], fixed: true },
+    { id: "s2b", description: "Nurse Kim calls my name and walks us to the exam room.", placeId: "pl-exam", personIds: ["p-nurse"], fixed: false },
+    { id: "s2c", description: "Nurse Kim checks how tall I am and how much I weigh.", placeId: "pl-exam", personIds: ["p-nurse"], fixed: false },
+    { id: "s2d", description: "We wait in the exam room for Dr. Patel.", placeId: "pl-exam", personIds: [], fixed: false },
+    { id: "s2e", description: "Dr. Patel comes in, says hello, listens to my heart and looks in my ears.", placeId: "pl-exam", personIds: ["p-patel"], fixed: false },
+    { id: "s3", description: "Dr. Patel gives me a shot.", placeId: "pl-exam", personIds: ["p-patel"], fixed: true },
     { id: "s4", description: "We go home.", personIds: [], fixed: false },
   ],
   hardParts: [
@@ -92,6 +111,40 @@ export const sampleUser: UserSettings = {
  */
 export const sampleEvents: Record<string, Event> = {
   doctor: sampleEvent,
+  // Built from the templates, with fake details filled in the way a user would.
+  haircut: (() => {
+    const e = eventFromTemplate(EVENT_TEMPLATES.haircut!, {
+      id: "event-haircut",
+      playerId: "player-sam",
+      startsAt: "2026-11-07T11:30:00-05:00",
+      include: ["t5", "t7"],
+    });
+    return {
+      ...e,
+      title: "Haircut with Ms. Rosa",
+      companions: [sampleEvent.companions[0]!],
+      transport: sampleEvent.transport,
+      people: [{ ...e.people[0]!, name: "Ms. Rosa", appearance: "a woman with short gray curly hair and red glasses, wearing a black apron", facts: ["Ms. Rosa has a chair shaped like a race car."] }],
+      steps: e.steps.map((s) => ({ ...s, description: s.description.replaceAll("The hairdresser", "Ms. Rosa").replaceAll("the hair salon", "Ms. Rosa's salon") })),
+    };
+  })(),
+  "new-baby": (() => {
+    const e = eventFromTemplate(EVENT_TEMPLATES["new-baby"]!, {
+      id: "event-new-baby",
+      playerId: "player-sam",
+      startsAt: "2026-11-14T15:00:00-05:00",
+      include: ["t5"],
+    });
+    return {
+      ...e,
+      title: "Meeting baby Lily",
+      companions: [sampleEvent.companions[0]!],
+      transport: sampleEvent.transport,
+      people: [{ ...e.people[0]!, name: "baby Lily", role: "my new cousin", appearance: "a tiny newborn baby wrapped in a soft yellow blanket", facts: [] }],
+      places: [{ ...e.places[0]!, name: "Aunt Mia's house" }],
+      steps: e.steps.map((s) => ({ ...s, description: s.description.replaceAll("the new baby", "baby Lily").replaceAll("The baby", "Baby Lily").replaceAll("the baby", "baby Lily") })),
+    };
+  })(),
 };
 
 /** A story that passes validation. */

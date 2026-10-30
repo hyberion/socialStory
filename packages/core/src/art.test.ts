@@ -8,7 +8,7 @@ const cast = castFor(sampleEvent, samplePlayer);
 
 describe("castFor", () => {
   it("lists the player, companions, people and comfort items, in that order", () => {
-    expect(cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "bear", "headphones", "transport"]);
+    expect(cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "p-nurse", "bear", "headphones", "transport"]);
     expect(cast[0]!.name).toBe("Sam");
   });
 });

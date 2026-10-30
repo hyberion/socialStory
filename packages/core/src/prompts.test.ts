@@ -16,7 +16,7 @@ describe("buildStoryPrompt", () => {
 
   it("marks fixed steps so the model is honest about them", () => {
     const { input } = buildStoryPrompt(sampleEvent, samplePlayer);
-    expect(input).toContain("Dr. Patel gives me a shot. [at Dr. Patel's office] [with Dr. Patel] (FIXED)");
+    expect(input).toContain("Dr. Patel gives me a shot. [at the exam room] [with Dr. Patel] (FIXED)");
   });
 
   it("keeps the rules that past runs taught us", () => {

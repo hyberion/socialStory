@@ -10,10 +10,12 @@ describe("photoChecklist", () => {
     expect(top).toEqual([
       "The outside or front door of Dr. Patel's office",
       "Dr. Patel (doctor)",
+      "Nurse Kim (nurse)",
       "Bear (your child's comfort item)",
       "headphones (your child's comfort item)",
-      "Inside Dr. Patel's office",
     ]);
+    // Never more than 5 "most helpful"; the inside shots become nice-to-haves.
+    expect(items.find((i) => i.label === "Inside Dr. Patel's office")?.priority).toBe("nice-to-have");
   });
 
   it("drops a comfort item once its photo is added", () => {

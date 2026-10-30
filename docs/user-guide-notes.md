@@ -56,6 +56,19 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 
 **Key promise to explain to parents:** the story only states facts you gave it. If something is missing, it leaves it out rather than guessing. The more detail you give, the richer the story.
 
+## Starting from a template
+
+Instead of a blank form, the user can start from a common event and edit it. Defined in `packages/core/src/templates.ts`. **Status:** templates built; the picker screen comes with the event screen.
+
+| Template | The usual steps it starts with |
+| --- | --- |
+| Doctor visit | Go there, check in at the front desk, waiting room, nurse calls your name and walks you to an exam room, height and weight, wait for the doctor, doctor says hello, listens to your heart and looks in your ears, go home. Can add: temperature and blood-pressure cuff; a shot. |
+| Haircut | Go there, wait your turn, big chair that goes up and down, cape, scissors, brushing off little hairs, mirror, pay and go home. Can add: water spray; clippers. |
+| First day at a new school | Go there, teacher says hello, cubby or hook, morning routine, lunch in the cafeteria, go home. Can add: recess; the bell. |
+| Meeting a new baby | Go there, wash hands, the baby is small and may be sleeping, the baby may cry, the grown-ups may be busy and tired, say goodbye. Can add: holding the baby while sitting down, with help. |
+
+In plain words for the guide: **A template is a starting point, not a promise.** Every step is yours to keep, change or remove. Steps that only sometimes happen (like a shot) are left out until you add them, because the story should never tell your child about something that won't happen. People start out named by role ("the nurse"); give them real names if you know them. Each template also asks a few questions ("Is there a shot planned?") that turn it into your child's event.
+
 ## Photo checklist
 
 When a user adds an event, the app suggests which photos to take, so they don't forget a useful one, don't have to think up the list, and don't feel they must photograph everything. Built in `packages/core/src/photos.ts`; preview with `pnpm photo-list doctor`. **Status:** built (logic and preview command); the upload screen is planned.
