@@ -122,6 +122,25 @@ Format preferences are a ranked, multi-select list (most players are a mix), and
 
 A short "why I'm taking pictures" note the user can print or show on their phone to staff and other adults at the place. It explains what the photos are for, who sees them and what we will never do with them, so asking permission is easier for the user. Draft text: [`photo-letter.md`](photo-letter.md). Rule: the letter's promises must match what the app actually does; if the app's data handling changes, the letter changes with it.
 
+## Accounts (after the hackathon)
+
+One model covers every case: everything belongs to an **organization**, and adults have roles in it.
+
+| Situation | Organization | Adults (roles) | Players |
+| --- | --- | --- | --- |
+| Family | The household | Parent (owner); invited co-parent, grandparent, sitter | One profile per child |
+| Teacher | Their class (an org of one) | Teacher (owner) | Imported from CSV |
+| School | The school | Admin, teachers, aides | Bulk import, each assigned to one or more teachers |
+
+- Players never get passwords. The player app is paired once by an adult (QR or short code); shared classroom tablets show a pick-your-picture screen.
+- Several adults per child, with per-org roles (approve and publish, or view only).
+- The same child in a family and a school is two separate profiles. Sharing between them needs explicit parent consent, never name matching.
+- Students and stories belong to the org, so a teacher leaving means reassignment, not data loss.
+- Sign-in through an auth library: magic-link email and Google. No stored passwords. Schools later: Google for Education or Clever sign-in, and Clever or ClassLink rostering instead of CSV.
+- CSV import collects the minimum: first name or nickname, optional reading level, teacher email, optional school ID (so re-imports update instead of duplicate). No birthdays, last names or diagnoses.
+- Before any school pilot: COPPA (under-13 data), FERPA (school records), district student-data privacy agreements, and school photo consent (ties to the photo letter). Worth a lawyer's hour.
+- Database tables carry an organization id from the start, even while there's only one family.
+
 ## Decisions and open questions
 
 Decided:
@@ -135,6 +154,7 @@ Decided:
 - Code gets written inside the hackathon window (Oct 26 noon to Nov 4, 9 PM ET).
 - Story checker warns, never blocks: the user has the final say.
 - Redraw shows two options side by side.
+- After the hackathon: accounts built on organizations with roles (family, solo teacher, school). Reading-level check: exact counts against our own level rules plus open readability scores now; Lexile as an optional licensed add-on for schools.
 - After the hackathon: per-player format preferences (read, listen, interact), story-based games, a people-free place tour, and the photo letter.
 
 Open:
