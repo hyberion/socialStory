@@ -28,6 +28,12 @@ export const TEXT_TASKS = {
     effort: "low",
     note: "Structured extraction; little reasoning needed.",
   },
+  /** One page rewritten, with the user's optional note ("mention the fish more"). */
+  rewritePage: {
+    model: MODEL_IDS.spark,
+    effort: "low",
+    note: "Same job as writeStory, one page at a time.",
+  },
   /** Event + profile -> Social Story script. The core creative task. */
   writeStory: {
     model: MODEL_IDS.spark,

@@ -173,3 +173,34 @@ export function buildRevisionPrompt(
     ].join("\n"),
   };
 }
+
+/**
+ * "Rewrite this page": the whole story for context, one page to replace.
+ * The user's note is guidance, never a way around the rules.
+ */
+export function buildPageRewritePrompt(
+  event: Event,
+  player: PlayerProfile,
+  story: Story,
+  pageIndex: number,
+  note?: string,
+): StoryPrompt {
+  const page = story.pages[pageIndex];
+  if (!page) throw new Error(`No page ${pageIndex + 1}`);
+  return {
+    instructions: `${RULES}\n\nAbout this child\n${formatPlayer(player)}`,
+    input: [
+      `Rewrite page ${pageIndex + 1} of this Social Story. Return only that one page.`,
+      `Keep its section ("${page.section}")${page.stepId ? ` and stepId ("${page.stepId}")` : ""}. Keep it consistent with the pages around it, and follow every rule above.`,
+      note?.trim()
+        ? `The parent asked: "${note.trim()}". Follow this where it fits the rules and the event details; never add facts the event doesn't give.`
+        : "Write a fresh version of the same moment.",
+      "",
+      "The event:",
+      formatEvent(event, player),
+      "",
+      "The whole story (JSON), for context:",
+      JSON.stringify(story, null, 2),
+    ].join("\n"),
+  };
+}

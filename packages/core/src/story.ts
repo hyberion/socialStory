@@ -79,6 +79,26 @@ export const StoryDraft = z.object({
 });
 export type StoryDraft = z.infer<typeof StoryDraft>;
 
+/** One page, in the strict shape the model returns ("Rewrite this page"). */
+export const PageDraft = z.object({
+  section: StorySection,
+  stepId: z.string(),
+  sceneBrief: z.string(),
+  inPicture: z.array(z.string()),
+  sentences: z.array(Sentence),
+});
+export type PageDraft = z.infer<typeof PageDraft>;
+
+export function draftToPage(draft: PageDraft): StoryPage {
+  return StoryPage.parse({
+    section: draft.section,
+    sentences: draft.sentences,
+    sceneBrief: draft.sceneBrief || undefined,
+    inPicture: draft.inPicture,
+    stepId: draft.stepId || undefined,
+  });
+}
+
 export function draftToStory(draft: StoryDraft): Story {
   return Story.parse({
     title: draft.title,

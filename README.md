@@ -53,7 +53,7 @@ Then open:
 
 | URL | What |
 | --- | --- |
-| http://localhost:5173 | User app (shows a system check) |
+| http://localhost:5173 | User app (review, edit and publish stories) |
 | http://localhost:5174 | Player app (story shelf; shows published stories) |
 | http://localhost:8787/api/health | API health check |
 

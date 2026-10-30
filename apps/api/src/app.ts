@@ -4,6 +4,9 @@ import { sampleStory, validateStory } from "@socialstory/core";
 import { config } from "./config.js";
 import { runTextTask } from "./meta.js";
 import { kitRoutes } from "./kitRoutes.js";
+import { draftRoutes } from "./draftRoutes.js";
+import { runStructuredTask } from "./meta.js";
+import { PageDraft } from "@socialstory/core";
 
 export const app = new Hono().basePath("/api");
 
@@ -24,6 +27,16 @@ app.get("/dev/smoke", async (c) => {
 });
 
 app.route("/kits", kitRoutes());
+
+// Editing routes for the user app. No sign-in yet, so these are for local
+// use and the passcode-protected demo only (see docs/launch-checklist.md).
+app.route(
+  "/drafts",
+  draftRoutes({
+    rewrite: async (prompt) =>
+      (await runStructuredTask("rewritePage", PageDraft, "story_page", prompt.input, { instructions: prompt.instructions })).data,
+  }),
+);
 
 app.onError((err, c) => {
   console.error(err);

@@ -1,69 +1,45 @@
 import { useEffect, useState } from "react";
-import { sampleEvent, sampleStory, validateStory } from "@socialstory/core";
-
-type Health = { ok: boolean; env: string } | { error: string };
+import { api } from "./api";
+import { Editor } from "./Editor";
 
 /**
- * Placeholder home screen. Proves the three pieces talk to each other:
- * this app, the API (health check), and the shared core package
- * (validator running right here in the browser).
+ * User app home: the stories you can edit. (Accounts come after the
+ * hackathon; for now these are the test family's stories.)
  */
 export function App() {
-  const [health, setHealth] = useState<Health | null>(null);
-  const validation = validateStory(sampleStory);
+  const [ids, setIds] = useState<string[]>();
+  const [error, setError] = useState<string>();
+  const [open, setOpen] = useState<string>();
 
   useEffect(() => {
-    fetch("/api/health")
-      .then((r) => r.json())
-      .then(setHealth)
-      .catch(() => setHealth({ error: "API not reachable. Is `pnpm dev:api` running?" }));
-  }, []);
+    if (open) return;
+    api.list().then(setIds).catch(() => setError("Can't reach the server. Is `pnpm dev` running?"));
+  }, [open]);
+
+  if (open) return <Editor id={open} onBack={() => setOpen(undefined)} />;
 
   return (
     <main className="page">
       <header>
         <h1>socialStory</h1>
-        <p className="muted">User app · scaffold</p>
+        <p className="muted">Your stories</p>
       </header>
-
-      <section className="card">
-        <h2>System check</h2>
-        <ul className="checks">
-          <li>
-            API:{" "}
-            {health === null
-              ? "checking..."
-              : "error" in health
-                ? <span className="bad">{health.error}</span>
-                : <span className="good">connected ({health.env})</span>}
-          </li>
-          <li>
-            Shared core: <span className="good">loaded</span>
-          </li>
-          <li>
-            Sample story validator:{" "}
-            <span className={validation.ok ? "good" : "bad"}>
-              {validation.ok ? "passes" : "fails"}
-            </span>{" "}
-            ({validation.stats.describing} describing : {validation.stats.coaching} coaching)
-          </li>
-        </ul>
-      </section>
-
-      <section className="card">
-        <h2>Sample event</h2>
-        <p>
-          <strong>{sampleEvent.title}</strong> · {new Date(sampleEvent.startsAt).toLocaleString()}
+      {error && <p className="note bad">{error}</p>}
+      {ids?.length === 0 && (
+        <p className="card">
+          No stories yet. Write one with <code>pnpm write-story doctor</code>, then come back.
         </p>
-        <ol>
-          {sampleEvent.steps.map((s) => (
-            <li key={s.id}>
-              {s.description}
-              {s.fixed && <span className="tag">fixed</span>}
-            </li>
-          ))}
-        </ol>
-      </section>
+      )}
+      <ul className="story-list">
+        {ids?.map((id) => (
+          <li key={id}>
+            <button className="story-link" onClick={() => setOpen(id)}>
+              {id}
+              <span className="muted">Review and edit →</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
