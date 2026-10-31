@@ -53,3 +53,16 @@ describe("detail level", () => {
     expect(full).toContain("Nothing babyish");
   });
 });
+
+describe("profile in the prompt", () => {
+  it("describes hard things and what helps, and adapts choices for kids who don't speak much", () => {
+    const sam = buildStoryPrompt(sampleEvent, samplePlayer).instructions;
+    expect(sam).toContain("Things that are hard for this child: sudden noises, waiting.");
+    expect(sam).toContain("Never add one that the event details don't include.");
+    expect(sam).toContain("knowing what comes next; holding Bear");
+    expect(sam).toContain("Never write choices that depend on speaking");
+    const talker = buildStoryPrompt(sampleEvent, { ...samplePlayer, communication: "full-sentences", hardThings: [], helps: [] }).instructions;
+    expect(talker).not.toContain("Things that are hard");
+    expect(talker).not.toContain("depend on speaking");
+  });
+});

@@ -155,3 +155,22 @@ body.dragging-sentence { user-select: none; -webkit-user-select: none; cursor: g
 .note p { margin: 0 0 8px; }
 .editor-head .link { justify-self: start; }
 .muted-line { color: var(--muted); font-size: 0.9rem; }
+
+/* ---- Profile form ---- */
+.form { display: grid; gap: 14px; margin-bottom: 16px; }
+.form h2 { margin: 0; font-size: 1.2rem; }
+.form label { display: grid; gap: 4px; }
+.form label > span { font-size: 0.9rem; color: var(--muted); }
+.form label.short input { max-width: 120px; }
+.form fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; display: grid; gap: 6px; }
+.form legend { padding: 0 6px; font-weight: 600; }
+.form label.choice { display: flex; gap: 8px; align-items: baseline; }
+.form label.choice > span { color: var(--text); font-size: 1rem; }
+.form small { color: var(--muted); }
+.form .row { display: flex; gap: 8px; align-items: center; }
+.form .row input { flex: 1; }
+.form .way { flex: 1; }
+.hint { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--bg); border: 1px dashed var(--line); }
+.toolbar.bottom { position: static; border: none; }
+.story-link.add { font-weight: 400; color: var(--accent); }
+h2 { margin: 28px 0 10px; }

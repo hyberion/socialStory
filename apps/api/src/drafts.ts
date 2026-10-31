@@ -17,6 +17,7 @@ import {
 } from "@socialstory/core";
 import { pageFile, readDrawnFrom, writeDrawnFrom } from "./kits.js";
 import { DATA_DIR, imagesDir, storiesDir } from "./paths.js";
+import { loadPlayer } from "./players.js";
 
 /**
  * Drafts: a written story plus its pictures, before publishing. This is what
@@ -30,9 +31,10 @@ import { DATA_DIR, imagesDir, storiesDir } from "./paths.js";
  */
 
 /** Who the story is for. One fake family until accounts exist. */
-export function draftContext(id: string): { event: Event; player: PlayerProfile } | undefined {
+export function draftContext(id: string, dataDir = DATA_DIR): { event: Event; player: PlayerProfile } | undefined {
   const event = sampleEvents[id];
-  return event ? { event, player: samplePlayer } : undefined;
+  if (!event) return undefined;
+  return { event, player: loadPlayer(event.playerId, dataDir) ?? samplePlayer };
 }
 
 const ID = /^[a-z0-9-]+$/;
@@ -44,7 +46,7 @@ export function listDrafts(dataDir = DATA_DIR): string[] {
   return readdirSync(dir)
     .filter((f) => f.endsWith(".json"))
     .map((f) => f.slice(0, -5))
-    .filter((id) => ID.test(id) && draftContext(id));
+    .filter((id) => ID.test(id) && draftContext(id, dataDir));
 }
 
 export function loadStory(id: string, dataDir = DATA_DIR): Story | undefined {
@@ -70,7 +72,7 @@ export interface DraftView {
 
 export function loadDraft(id: string, dataDir = DATA_DIR): DraftView | undefined {
   const story = loadStory(id, dataDir);
-  const ctx = draftContext(id);
+  const ctx = draftContext(id, dataDir);
   if (!story || !ctx) return undefined;
   const dir = imagesDir(id, dataDir);
   const pictures: Record<string, number> = {};
@@ -105,7 +107,7 @@ export function saveDraft(
   input: { story: unknown; origins: Array<number | null> },
   dataDir = DATA_DIR,
 ): Story {
-  if (!ID.test(id) || !draftContext(id)) throw new Error("Unknown story");
+  if (!ID.test(id) || !draftContext(id, dataDir)) throw new Error("Unknown story");
   const story = Story.parse(input.story);
   const { origins } = input;
   if (origins.length !== story.pages.length) throw new Error("origins must have one entry per page");

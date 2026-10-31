@@ -4,6 +4,7 @@ import { sampleStory, validateStory } from "@socialstory/core";
 import { config } from "./config.js";
 import { runTextTask } from "./meta.js";
 import { kitRoutes } from "./kitRoutes.js";
+import { playerRoutes } from "./playerRoutes.js";
 import { makeMetaDraftGenerator } from "./generators.js";
 import { draftRoutes } from "./draftRoutes.js";
 import { runStructuredTask } from "./meta.js";
@@ -28,6 +29,7 @@ app.get("/dev/smoke", async (c) => {
 });
 
 app.route("/kits", kitRoutes());
+app.route("/players", playerRoutes());
 
 // Editing routes for the user app. No sign-in yet, so these are for local
 // use and the passcode-protected demo only (see docs/launch-checklist.md).

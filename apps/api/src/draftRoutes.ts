@@ -30,7 +30,7 @@ export function draftRoutes(options: {
   routes.get("/:id/images/:file", (c) => {
     const id = c.req.param("id");
     const file = c.req.param("file");
-    if (!draftContext(id) || !/^(page-\d{2}|cast-[a-z0-9-]+)\.png$/.test(file)) return c.json({ error: "Not found" }, 404);
+    if (!draftContext(id, dataDir) || !/^(page-\d{2}|cast-[a-z0-9-]+)\.png$/.test(file)) return c.json({ error: "Not found" }, 404);
     const path = resolve(imagesDir(id, dataDir), file);
     if (!existsSync(path)) return c.json({ error: "Not found" }, 404);
     return c.body(readFileSync(path), 200, { "Content-Type": "image/png", "Cache-Control": "no-cache" });
@@ -72,7 +72,7 @@ export function draftRoutes(options: {
    */
   routes.post("/:id/regenerate", async (c) => {
     const id = c.req.param("id");
-    const ctx = draftContext(id);
+    const ctx = draftContext(id, dataDir);
     const old = loadStory(id, dataDir);
     if (!ctx || !old) return c.json({ error: "No story with that id" }, 404);
     const { care } = (await c.req.json().catch(() => ({}))) as { care?: boolean };
@@ -84,7 +84,7 @@ export function draftRoutes(options: {
   /** Publishes the saved story. The checker warns but never blocks: the user decides. */
   routes.post("/:id/publish", (c) => {
     const id = c.req.param("id");
-    const ctx = draftContext(id);
+    const ctx = draftContext(id, dataDir);
     const story = loadStory(id, dataDir);
     if (!ctx || !story) return c.json({ error: "No story with that id" }, 404);
     const check = validateStory(story, { cast: castFor(ctx.event, ctx.player), readingLevel: ctx.player.readingLevel });

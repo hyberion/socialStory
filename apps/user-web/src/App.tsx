@@ -1,39 +1,70 @@
 import { useEffect, useState } from "react";
+import type { PlayerProfile } from "@socialstory/core";
 import { api } from "./api";
+import { players } from "./playersApi";
 import { Editor } from "./Editor";
+import { ProfileForm } from "./ProfileForm";
+
+type Screen = { kind: "home" } | { kind: "story"; id: string } | { kind: "profile"; id?: string };
 
 /**
- * User app home: the stories you can edit. (Accounts come after the
- * hackathon; for now these are the test family's stories.)
+ * User app home: your children and your stories. (Accounts come after the
+ * hackathon; for now this is one test family.)
  */
 export function App() {
-  const [ids, setIds] = useState<string[]>();
+  const [screen, setScreen] = useState<Screen>({ kind: "home" });
+  const [kids, setKids] = useState<PlayerProfile[]>();
+  const [stories, setStories] = useState<string[]>();
   const [error, setError] = useState<string>();
-  const [open, setOpen] = useState<string>();
 
   useEffect(() => {
-    if (open) return;
-    api.list().then(setIds).catch(() => setError("Can't reach the server. Is `pnpm dev` running?"));
-  }, [open]);
+    if (screen.kind !== "home") return;
+    Promise.all([players.list(), api.list()])
+      .then(([k, s]) => {
+        setKids(k);
+        setStories(s);
+      })
+      .catch(() => setError("Can't reach the server. Is `pnpm dev` running?"));
+  }, [screen]);
 
-  if (open) return <Editor id={open} onBack={() => setOpen(undefined)} />;
+  const home = () => setScreen({ kind: "home" });
+  if (screen.kind === "story") return <Editor id={screen.id} onBack={home} />;
+  if (screen.kind === "profile") return <ProfileForm id={screen.id} onDone={home} />;
 
   return (
     <main className="page">
       <header>
         <h1>socialStory</h1>
-        <p className="muted">Your stories</p>
       </header>
       {error && <p className="note bad">{error}</p>}
-      {ids?.length === 0 && (
+
+      <h2>Children</h2>
+      <ul className="story-list">
+        {kids?.map((k) => (
+          <li key={k.id}>
+            <button className="story-link" onClick={() => setScreen({ kind: "profile", id: k.id })}>
+              {k.displayName}
+              <span className="muted">Profile →</span>
+            </button>
+          </li>
+        ))}
+        <li>
+          <button className="story-link add" onClick={() => setScreen({ kind: "profile" })}>
+            + Add a child
+          </button>
+        </li>
+      </ul>
+
+      <h2>Stories</h2>
+      {stories?.length === 0 && (
         <p className="card">
           No stories yet. Write one with <code>pnpm write-story doctor</code>, then come back.
         </p>
       )}
       <ul className="story-list">
-        {ids?.map((id) => (
+        {stories?.map((id) => (
           <li key={id}>
-            <button className="story-link" onClick={() => setOpen(id)}>
+            <button className="story-link" onClick={() => setScreen({ kind: "story", id })}>
               {id}
               <span className="muted">Review and edit →</span>
             </button>

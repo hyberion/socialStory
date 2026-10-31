@@ -71,6 +71,47 @@ export const ReviewMode = z.enum([
 ]);
 export type ReviewMode = z.infer<typeof ReviewMode>;
 
+/**
+ * What's hard for this child. Functional, not diagnostic: the app never asks
+ * for a diagnosis. Each one tells the writer what to describe honestly and
+ * where to offer a choice.
+ */
+export const HardThing = z.enum([
+  "loud-places",
+  "sudden-noises",
+  "bright-lights",
+  "being-touched",
+  "waiting",
+  "new-people",
+  "crowds",
+  "strong-smells",
+  "changes-in-plans",
+  "being-away-from-family",
+]);
+export type HardThing = z.infer<typeof HardThing>;
+
+/** How the child usually communicates. Shapes tone and the choices offered, never what they're "allowed" to do. */
+export const Communication = z.enum([
+  "full-sentences",
+  "short-phrases",
+  "single-words",
+  "aac",
+  "mostly-nonspeaking",
+]);
+export type Communication = z.infer<typeof Communication>;
+
+/** Ways the child takes in a story best, in the parent's order of preference. */
+export const WayIn = z.enum(["read", "listen", "interact"]);
+export type WayIn = z.infer<typeof WayIn>;
+
+/** What the child can comfortably do on a screen. Decides which games are offered. */
+export const ScreenAbilities = z.object({
+  tap: z.boolean().default(true),
+  drag: z.boolean().default(false),
+  type: z.boolean().default(false),
+});
+export type ScreenAbilities = z.infer<typeof ScreenAbilities>;
+
 export const PlayerProfile = z.object({
   id: z.string(),
   /** What the player is called in stories. */
@@ -87,5 +128,15 @@ export const PlayerProfile = z.object({
   comforts: z.array(ComfortItem).default([]),
   /** Interests that can make content more engaging (trains, dinosaurs...). */
   interests: z.array(z.string()).default([]),
+  /** Optional. Only ever used to suggest starting settings, never to lock them. */
+  age: z.number().int().min(1).max(30).optional(),
+  communication: Communication.optional(),
+  hardThings: z.array(HardThing).default([]),
+  /** Hard things in the parent's own words, beyond the list. */
+  otherHardThings: z.array(z.string()).default([]),
+  /** What helps, in the parent's words: "knowing what comes next", "deep breaths with Dad". */
+  helps: z.array(z.string()).default([]),
+  screen: ScreenAbilities.default({}),
+  waysIn: z.array(WayIn).default(["read", "listen"]),
 });
 export type PlayerProfile = z.infer<typeof PlayerProfile>;

@@ -32,6 +32,13 @@ export const samplePlayer: PlayerProfile = {
     },
   ],
   interests: ["trains"],
+  age: 7,
+  communication: "short-phrases",
+  hardThings: ["sudden-noises", "waiting"],
+  otherHardThings: [],
+  helps: ["knowing what comes next", "holding Bear"],
+  screen: { tap: true, drag: true, type: false },
+  waysIn: ["listen", "read", "interact"],
 };
 
 export const sampleEvent: Event = {

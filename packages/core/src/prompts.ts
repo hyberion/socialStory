@@ -1,5 +1,6 @@
 import type { DetailLevel, PlayerProfile, ReadingLevel } from "./profile.js";
 import { READING_LIMITS } from "./reading.js";
+import { HARD_THING_PROMPTS } from "./onboarding.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
@@ -144,10 +145,29 @@ function formatPlayer(player: PlayerProfile): string {
     player.perspective === "first"
       ? `Write in first person, as the child ("I", "my"). The child's name is ${player.displayName}.`
       : `Write in third person about ${player.displayName} ("${player.displayName} goes...").`;
+  const hard = [...player.hardThings.map((h) => HARD_THING_PROMPTS[h]), ...player.otherHardThings];
+  const hardRule = hard.length
+    ? `Things that are hard for this child: ${hard.join(", ")}. When the event includes one of these, describe it honestly and plainly, and offer a choice the child controls. Never add one that the event details don't include.`
+    : "";
+  const helpsRule = player.helps.length
+    ? `Things that help this child: ${player.helps.join("; ")}. Use these as choices where they fit the moment.`
+    : "";
+  const communicationRule =
+    player.communication && player.communication !== "full-sentences"
+      ? "The child may not use many spoken words. Never write choices that depend on speaking (\"I can tell the doctor\"); offer choices the child can show instead (pointing, a card, a hand squeeze, looking away)."
+      : "";
   const interests = player.interests.length
     ? `The child likes: ${player.interests.join(", ")}. These may shape word choice only; never add them to the event as things that will happen or be seen.`
     : "";
-  return [readingLevelRule(player.readingLevel), DETAIL_RULES[player.detailLevel], perspective, interests]
+  return [
+    readingLevelRule(player.readingLevel),
+    DETAIL_RULES[player.detailLevel],
+    perspective,
+    hardRule,
+    helpsRule,
+    communicationRule,
+    interests,
+  ]
     .filter(Boolean)
     .join("\n");
 }
