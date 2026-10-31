@@ -11,12 +11,14 @@ import {
   ReadingLevel,
   WAY_IN_LABELS,
   WayIn,
+  currentAge,
   suggestFromAge,
   type ComfortItem,
   type PlayerProfile,
 } from "@socialstory/core";
 import { players } from "./playersApi";
 
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const lines = (text: string) => text.split("\n").map((s) => s.trim()).filter(Boolean);
 const commas = (text: string) => text.split(",").map((s) => s.trim()).filter(Boolean);
 
@@ -79,7 +81,8 @@ export function ProfileForm({
 
   if (!p) return <main className="page"><p className="muted">Loading…</p></main>;
   const set = (patch: Partial<PlayerProfile>) => setP({ ...p, ...patch });
-  const suggestion = p.age ? suggestFromAge(p.age) : undefined;
+  const age = currentAge(p);
+  const suggestion = age ? suggestFromAge(age) : undefined;
   const name = p.displayName.trim() || "your child";
 
   async function save() {
@@ -135,19 +138,51 @@ export function ProfileForm({
             onChange={(e) => set({ appearance: e.target.value || undefined })}
           />
         </label>
-        <label className="short">
-          <span>Age (optional)</span>
-          <input
-            type="number"
-            min={1}
-            max={30}
-            value={p.age ?? ""}
-            onChange={(e) => set({ age: e.target.value ? Number(e.target.value) : undefined })}
-          />
-        </label>
+        <fieldset className="born">
+          <legend>Age (optional)</legend>
+          <div className="row">
+            <label>
+              <span>Born in (month)</span>
+              <select
+                value={p.birthMonth ?? ""}
+                onChange={(e) => set({ birthMonth: e.target.value ? Number(e.target.value) : undefined })}
+              >
+                <option value="">—</option>
+                {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Year</span>
+              <input
+                type="number"
+                min={1900}
+                max={new Date().getFullYear()}
+                placeholder="2019"
+                value={p.birthYear ?? ""}
+                onChange={(e) => set({ birthYear: e.target.value ? Number(e.target.value) : undefined })}
+              />
+            </label>
+            {!p.birthYear && (
+              <label>
+                <span>or just their age</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={p.age ?? ""}
+                  onChange={(e) => set({ age: e.target.value ? Number(e.target.value) : undefined })}
+                />
+              </label>
+            )}
+          </div>
+          <small>
+            {p.birthYear && age ? `${name} is ${age}. ` : ""}
+            Month and year keep the age up to date on their own; we don't need the exact day.
+          </small>
+        </fieldset>
         {suggestion && (suggestion.readingLevel !== p.readingLevel || suggestion.detailLevel !== p.detailLevel) && (
           <p className="hint">
-            Many {p.age}-year-olds start with <strong>{READING_LEVEL_LABELS[suggestion.readingLevel]}</strong> and{" "}
+            Many {age}-year-olds start with <strong>{READING_LEVEL_LABELS[suggestion.readingLevel]}</strong> and{" "}
             <strong>{DETAIL_LEVEL_LABELS[suggestion.detailLevel]}</strong> detail. Only a starting point: you know {name}.{" "}
             <button className="small" onClick={() => set(suggestion)}>Use these</button>
           </p>

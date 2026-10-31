@@ -192,3 +192,4 @@ h2 { margin: 28px 0 10px; }
 .so-far ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 .add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 600px) { .add-row { grid-template-columns: 1fr; } }
+.born .row { display: flex; gap: 12px; flex-wrap: wrap; } .born .row label { flex: 0 1 150px; }

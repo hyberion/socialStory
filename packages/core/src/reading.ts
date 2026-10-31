@@ -25,7 +25,7 @@ export const READING_LEVEL_LABELS: Record<ReadingLevel, string> = {
   "pre-verbal": "Listener (not reading yet)",
   "early-reader": "Early reader",
   reader: "Reader",
-  "fluent-reader": "Fluent reader (older kids and teens)",
+  "fluent-reader": "Fluent reader (older kids, teens and adults)",
 };
 
 export const DETAIL_LEVEL_LABELS: Record<DetailLevel, string> = {

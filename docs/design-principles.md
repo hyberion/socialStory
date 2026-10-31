@@ -72,6 +72,10 @@ Parents plan before they have photos, so the app is built around a gap in the mi
 5. **Story.** Written from the outline and the media; edited and reviewed in the editor.
 6. **Pictures, then publish.**
 
+**After the hackathon: birthdays.** An optional birthday (month and day) used only to nudge the parent ("Ben's birthday is in 3 weeks. Want to make a birthday story?"), plus a birthday template. Birthdays are a classic hard event (surprises, noise, attention), so the nudge goes to the parent, never the player.
+
+**Not only for kids.** Players can be teens or adults; nothing in the app should assume a child or talk down.
+
 **Showcase story.** The doctor story is kept as a fully loaded beta with every feature that exists, including ones the normal flow can't make yet (read-along narration, word help, games, calendar and clock). It doubles as the roadmap and the backbone of the demo video.
 
 **Hackathon plan (Oct 30):** Sat child profile; Sun event interview, outline and to-do list; Mon media step, SAM, story from event plus media, deploy; Tue showcase story (narration slice, word help) and polish; Wed demo video. Narration stays in as a stretch with a guaranteed minimum: the showcase story's read-along.

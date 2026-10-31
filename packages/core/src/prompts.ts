@@ -18,7 +18,7 @@ const READING_LEVEL_INTRO: Record<ReadingLevel, string> = {
   "early-reader": "The child is an early reader. Use simple, concrete words.",
   reader: "The child reads well. Still use plain, concrete words.",
   "fluent-reader":
-    "The child reads fluently and may be older or a teenager. Use plain, precise words and a respectful, matter-of-fact tone. Nothing babyish.",
+    "The reader reads fluently and may be a teenager or an adult. Use plain, precise words and a respectful, matter-of-fact tone that fits their age. Nothing babyish.",
 };
 
 function readingLevelRule(level: ReadingLevel): string {

@@ -14,7 +14,7 @@ export const ReadingLevel = z.enum([
   "early-reader",
   /** Full sentences, more detail per page. */
   "reader",
-  /** Longer pages for strong readers, older kids and teens; never babyish. */
+  /** Longer pages for strong readers: older kids, teens and adults; never babyish. */
   "fluent-reader",
 ]);
 export type ReadingLevel = z.infer<typeof ReadingLevel>;
@@ -129,7 +129,13 @@ export const PlayerProfile = z.object({
   /** Interests that can make content more engaging (trains, dinosaurs...). */
   interests: z.array(z.string()).default([]),
   /** Optional. Only ever used to suggest starting settings, never to lock them. */
-  age: z.number().int().min(1).max(30).optional(),
+  age: z.number().int().min(1).max(120).optional(),
+  /**
+   * Birth month and year, if given: keeps the age current without storing a
+   * full birthdate (less identifying). Wins over \`age\` when set.
+   */
+  birthMonth: z.number().int().min(1).max(12).optional(),
+  birthYear: z.number().int().min(1900).max(2100).optional(),
   communication: Communication.optional(),
   hardThings: z.array(HardThing).default([]),
   /** Hard things in the parent's own words, beyond the list. */

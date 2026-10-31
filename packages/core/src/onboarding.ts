@@ -43,6 +43,23 @@ export const WAY_IN_LABELS: Record<WayIn, string> = {
 };
 
 /**
+ * The player's age today: from birth month and year when given (so it keeps
+ * up by itself), otherwise the age the user typed. Before the birth month
+ * comes round, the birthday hasn't happened yet this year.
+ */
+export function currentAge(
+  p: { age?: number; birthMonth?: number; birthYear?: number },
+  today: Date = new Date(),
+): number | undefined {
+  if (p.birthYear) {
+    const month = today.getMonth() + 1;
+    const age = today.getFullYear() - p.birthYear - (p.birthMonth && month < p.birthMonth ? 1 : 0);
+    return age > 0 ? age : undefined;
+  }
+  return p.age;
+}
+
+/**
  * Starting suggestions from age, shown as "suggested" and never applied on
  * their own (principle 1: the parent knows the child; age is a weak guide).
  */

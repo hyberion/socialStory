@@ -66,3 +66,19 @@ describe("profile in the prompt", () => {
     expect(talker).not.toContain("depend on speaking");
   });
 });
+
+import { currentAge, suggestFromAge } from "./onboarding.js";
+
+describe("age", () => {
+  const oct31 = new Date(2026, 9, 31);
+  it("keeps up by itself from birth month and year", () => {
+    expect(currentAge({ birthYear: 2000, birthMonth: 3 }, oct31)).toBe(26);
+    expect(currentAge({ birthYear: 2000, birthMonth: 12 }, oct31)).toBe(25); // birthday not yet this year
+    expect(currentAge({ birthYear: 2019 }, oct31)).toBe(7);
+  });
+  it("falls back to a typed age, and works for adults", () => {
+    expect(currentAge({ age: 26 })).toBe(26);
+    expect(currentAge({})).toBeUndefined();
+    expect(suggestFromAge(26).readingLevel).toBe("fluent-reader");
+  });
+});
