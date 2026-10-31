@@ -42,7 +42,16 @@ const BLANK: Omit<PlayerProfile, "id"> = {
  * same fields). Asks what helps and what's hard, never for a diagnosis.
  * Every setting can change any time.
  */
-export function ProfileForm({ id, onDone }: { id?: string; onDone: () => void }) {
+export function ProfileForm({
+  id,
+  initial,
+  onDone,
+}: {
+  id?: string;
+  /** A new child's profile filled in by the interview, to review before saving. */
+  initial?: Omit<PlayerProfile, "id">;
+  onDone: () => void;
+}) {
   const [p, setP] = useState<Omit<PlayerProfile, "id"> & { id?: string }>();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
@@ -53,7 +62,11 @@ export function ProfileForm({ id, onDone }: { id?: string; onDone: () => void })
 
   useEffect(() => {
     if (!id) {
-      setP({ ...BLANK });
+      const start = initial ?? BLANK;
+      setP({ ...start });
+      setOtherHard(start.otherHardThings.join("\n"));
+      setHelps(start.helps.join("\n"));
+      setInterests(start.interests.join(", "));
       return;
     }
     players.load(id).then((loaded) => {
@@ -102,7 +115,7 @@ export function ProfileForm({ id, onDone }: { id?: string; onDone: () => void })
   return (
     <main className="page">
       <button className="link" onClick={onDone}>← Back</button>
-      <h1>{p.id ? `${name}'s profile` : "Add a child"}</h1>
+      <h1>{p.id ? `${name}'s profile` : initial ? `Check ${name}'s profile` : "Add a child"}</h1>
       <p className="muted">
         Everything here shapes {name}'s stories and games, and you can change any of it whenever you like. Skip anything you'd
         rather not answer.

@@ -4,8 +4,13 @@ import { api } from "./api";
 import { players } from "./playersApi";
 import { Editor } from "./Editor";
 import { ProfileForm } from "./ProfileForm";
+import { Interview } from "./Interview";
 
-type Screen = { kind: "home" } | { kind: "story"; id: string } | { kind: "profile"; id?: string };
+type Screen =
+  | { kind: "home" }
+  | { kind: "story"; id: string }
+  | { kind: "profile"; id?: string; initial?: Omit<PlayerProfile, "id"> }
+  | { kind: "interview" };
 
 /**
  * User app home: your children and your stories. (Accounts come after the
@@ -29,7 +34,9 @@ export function App() {
 
   const home = () => setScreen({ kind: "home" });
   if (screen.kind === "story") return <Editor id={screen.id} onBack={home} />;
-  if (screen.kind === "profile") return <ProfileForm id={screen.id} onDone={home} />;
+  if (screen.kind === "profile") return <ProfileForm id={screen.id} initial={screen.initial} onDone={home} />;
+  if (screen.kind === "interview")
+    return <Interview onCancel={home} onReview={(initial) => setScreen({ kind: "profile", initial })} />;
 
   return (
     <main className="page">
@@ -48,9 +55,12 @@ export function App() {
             </button>
           </li>
         ))}
-        <li>
+        <li className="add-row">
+          <button className="story-link add" onClick={() => setScreen({ kind: "interview" })}>
+            + Add a child by talking it through
+          </button>
           <button className="story-link add" onClick={() => setScreen({ kind: "profile" })}>
-            + Add a child
+            + Add a child with a form
           </button>
         </li>
       </ul>

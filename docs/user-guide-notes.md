@@ -35,6 +35,14 @@ One profile per player (child). Every setting can be changed at any time; nothin
 | Ways in | Reading, listening, games; in your order | Reading, then listening | Which way the story is offered first. | Saved; the player uses it once narration lands |
 | Interests | List | None | Things your child loves. These only shape word choice. **They never add things to the event**, so the story won't promise trains that won't be there. | Built (stories) |
 
+### Setting up a child
+
+Two ways, same result: **talk it through** (an interview) or **fill in a form.**
+
+- **The interview** asks one short question at a time: name, looks, age (optional), reading, how your child communicates, what's hard, what helps, comfort items, favorite things, what they can do on a screen, and how they take in stories best. "I don't know" and "Skip" are always there, and "Stop here and review" ends it whenever you like. A "So far" panel shows what's been understood. **Status:** built (typing); the microphone comes with voice input.
+- **Nothing is saved until you check it.** The interview ends on the same form, filled in, for you to correct and save.
+- **We never ask for a diagnosis, and never store one.** If you mention one, the app records only what you describe your child doing, needing or finding hard. (There's a safety net in the code too, not just an instruction to the AI.)
+
 ## Your settings (the user)
 
 | Setting | Options | Default | In plain words | Status |

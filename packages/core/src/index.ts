@@ -12,5 +12,6 @@ export * from "./kit.js";
 export * from "./when.js";
 export * from "./reading.js";
 export * from "./onboarding.js";
+export * from "./interview.js";
 export * from "./templates.js";
 export * from "./fixtures.js";

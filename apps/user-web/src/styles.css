@@ -174,3 +174,21 @@ body.dragging-sentence { user-select: none; -webkit-user-select: none; cursor: g
 .toolbar.bottom { position: static; border: none; }
 .story-link.add { font-weight: 400; color: var(--accent); }
 h2 { margin: 28px 0 10px; }
+
+/* ---- Interview ---- */
+.interview-grid { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+@media (max-width: 800px) { .interview-grid { grid-template-columns: 1fr; } .so-far { order: -1; } }
+.chat { display: grid; gap: 8px; }
+.bubble { margin: 0; padding: 10px 14px; border-radius: 14px; max-width: 85%; line-height: 1.45; }
+.bubble.q { background: var(--surface); border: 1px solid var(--line); justify-self: start; }
+.bubble.a { background: var(--accent); color: #fff; justify-self: end; margin-left: auto; }
+.chat > .turn { display: grid; gap: 8px; }
+.thinking { color: var(--muted); }
+.answer-row { display: flex; gap: 8px; align-items: stretch; margin-top: 8px; }
+.answer-row textarea { flex: 1; resize: vertical; }
+.quick { display: flex; gap: 8px; flex-wrap: wrap; }
+.so-far { position: sticky; top: 16px; }
+.so-far h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.so-far ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .add-row { grid-template-columns: 1fr; } }

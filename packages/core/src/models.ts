@@ -28,6 +28,12 @@ export const TEXT_TASKS = {
     effort: "low",
     note: "Structured extraction; little reasoning needed.",
   },
+  /** One interview step: update the draft from the answer, ask the next question. */
+  interview: {
+    model: MODEL_IDS.spark,
+    effort: "low",
+    note: "Short, frequent calls; the user is waiting for the next question.",
+  },
   /** One page rewritten, with the user's optional note ("mention the fish more"). */
   rewritePage: {
     model: MODEL_IDS.spark,
