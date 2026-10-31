@@ -61,6 +61,21 @@ Stories are easy now; getting a kid ready isn't. The product is a preparation ar
 
 **Models:** Muse Spark (story and game logic), Muse Image (scenes), SAM 3.1 (real objects as game pieces), Muse Voice Transcribe (parent dictation).
 
+## The user's journey (Oct 30 rework)
+
+Parents plan before they have photos, so the app is built around a gap in the middle: plan, go gather, come back and build.
+
+1. **Child profile (once, then adjust any time).** By interview (voice or typing) or by plain fields and toggles. Asks what helps and what's hard, never for a diagnosis: sounds (loud places, sudden noises), lights, touch, waiting, new people, crowds; how the child communicates; reading; what they can do on a screen (tap, drag, type, listen); age only as a starting suggestion. The profile sets the defaults for stories, games and reading level; the parent adjusts.
+2. **Event interview.** Voice or typing. Spark asks one question at a time, starting from the matching template's steps and questions and whatever is still missing. "I don't know yet" is always a fine answer and becomes a to-do. Produces an editable **outline** (the event's steps, people, places, hard parts) and a **media to-do list** (the photo checklist).
+3. **The gap.** The parent gathers what they can, over days if needed.
+4. **Media step.** For each to-do: upload it (SAM cuts the person or object out of the photo), or mark "can't get" and choose: draw it from a description, use a generic drawing, leave it out of the pictures, or take the photo at the event for next time.
+5. **Story.** Written from the outline and the media; edited and reviewed in the editor.
+6. **Pictures, then publish.**
+
+**Showcase story.** The doctor story is kept as a fully loaded beta with every feature that exists, including ones the normal flow can't make yet (read-along narration, word help, games, calendar and clock). It doubles as the roadmap and the backbone of the demo video.
+
+**Hackathon plan (Oct 30):** Sat child profile; Sun event interview, outline and to-do list; Mon media step, SAM, story from event plus media, deploy; Tue showcase story (narration slice, word help) and polish; Wed demo video. Narration stays in as a stretch with a guaranteed minimum: the showcase story's read-along.
+
 ## Generation pipeline
 
 Kits are built in five gated stages, cheapest first, so mistakes get caught while they cost nothing to fix. This is Gray's criterion #9 (refine before use) built into the product.
