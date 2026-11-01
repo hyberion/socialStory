@@ -8,11 +8,15 @@ import {
   formatDollars,
   isReasoningEffort,
   sampleEvents,
+  samplePlayer,
   type Event,
+  type PlayerProfile,
   type ReasoningEffort,
   type Story,
 } from "@socialstory/core";
 import type { WriteStoryResult } from "../storyWriter.js";
+import { listEvents, loadEvent } from "../events.js";
+import { loadPlayer } from "../players.js";
 
 export function storyCost(result: WriteStoryResult): number {
   return estimateCost(MODEL_IDS.spark, result.totalUsage);
@@ -20,12 +24,21 @@ export function storyCost(result: WriteStoryResult): number {
 
 /** Looks up a sample event by name, or exits with the list of choices. */
 export function pickEvent(name: string): Event {
-  const event = sampleEvents[name];
+  // Events made in the app first, then the built-in samples.
+  const event = loadEvent(name) ?? sampleEvents[name];
   if (!event) {
-    console.error(`\nNo sample event called "${name}". Choose one of: ${Object.keys(sampleEvents).join(", ")}\n`);
+    const mine = listEvents().map((e) => e.id);
+    console.error(
+      `\nNo event called "${name}". Choose one of: ${[...mine, ...Object.keys(sampleEvents)].join(", ")}\n`,
+    );
     process.exit(1);
   }
   return event;
+}
+
+/** The child an event is for: their saved profile, or the sample child. */
+export function pickPlayer(event: Event): PlayerProfile {
+  return loadPlayer(event.playerId) ?? samplePlayer;
 }
 
 /** Parses an effort name, or exits with the list of choices. */

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { photoLetter, photoListText, type Event, type PhotoLetter, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
+import { players } from "./playersApi";
+import { photoLetter, photoListText, type Event, type PhotoLetter, type PhotoRef, type PlayerProfile, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
 import { events, localOffset } from "./eventsApi";
 
 const lines = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
@@ -39,10 +40,67 @@ export function EventOutline({
   const [photos, setPhotos] = useState<PhotoChecklist>();
   const [hard, setHard] = useState(initial.hardParts.map((h) => h.description).join("\n"));
 
+  // The child's profile holds their comfort-item photos (shared by every story).
+  const [child, setChild] = useState<PlayerProfile>();
+  const [photoBusy, setPhotoBusy] = useState<string>();
+  const [photoNote, setPhotoNote] = useState<string>();
+  const refresh = () => {
+    if (e.id === "new") return;
+    events.photos(e.id).then(setPhotos).catch(() => {});
+    players.load(e.playerId).then(setChild).catch(() => {});
+  };
   useEffect(() => {
-    if (saved && e.id !== "new") events.photos(e.id).then(setPhotos).catch(() => {});
+    if (saved) refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saved, e.id]);
+
+  async function addPhoto(itemId: string, file: File) {
+    // The server answers with the saved event, so save outline edits first or they'd be lost.
+    if (dirty && !(await save())) return;
+    setPhotoBusy(itemId);
+    setPhotoNote(undefined);
+    try {
+      const r = await events.addPhoto(e.id, itemId, file);
+      setE(r.event);
+      setPhotoNote(
+        r.cutout === "made"
+          ? "Added. SAM 3.1 cut them out of the photo: that cutout is what the pictures will be drawn from."
+          : r.cutout === "not-found"
+            ? "Added. SAM couldn't find them clearly in this photo, so the whole photo will be used. A closer, plainer photo cuts out better."
+            : r.cutout === "failed"
+              ? "Added. The cutout didn't work this time, so the whole photo will be used."
+              : "Added.",
+      );
+      refresh();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setPhotoBusy(undefined);
+    }
+  }
+  async function removePhoto(itemId: string) {
+    if (dirty && !(await save())) return;
+    setPhotoBusy(itemId);
+    try {
+      setE((await events.removePhoto(e.id, itemId)).event);
+      refresh();
+    } finally {
+      setPhotoBusy(undefined);
+    }
+  }
+  async function setPlan(itemId: string, plan: string | null) {
+    if (dirty && !(await save())) return;
+    setE((await events.setPlan(e.id, itemId, plan)).event);
+  }
+
+  /** Every photo added so far, with a name for each. */
+  const added: Array<{ id: string; label: string; photo: PhotoRef }> = [
+    ...[...e.companions, ...e.people].filter((p) => p.photo).map((p) => ({ id: p.photo!.id, label: p.name, photo: p.photo! })),
+    ...e.places.flatMap((pl) =>
+      pl.photos.map((ph) => ({ id: ph.id, label: ph.id.endsWith("-entrance") ? `${pl.name}: outside` : ph.id.endsWith("-inside") ? `${pl.name}: inside` : ph.id.replace(/^extra-/, "").replace(/-/g, " "), photo: ph })),
+    ),
+    ...[...(child?.comforts ?? []), ...e.comforts].filter((c) => c.photo).map((c) => ({ id: c.photo!.id, label: c.name, photo: c.photo! })),
+  ];
 
   const set = (patch: Partial<Event>) => {
     setE({ ...e, ...patch });
@@ -325,8 +383,29 @@ export function EventOutline({
             {"share" in navigator && <button onClick={() => void shareList()}>Share…</button>}
             <button onClick={() => setLetterOpen(true)}>📄 Letter to show staff</button>
           </div>
-          <PhotoList title="Most helpful" items={most} />
-          {nice.length > 0 && <PhotoList title="Nice to have" items={nice} />}
+          {photoNote && <p className="note good no-print">{photoNote}</p>}
+          {added.length > 0 && (
+            <fieldset className="no-print">
+              <legend>Added</legend>
+              <ul className="added">
+                {added.map((a) => (
+                  <li key={a.id}>
+                    <img src={`/api/photos/${a.photo.src}`} alt={a.label} />
+                    {a.photo.cutout && (
+                      <figure className="cutout">
+                        <img src={`/api/photos/${a.photo.cutout}`} alt={`${a.label}, cut out`} />
+                        <figcaption>Cut out by SAM 3.1</figcaption>
+                      </figure>
+                    )}
+                    <span>{a.label}</span>
+                    <button className="small" onClick={() => void removePhoto(a.id)} disabled={photoBusy === a.id}>Remove</button>
+                  </li>
+                ))}
+              </ul>
+            </fieldset>
+          )}
+          <PhotoList title="Most helpful" items={most} plans={e.photoPlans} busy={photoBusy} onAdd={addPhoto} onPlan={setPlan} />
+          {nice.length > 0 && <PhotoList title="Nice to have" items={nice} plans={e.photoPlans} busy={photoBusy} onAdd={addPhoto} onPlan={setPlan} />}
           <ul className="tips">{photos.generalTips.map((t) => <li key={t}>{t}</li>)}</ul>
           <button className="no-print" onClick={onDone}>I'll come back with photos</button>
         </section>
@@ -381,17 +460,60 @@ function LetterView({
   );
 }
 
-function PhotoList({ title, items }: { title: string; items: PhotoChecklist["items"] }) {
+const PLAN_LABELS: Record<string, string> = {
+  describe: "Draw it from my description",
+  generic: "Use a simple, generic drawing",
+  "leave-out": "Leave it out of the pictures",
+  "at-event": "I'll take it at the event",
+};
+
+function PhotoList({
+  title,
+  items,
+  plans,
+  busy,
+  onAdd,
+  onPlan,
+}: {
+  title: string;
+  items: PhotoChecklist["items"];
+  plans: Record<string, string>;
+  busy?: string;
+  onAdd: (itemId: string, file: File) => void;
+  onPlan: (itemId: string, plan: string | null) => void;
+}) {
   return (
     <fieldset>
       <legend>{title}</legend>
       <ul className="photo-todo">
         {items.map((p) => (
           <li key={p.id}>
-            <span className="box" aria-hidden="true">☐</span>
-            <strong>{p.label}</strong>
-            <span className="muted"> {p.why}</span>
-            {p.tip && <small> {p.tip}</small>}
+            <div>
+              <span className="box" aria-hidden="true">☐</span>
+              <strong>{p.label}</strong>
+              <span className="muted"> {p.why}</span>
+              {p.tip && <small> {p.tip}</small>}
+            </div>
+            <div className="todo-actions no-print">
+              <label className={busy === p.id ? "button disabled" : "button"}>
+                {busy === p.id ? "Adding…" : "📷 Add photo"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={!!busy}
+                  onChange={(x) => {
+                    const f = x.target.files?.[0];
+                    if (f) onAdd(p.id, f);
+                    x.target.value = "";
+                  }}
+                />
+              </label>
+              <select value={plans[p.id] ?? ""} onChange={(x) => onPlan(p.id, x.target.value || null)} aria-label="If you can't get this photo">
+                <option value="">Can't get it?</option>
+                {Object.entries(PLAN_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
           </li>
         ))}
       </ul>

@@ -30,7 +30,7 @@ import {
   castFor,
   castOnPage,
   formatDollars,
-  samplePlayer,
+
   sampleUser,
   worldRulesFor,
   validateStory,
@@ -40,7 +40,7 @@ import {
 import { generateImage, type ReferenceImage } from "../images.js";
 import { readDrawnFrom, writeDrawnFrom } from "../kits.js";
 import { DATA_DIR } from "../paths.js";
-import { pickEvent, printRequestError } from "./report.js";
+import { pickEvent, pickPlayer, printRequestError } from "./report.js";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -72,13 +72,15 @@ if (!rawPages.every((p) => typeof p === "object" && p !== null && "inPicture" in
   process.exit(1);
 }
 const story = Story.parse(saved.story);
-const cast = castFor(event, samplePlayer);
+const player = pickPlayer(event);
+const cast = castFor(event, player);
 const worldRules = worldRulesFor(sampleUser.region);
 const photosDir = resolve(dataDir, "photos");
 
 /** Loads a cast member's real photo, if they have one and the file exists. */
 function loadPhoto(member: CastMember): ReferenceImage | undefined {
-  const src = member.photo?.src;
+  // The SAM cutout (just the person or object) is the cleaner reference.
+  const src = member.photo?.cutout ?? member.photo?.src;
   if (!src) return undefined;
   const path = isAbsolute(src) ? src : resolve(photosDir, src);
   const mimeType = ({ ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp" } as const)[

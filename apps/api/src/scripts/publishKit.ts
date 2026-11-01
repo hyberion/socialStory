@@ -8,10 +8,10 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { Story, samplePlayer, validateStory, castFor } from "@socialstory/core";
+import { Story, validateStory, castFor } from "@socialstory/core";
 import { publishKit } from "../kits.js";
 import { storiesDir } from "../paths.js";
-import { pickEvent } from "./report.js";
+import { pickEvent, pickPlayer } from "./report.js";
 
 const name = process.argv[2] ?? "doctor";
 const event = pickEvent(name);
@@ -23,8 +23,9 @@ if (!existsSync(storyFile)) {
 const story = Story.parse(JSON.parse(readFileSync(storyFile, "utf8")).story);
 
 // The checker warns, never blocks: the user has the final say.
-const check = validateStory(story, { cast: castFor(event, samplePlayer), readingLevel: samplePlayer.readingLevel });
-const { kit, warnings, dir } = publishKit({ id: name, event, player: samplePlayer, story });
+const player = pickPlayer(event);
+const check = validateStory(story, { cast: castFor(event, player), readingLevel: player.readingLevel });
+const { kit, warnings, dir } = publishKit({ id: name, event, player, story });
 
 console.log(`\n  Published "${kit.title}" (${kit.pages.length} pages, ${kit.pages.filter((p) => p.image).length} pictures)`);
 for (const issue of check.issues) console.log(`  ! Story check: ${issue.message}`);

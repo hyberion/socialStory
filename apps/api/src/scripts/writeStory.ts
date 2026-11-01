@@ -10,10 +10,10 @@
  *   pnpm write-story doctor --effort medium
  */
 import { parseArgs } from "node:util";
-import { samplePlayer, TEXT_TASKS } from "@socialstory/core";
+import { TEXT_TASKS } from "@socialstory/core";
 import { makeMetaDraftGenerator } from "../generators.js";
 import { writeStory, type WriteStoryResult } from "../storyWriter.js";
-import { pickEffort, pickEvent, printRequestError, printStory, printVerdict, saveResult } from "./report.js";
+import { pickEffort, pickEvent, pickPlayer, printRequestError, printStory, printVerdict, saveResult } from "./report.js";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -22,17 +22,18 @@ const { positionals, values } = parseArgs({
 
 const name = positionals[0] ?? "doctor";
 const event = pickEvent(name);
+const player = pickPlayer(event);
 const effort = values.effort ? pickEffort(values.effort) : undefined;
 
 console.log(
-  `\nWriting a story for "${event.title}" (${samplePlayer.displayName}, ${samplePlayer.readingLevel})` +
+  `\nWriting a story for "${event.title}" (${player.displayName}, ${player.readingLevel})` +
     ` at ${effort ?? TEXT_TASKS.writeStory.effort} reasoning\n`,
 );
 const started = Date.now();
 
 let result: WriteStoryResult;
 try {
-  result = await writeStory(event, samplePlayer, makeMetaDraftGenerator({ effort }), {
+  result = await writeStory(event, player, makeMetaDraftGenerator({ effort }), {
     onProgress: (m) => console.log(`  ... ${m}`),
   });
 } catch (err) {

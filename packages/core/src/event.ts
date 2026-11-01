@@ -12,6 +12,8 @@ export const PhotoRef = z.object({
   src: z.string(),
   /** The user's short description, also used as the SAM prompt hint. */
   caption: z.string().optional(),
+  /** SAM 3.1 cutout of the person or object, background see-through (same storage as src). */
+  cutout: z.string().optional(),
 });
 export type PhotoRef = z.infer<typeof PhotoRef>;
 
@@ -111,6 +113,14 @@ export const Transport = z.object({
 });
 export type Transport = z.infer<typeof Transport>;
 
+/**
+ * What to do about a photo the user can't get (keyed by photo to-do id):
+ * draw from the description, use a generic drawing, leave that person or
+ * thing out of the pictures, or take the photo at the event for next time.
+ */
+export const PhotoPlan = z.enum(["describe", "generic", "leave-out", "at-event"]);
+export type PhotoPlan = z.infer<typeof PhotoPlan>;
+
 export const Event = z.object({
   id: z.string(),
   playerId: z.string(),
@@ -133,6 +143,8 @@ export const Event = z.object({
   hardParts: z.array(HardPart).default([]),
   /** Comfort items for this event (merged with the player's standing comforts). */
   comforts: z.array(ComfortItem).default([]),
+  /** "Can't get it" choices, keyed by photo to-do id ("person-p-patel"). */
+  photoPlans: z.record(z.string(), PhotoPlan).default({}),
   /** Other plain facts from the user about the day. */
   notes: z.string().max(2000).optional(),
   status: EventStatus.default("draft"),

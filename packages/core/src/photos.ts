@@ -118,11 +118,13 @@ function slug(text: string): string {
 export function photoChecklist(event: Event, player: PlayerProfile): PhotoChecklist {
   const candidates: Array<Omit<PhotoSuggestion, "priority"> & { strong: boolean }> = [];
   const firstPlace = event.places[0];
+  // Place and extra photos are stored on the place under their to-do id.
+  const done = new Set(event.places.flatMap((p) => p.photos.map((ph) => ph.id)));
 
   // 1. The entrance of the first place: the first thing your child sees.
   // Later places are usually rooms inside it (an exam room has no front door).
   for (const [i, place] of event.places.slice(0, 1).entries()) {
-    if (place.photos.length) continue;
+    if (done.has(`place-${place.id}-entrance`)) continue;
     candidates.push({
       id: `place-${place.id}-entrance`,
       label: `The outside or front door of ${place.name}`,
@@ -162,6 +164,7 @@ export function photoChecklist(event: Event, player: PlayerProfile): PhotoCheckl
   // 4. Inside each place, if the steps happen there.
   for (const place of event.places) {
     if (!event.steps.some((s) => s.placeId === place.id)) continue;
+    if (done.has(`place-${place.id}-inside`)) continue;
     candidates.push({
       id: `place-${place.id}-inside`,
       label: `Inside ${place.name}`,
@@ -181,6 +184,7 @@ export function photoChecklist(event: Event, player: PlayerProfile): PhotoCheckl
       // event has an exam room, so "Inside the exam room" is already listed).
       const core = item.label.toLowerCase().replace(/^the /, "");
       if (candidates.some((c) => c.label.toLowerCase().includes(core))) continue;
+      if (done.has(`extra-${slug(item.label)}`)) continue;
       candidates.push({
         id: `extra-${slug(item.label)}`,
         label: item.label,

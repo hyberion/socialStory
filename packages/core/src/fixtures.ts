@@ -105,6 +105,7 @@ export const sampleEvent: Event = {
     { id: "h2", description: "the shot", stepId: "s3" },
   ],
   comforts: [],
+  photoPlans: {},
   status: "draft",
 };
 

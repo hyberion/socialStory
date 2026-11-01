@@ -30,8 +30,21 @@ export function comfortsFor(event: Event, player: PlayerProfile): ComfortItem[] 
   return [...byId.values()];
 }
 
+/**
+ * Applies the user's "can't get it" choices: "leave-out" removes someone or
+ * something from the pictures; "generic" draws the role without the
+ * description (a simple, generic doctor).
+ */
+function applyPlans(event: Event, members: CastMember[]): CastMember[] {
+  const planFor = (m: CastMember) =>
+    event.photoPlans[m.kind === "prop" ? `comfort-${m.id}` : `person-${m.id}`];
+  return members
+    .filter((m) => m.id === PLAYER_CAST_ID || planFor(m) !== "leave-out")
+    .map((m) => (planFor(m) === "generic" && !m.photo ? { ...m, appearance: undefined } : m));
+}
+
 export function castFor(event: Event, player: PlayerProfile): CastMember[] {
-  return [
+  return applyPlans(event, [
     { id: PLAYER_CAST_ID, kind: "person", name: player.displayName, role: "the child", appearance: player.appearance },
     ...event.companions.map((c) => ({
       id: c.id,
@@ -69,5 +82,5 @@ export function castFor(event: Event, player: PlayerProfile): CastMember[] {
           },
         ]
       : []),
-  ];
+  ]);
 }

@@ -13,10 +13,13 @@ const fakeWriter = () => async () => ({
   usage: { inputTokens: 0, outputTokens: 0, reasoningTokens: 0 },
 });
 
+/** Stand-in SAM: "finds" a 10x10 square in the middle of the photo. */
+const fakeSegment: import("./sam.js").Segmenter = async () => ({ bounds: { left: 5, top: 5, right: 15, bottom: 15 }, raster: new Uint8Array(100).fill(1) });
+
 function setup(listen: ListenEvent = async () => { throw new Error("no model in tests"); }) {
   const dataDir = mkdtempSync(join(tmpdir(), "events-"));
   const app = new Hono()
-    .route("/api/events", eventRoutes({ listen, writer: fakeWriter, dataDir }))
+    .route("/api/events", eventRoutes({ listen, writer: fakeWriter, segment: fakeSegment, dataDir }))
     .route("/api/drafts", draftRoutes({ rewrite: async () => { throw new Error(); }, writer: fakeWriter, dataDir }));
   return { app, dataDir };
 }
@@ -64,5 +67,61 @@ describe("events", () => {
     expect(await (await app.request("/api/drafts")).json()).toContain(saved.id);
     const draft = (await (await app.request(`/api/drafts/${saved.id}`)).json()) as { event: { title: string } };
     expect(draft.event.title).toBe("Haircut with Ms. Rosa");
+  });
+});
+
+import sharp from "sharp";
+import { loadPlayer } from "./players.js";
+
+describe("media step", () => {
+  async function savedDoctorEvent() {
+    const ctx = setup();
+    const outline = (await (await ctx.app.request("/api/events/build", json({ templateKey: "doctor", playerId: "player-sam", tzOffset: "-05:00", draft: { ...EMPTY_EVENT_DRAFT, people: [{ role: "doctor", name: "Dr. Patel", appearance: "", facts: [] }] } }))).json()) as Event;
+    const saved = (await (await ctx.app.request("/api/events", json(outline))).json()) as Event;
+    const photo = await sharp({ create: { width: 40, height: 30, channels: 3, background: "#88aacc" } }).jpeg().toBuffer();
+    const upload = (itemId: string) => ctx.app.request(`/api/events/${saved.id}/photos/${itemId}`, { method: "POST", body: photo, headers: { "Content-Type": "image/jpeg" } });
+    return { ...ctx, saved, upload };
+  }
+  type Reply = { event: Event; photo?: { src: string; cutout?: string }; cutout?: string };
+
+  it("a person's photo gets a SAM cutout and is attached to them", async () => {
+    const { app, saved, upload, dataDir } = await savedDoctorEvent();
+    const patel = saved.people.find((p) => p.name === "Dr. Patel")!;
+    const r = (await (await upload(`person-${patel.id}`)).json()) as Reply;
+    expect(r.cutout).toBe("made");
+    expect(r.event.people.find((p) => p.id === patel.id)?.photo?.cutout).toMatch(/-cutout\.png$/);
+    expect(existsSync(join(dataDir, "photos", r.photo!.cutout!))).toBe(true);
+    // It drops off the to-do list, and the cutout can be fetched for a preview.
+    const list = (await (await app.request(`/api/events/${saved.id}/photos`)).json()) as { items: Array<{ id: string }> };
+    expect(list.items.some((i) => i.id === `person-${patel.id}`)).toBe(false);
+  });
+
+  it("a comfort item's photo is saved on the child's profile, for every story", async () => {
+    const { upload, dataDir } = await savedDoctorEvent();
+    const r = (await (await upload("comfort-bear")).json()) as Reply;
+    expect(r.photo?.src).toBe("players/player-sam/comfort-bear.jpg");
+    expect(loadPlayer("player-sam", dataDir)?.comforts.find((c) => c.id === "bear")?.photo?.cutout).toBeDefined();
+  });
+
+  it("a place photo checks off only its own to-do, and removing it brings the to-do back", async () => {
+    const { app, saved, upload } = await savedDoctorEvent();
+    const office = saved.places[0]!;
+    const r = (await (await upload(`place-${office.id}-entrance`)).json()) as Reply;
+    expect(r.cutout).toBe("not-needed");
+    const ids = async () => ((await (await app.request(`/api/events/${saved.id}/photos`)).json()) as { items: Array<{ id: string }> }).items.map((i) => i.id);
+    expect(await ids()).not.toContain(`place-${office.id}-entrance`);
+    expect(await ids()).toContain(`place-${office.id}-inside`);
+    await app.request(`/api/events/${saved.id}/photos/place-${office.id}-entrance`, { method: "DELETE" });
+    expect(await ids()).toContain(`place-${office.id}-entrance`);
+  });
+
+  it("saves can't-get-it choices, and refuses photos that aren't on the list or aren't photos", async () => {
+    const { app, saved, upload } = await savedDoctorEvent();
+    const nurse = saved.people.find((p) => p.role === "nurse")!;
+    const r = (await (await app.request(`/api/events/${saved.id}/plans/person-${nurse.id}`, { method: "PUT", body: JSON.stringify({ plan: "leave-out" }), headers: { "Content-Type": "application/json" } })).json()) as Reply;
+    expect(r.event.photoPlans[`person-${nurse.id}`]).toBe("leave-out");
+    expect((await upload("person-nobody")).status).toBe(400);
+    const notPhoto = await app.request(`/api/events/${saved.id}/photos/comfort-bear`, { method: "POST", body: "hello", headers: { "Content-Type": "image/jpeg" } });
+    expect(notPhoto.status).toBe(400);
   });
 });

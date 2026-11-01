@@ -1,7 +1,10 @@
 import type { Event, PhotoChecklist } from "@socialstory/core";
 
 async function call<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, { ...init, headers: init?.body ? { "Content-Type": "application/json" } : undefined });
+  // Photos go up as raw bytes with their own type; everything else is JSON.
+  const isFile = typeof File !== "undefined" && init?.body instanceof File;
+  const headers = init?.body ? { "Content-Type": isFile ? (init.body as File).type || "image/jpeg" : "application/json" } : undefined;
+  const res = await fetch(url, { ...init, headers });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error((body as { error?: string }).error ?? `Request failed (${res.status})`);
   return body as T;
@@ -31,5 +34,17 @@ export const events = {
   create: (e: Event) => call<Event>("/api/events", json(e)),
   save: (e: Event) => call<Event>(`/api/events/${encodeURIComponent(e.id)}`, { method: "PUT", body: JSON.stringify(e) }),
   photos: (id: string) => call<PhotoChecklist>(`/api/events/${encodeURIComponent(id)}/photos`),
+  addPhoto: (id: string, itemId: string, file: File) =>
+    call<{ event: Event; cutout: "made" | "not-found" | "not-needed" | "failed" }>(
+      `/api/events/${encodeURIComponent(id)}/photos/${encodeURIComponent(itemId)}`,
+      { method: "POST", body: file },
+    ),
+  removePhoto: (id: string, itemId: string) =>
+    call<{ event: Event }>(`/api/events/${encodeURIComponent(id)}/photos/${encodeURIComponent(itemId)}`, { method: "DELETE" }),
+  setPlan: (id: string, itemId: string, plan: string | null) =>
+    call<{ event: Event }>(`/api/events/${encodeURIComponent(id)}/plans/${encodeURIComponent(itemId)}`, {
+      method: "PUT",
+      body: JSON.stringify({ plan }),
+    }),
   write: (id: string) => call<{ id: string; ok: boolean }>(`/api/events/${encodeURIComponent(id)}/write`, { method: "POST" }),
 };

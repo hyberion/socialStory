@@ -154,3 +154,26 @@ describe("photo list duplicates", () => {
     expect(letter.asks.every((a) => a[0] === a[0]!.toUpperCase())).toBe(true);
   });
 });
+
+import { castFor } from "./cast.js";
+
+describe("can't-get-it choices", () => {
+  it("leave out removes someone from the pictures; generic drops their description", () => {
+    const e = eventFromDraft("doctor", doctorAnswers, args);
+    const patel = e.people.find((p) => p.name === "Dr. Patel")!;
+    const nurse = e.people.find((p) => p.name === "Nurse Kim")!;
+    const cast = castFor({ ...e, photoPlans: { [`person-${nurse.id}`]: "leave-out", [`person-${patel.id}`]: "generic" } }, samplePlayer);
+    expect(cast.some((m) => m.id === nurse.id)).toBe(false);
+    expect(cast.find((m) => m.id === patel.id)?.appearance).toBeUndefined();
+    expect(cast.some((m) => m.id === "player")).toBe(true);
+  });
+
+  it("a place photo checks off only its own to-do", () => {
+    const e = eventFromDraft("doctor", doctorAnswers, args);
+    const office = e.places[0]!;
+    const withPhoto = { ...e, places: e.places.map((p) => (p.id === office.id ? { ...p, photos: [{ id: `place-${office.id}-entrance`, src: "x.jpg" }] } : p)) };
+    const ids = photoChecklist(withPhoto, samplePlayer).items.map((i) => i.id);
+    expect(ids).not.toContain(`place-${office.id}-entrance`);
+    expect(ids).toContain(`place-${office.id}-inside`);
+  });
+});

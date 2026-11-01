@@ -9,6 +9,9 @@ import { kitRoutes } from "./kitRoutes.js";
 import { playerRoutes } from "./playerRoutes.js";
 import { interviewRoutes } from "./interviewRoutes.js";
 import { eventRoutes } from "./eventRoutes.js";
+import { samSegment } from "./samCall.js";
+import { photoFile } from "./media.js";
+import { readFileSync } from "node:fs";
 import { makeMetaDraftGenerator } from "./generators.js";
 import { draftRoutes } from "./draftRoutes.js";
 import { runStructuredTask } from "./meta.js";
@@ -44,8 +47,20 @@ app.route(
     listen: async (prompt) =>
       (await runStructuredTask("interview", EventInterviewReply, "event_interview_answer", prompt.input, { instructions: prompt.instructions })).data,
     writer: () => makeMetaDraftGenerator(),
+    segment: samSegment,
   }),
 );
+
+/** The user's photos, for previews in the user app (allow-listed paths only). */
+app.get("/photos/*", (c) => {
+  const rel = decodeURIComponent(c.req.path.replace(/^\/api\/photos\//, ""));
+  const file = photoFile(rel);
+  if (!file) return c.json({ error: "Not found" }, 404);
+  return c.body(readFileSync(file), 200, {
+    "Content-Type": file.endsWith(".png") ? "image/png" : "image/jpeg",
+    "Cache-Control": "no-cache",
+  });
+});
 app.route(
   "/interview",
   interviewRoutes({

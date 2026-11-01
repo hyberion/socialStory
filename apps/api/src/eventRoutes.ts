@@ -10,12 +10,15 @@ import {
   eventScreenText,
   nextEventQuestion,
   photoChecklist,
+  PhotoPlan,
   samplePlayer,
   type EventInterviewReply,
 } from "@socialstory/core";
 import { DATA_DIR, storiesDir } from "./paths.js";
 import { listEvents, loadEvent, newEventId, saveEvent } from "./events.js";
-import { loadPlayer } from "./players.js";
+import { loadPlayer, savePlayer } from "./players.js";
+import { addPhoto, removePhoto } from "./media.js";
+import type { Segmenter } from "./sam.js";
 import { writeStory, type GenerateDraft } from "./storyWriter.js";
 
 export type ListenEvent = (prompt: { instructions: string; input: string }) => Promise<EventInterviewReply>;
@@ -26,7 +29,7 @@ const NOTHING = /^\s*(i don'?t know|not sure|no idea|skip( this one)?|pass|none|
  * story from a saved event. Model calls are passed in so tests run without
  * a Meta key.
  */
-export function eventRoutes(options: { listen: ListenEvent; writer: () => GenerateDraft; dataDir?: string }) {
+export function eventRoutes(options: { listen: ListenEvent; writer: () => GenerateDraft; segment: Segmenter; dataDir?: string }) {
   const dataDir = options.dataDir ?? DATA_DIR;
   const routes = new Hono();
   const player = (id: unknown) => (typeof id === "string" && loadPlayer(id, dataDir)) || samplePlayer;
@@ -114,6 +117,45 @@ export function eventRoutes(options: { listen: ListenEvent; writer: () => Genera
   routes.get("/:id/photos", (c) => {
     const e = loadEvent(c.req.param("id"), dataDir);
     return e ? c.json(photoChecklist(e, player(e.playerId))) : c.json({ error: "No event with that id" }, 404);
+  });
+
+  /** Adds a photo for one to-do item (raw image bytes in the body). */
+  routes.post("/:id/photos/:itemId", async (c) => {
+    const e = loadEvent(c.req.param("id"), dataDir);
+    if (!e) return c.json({ error: "No event with that id" }, 404);
+    const upload = Buffer.from(await c.req.arrayBuffer());
+    if (!upload.length) return c.json({ error: "No photo was sent." }, 400);
+    if (upload.length > 15 * 1024 * 1024) return c.json({ error: "That photo is over 15 MB. Try a smaller one." }, 400);
+    try {
+      const result = await addPhoto({ event: e, player: player(e.playerId), itemId: c.req.param("itemId"), upload, segment: options.segment }, dataDir);
+      saveEvent(result.event, dataDir);
+      if (result.player !== player(e.playerId)) savePlayer(result.player, dataDir);
+      return c.json({ event: result.event, photo: result.photo, cutout: result.cutout });
+    } catch (err) {
+      return c.json({ error: (err as Error).message.includes("Input buffer") ? "That file isn't a photo the app can read. Try a JPG or PNG." : (err as Error).message }, 400);
+    }
+  });
+
+  routes.delete("/:id/photos/:itemId", (c) => {
+    const e = loadEvent(c.req.param("id"), dataDir);
+    if (!e) return c.json({ error: "No event with that id" }, 404);
+    const result = removePhoto({ event: e, player: player(e.playerId), itemId: c.req.param("itemId") }, dataDir);
+    saveEvent(result.event, dataDir);
+    savePlayer(result.player, dataDir);
+    return c.json({ event: result.event });
+  });
+
+  /** "Can't get it" choice for one to-do item; null clears it. */
+  routes.put("/:id/plans/:itemId", async (c) => {
+    const e = loadEvent(c.req.param("id"), dataDir);
+    if (!e) return c.json({ error: "No event with that id" }, 404);
+    const { plan } = (await c.req.json().catch(() => ({}))) as { plan?: unknown };
+    const parsed = PhotoPlan.nullable().safeParse(plan ?? null);
+    if (!parsed.success) return c.json({ error: "Unknown choice" }, 400);
+    const plans = { ...e.photoPlans };
+    if (parsed.data) plans[c.req.param("itemId")] = parsed.data;
+    else delete plans[c.req.param("itemId")];
+    return c.json({ event: saveEvent({ ...e, photoPlans: plans }, dataDir) });
   });
 
   /** Writes the story for a saved event (about 10 seconds), ready for the editor. */
