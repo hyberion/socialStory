@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Event, PlayerProfile } from "@socialstory/core";
 import { NewStory } from "./NewStory";
 import { EventOutline } from "./EventOutline";
+import { FirstStory } from "./FirstStory";
 import { events } from "./eventsApi";
 import { api } from "./api";
 import { players } from "./playersApi";
@@ -15,7 +16,8 @@ type Screen =
   | { kind: "profile"; id?: string; initial?: Omit<PlayerProfile, "id"> }
   | { kind: "interview" }
   | { kind: "new-story" }
-  | { kind: "outline"; event: Event };
+  | { kind: "outline"; event: Event }
+  | { kind: "first-story"; player: PlayerProfile };
 
 /**
  * User app home: your children and your stories. (Accounts come after the
@@ -55,7 +57,17 @@ export function App() {
         onOutline={saved.some((e) => e.id === screen.id) || screen.fromOutline ? () => void openOutline(screen.id) : undefined}
       />
     );
-  if (screen.kind === "profile") return <ProfileForm id={screen.id} initial={screen.initial} onDone={home} />;
+  if (screen.kind === "profile")
+    return (
+      <ProfileForm
+        id={screen.id}
+        initial={screen.initial}
+        onDone={(saved, isNew) => (saved && isNew ? setScreen({ kind: "first-story", player: saved }) : home())}
+        onFirstStory={(player) => setScreen({ kind: "first-story", player })}
+      />
+    );
+  if (screen.kind === "first-story")
+    return <FirstStory player={screen.player} onSkip={home} onWritten={(id) => setScreen({ kind: "story", id })} />;
   if (screen.kind === "new-story")
     return <NewStory onCancel={home} onOutline={(event) => setScreen({ kind: "outline", event })} />;
   if (screen.kind === "outline")

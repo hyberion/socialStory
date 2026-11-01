@@ -11,6 +11,7 @@ import {
   nextEventQuestion,
   photoChecklist,
   PhotoPlan,
+  aboutMeEvent,
   samplePlayer,
   type EventInterviewReply,
 } from "@socialstory/core";
@@ -76,6 +77,18 @@ export function eventRoutes(options: { listen: ListenEvent; writer: () => Genera
       next: next ? { id: next.id, spoken: next.spoken, screen: eventScreenText(next, child.displayName), showSteps: !!next.showSteps } : null,
       progress: { number: asked.length + 1, total: asked.length + remaining },
     });
+  });
+
+  /** The child's first story, "All about me", made from their profile and written straight away. */
+  routes.post("/about-me", async (c) => {
+    const { playerId } = (await c.req.json().catch(() => ({}))) as { playerId?: string };
+    const child = typeof playerId === "string" ? loadPlayer(playerId, dataDir) ?? (playerId === samplePlayer.id ? samplePlayer : undefined) : undefined;
+    if (!child) return c.json({ error: "No child with that id" }, 404);
+    const event = saveEvent(aboutMeEvent(child), dataDir);
+    const result = await writeStory(event, child, options.writer());
+    mkdirSync(storiesDir(dataDir), { recursive: true });
+    writeFileSync(resolve(storiesDir(dataDir), `${event.id}.json`), JSON.stringify({ story: result.story, validation: result.validation }, null, 2));
+    return c.json({ id: event.id, ok: result.validation.ok });
   });
 
   /** Turns finished answers into an event outline to review (not saved yet). */

@@ -46,5 +46,6 @@ export const events = {
       method: "PUT",
       body: JSON.stringify({ plan }),
     }),
+  aboutMe: (playerId: string) => call<{ id: string; ok: boolean }>("/api/events/about-me", json({ playerId })),
   write: (id: string) => call<{ id: string; ok: boolean }>(`/api/events/${encodeURIComponent(id)}/write`, { method: "POST" }),
 };

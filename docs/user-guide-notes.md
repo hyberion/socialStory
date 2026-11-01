@@ -76,6 +76,12 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 
 **Key promise to explain to parents:** the story only states facts you gave it. If something is missing, it leaves it out rather than guessing. The more detail you give, the richer the story.
 
+## Your child's first story: "All about me"
+
+Right after you add a child, the app offers to make their first story: a short, happy **"All about [name]"** story, made only from the profile (what your child looks like, what they love, what helps, their comfort items) plus how the app works ("I can tap the arrow to see the next page"). No hard things, no events, no date. You can also make it later from the child's profile. **Status:** built.
+
+Why it comes first, in plain words for the guide: your child gets to know the drawn character as *me* before that character turns up at the doctor or a new school; they learn the app on a story with nothing worrying in it; and you get a first look at the pictures to fix anything that doesn't look like your child. Like every story, it reaches your child only when you publish it.
+
 ## Making a new story
 
 Plan first, gather photos later. **Status:** built.

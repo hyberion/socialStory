@@ -2,6 +2,7 @@ import type { DetailLevel, PlayerProfile, ReadingLevel } from "./profile.js";
 import { READING_LIMITS } from "./reading.js";
 import { HARD_THING_PROMPTS } from "./onboarding.js";
 import { dateWords, timeWords, wallClock } from "./when.js";
+import { ABOUT_ME_KIND } from "./aboutMe.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
@@ -91,7 +92,12 @@ function formatEvent(event: Event, player: PlayerProfile): string {
   const places = new Map(event.places.map((p) => [p.id, p]));
   // The event's own wall-clock time (not the server's time zone); empty = not decided.
   const t = wallClock(event.startsAt);
-  const when = t ? `${dateWords(t)}, ${timeWords(t)}` : "not decided yet (do not mention a day or time)";
+  const aboutMe = event.kind === ABOUT_ME_KIND;
+  const when = aboutMe
+    ? "any time: this story is always on the child's shelf"
+    : t
+      ? `${dateWords(t)}, ${timeWords(t)}`
+      : "not decided yet (do not mention a day or time)";
   const comforts = comfortsFor(event, player).map((c) => c.name);
 
   const lines = [
@@ -127,6 +133,9 @@ function formatEvent(event: Event, player: PlayerProfile): string {
     event.transport ? `Getting there: ${event.transport.mode}, called "${event.transport.name}"` : null,
     "",
     event.notes ? `Other details from the user (true facts you may use): ${event.notes}` : null,
+    aboutMe
+      ? "This is an \"All about me\" story: the child's first story in the app. Make it warm, affirming and literal, about who the child is. Use only the facts in the steps above (here the child's likes are true facts, not just word choice). Mention no hard things, no events, no other people. End by saying the child can read this story and their other stories here any time. In every picture, show the child as they are described."
+      : null,
     "",
     "Hard parts to expect:",
     ...(event.hardParts.length ? event.hardParts.map((h) => `- ${h.description}`) : ["- none listed"]),

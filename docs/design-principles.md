@@ -78,6 +78,8 @@ Parents plan before they have photos, so the app is built around a gap in the mi
 
 **Not only for kids.** Players can be teens or adults; nothing in the app should assume a child or talk down.
 
+**First story: "All about me" (Brad, Nov 1).** Offered as soon as a child's profile is saved. Affirming (Gray criterion 2: at least half of stories applaud, not prepare), made only from the profile, no hard things or events. It links the drawn character to the child ("this is me"), teaches the reader on a story with nothing at stake, and gives the parent a first look at the portrait. The parent approves the portrait before publishing; a photo option comes later for children who reject a drawing that's almost-but-not-quite them.
+
 **Showcase story.** The doctor story is kept as a fully loaded beta with every feature that exists, including ones the normal flow can't make yet (read-along narration, word help, games, calendar and clock). It doubles as the roadmap and the backbone of the demo video.
 
 **Hackathon plan (Oct 30):** Sat child profile; Sun event interview, outline and to-do list; Mon media step, SAM, story from event plus media, deploy; Tue showcase story (narration slice, word help) and polish; Wed demo video. Narration stays in as a stretch with a guaranteed minimum: the showcase story's read-along.

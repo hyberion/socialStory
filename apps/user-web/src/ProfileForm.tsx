@@ -48,11 +48,15 @@ export function ProfileForm({
   id,
   initial,
   onDone,
+  onFirstStory,
 }: {
   id?: string;
   /** A new child's profile filled in by the interview, to review before saving. */
   initial?: Omit<PlayerProfile, "id">;
-  onDone: () => void;
+  /** Called after saving (with the saved child and whether they're new), or on Back/Cancel (no arguments). */
+  onDone: (saved?: PlayerProfile, isNew?: boolean) => void;
+  /** Offer "Make an All about me story" for an existing child. */
+  onFirstStory?: (p: PlayerProfile) => void;
 }) {
   const [p, setP] = useState<Omit<PlayerProfile, "id"> & { id?: string }>();
   const [saving, setSaving] = useState(false);
@@ -94,8 +98,8 @@ export function ProfileForm({
     setError(undefined);
     const profile = { ...p!, otherHardThings: lines(otherHard), helps: lines(helps), interests: commas(interests) };
     try {
-      await (p!.id ? players.save(p!.id, profile) : players.create(profile));
-      onDone();
+      const result = await (p!.id ? players.save(p!.id, profile) : players.create(profile));
+      onDone(result, !p!.id);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -117,8 +121,15 @@ export function ProfileForm({
 
   return (
     <main className="page">
-      <button className="link" onClick={onDone}>← Back</button>
+      <button className="link" onClick={() => onDone()}>← Back</button>
       <h1>{p.id ? `${name}'s profile` : initial ? `Check ${name}'s profile` : "Add a child"}</h1>
+      {p.id && onFirstStory && (
+        <p>
+          <button className="small" onClick={() => onFirstStory(p as PlayerProfile)}>
+            Make an "All about {name}" story
+          </button>
+        </p>
+      )}
       <p className="muted">
         Everything here shapes {name}'s stories and games, and you can change any of it whenever you like. Skip anything you'd
         rather not answer.
@@ -323,7 +334,7 @@ export function ProfileForm({
 
       {error && <p className="note bad">{error}</p>}
       <div className="toolbar bottom">
-        <button onClick={onDone}>Cancel</button>
+        <button onClick={() => onDone()}>Cancel</button>
         <button className="primary" onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</button>
       </div>
     </main>

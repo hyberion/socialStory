@@ -177,3 +177,30 @@ describe("can't-get-it choices", () => {
     expect(ids).toContain(`place-${office.id}-inside`);
   });
 });
+
+import { aboutMeEvent } from "./aboutMe.js";
+
+describe("All about me", () => {
+  it("is built only from the profile: me, what I love, what helps, how the app works", () => {
+    const e = aboutMeEvent(samplePlayer);
+    expect(e.id).toBe("sam-about-me");
+    expect(e.title).toBe("All about Sam");
+    expect(e.startsAt).toBe("");
+    const text = e.steps.map((s) => s.description).join(" ");
+    expect(text).toContain("This is me, Sam. What I look like: a seven-year-old boy");
+    expect(text).toContain("I love trains.");
+    expect(text).toContain("Bear and headphones are with me when I need them.");
+    expect(text).toContain("I can tap the speaker to hear the words.");
+    expect(text).not.toMatch(/waiting|noise/i); // no hard things
+    expect(e.people).toEqual([]);
+    const prompt = buildStoryPrompt(e, samplePlayer).input;
+    expect(prompt).toContain("When: any time");
+    expect(prompt).toContain("All about me");
+  });
+
+  it("works for a child with very little in the profile", () => {
+    const e = aboutMeEvent({ ...samplePlayer, appearance: undefined, interests: [], comforts: [], helps: [], sensory: { ...samplePlayer.sensory, soundEnabled: false } });
+    expect(e.steps.map((s) => s.id)).toEqual(["me", "app"]);
+    expect(e.steps[0]!.description).toBe("This is me, Sam.");
+  });
+});

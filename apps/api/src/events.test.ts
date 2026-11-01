@@ -73,6 +73,16 @@ describe("events", () => {
 import sharp from "sharp";
 import { loadPlayer } from "./players.js";
 
+describe("All about me", () => {
+  it("makes the child's first story from their profile, ready for the editor", async () => {
+    const { app } = setup();
+    const r = (await (await app.request("/api/events/about-me", json({ playerId: "player-sam" }))).json()) as { id: string };
+    expect(r.id).toBe("sam-about-me");
+    expect(await (await app.request("/api/drafts")).json()).toContain("sam-about-me");
+    expect((await app.request("/api/events/about-me", json({ playerId: "player-nobody" }))).status).toBe(404);
+  });
+});
+
 describe("media step", () => {
   async function savedDoctorEvent() {
     const ctx = setup();
