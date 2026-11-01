@@ -13,6 +13,8 @@ import {
   WayIn,
   currentAge,
   suggestFromAge,
+  ILLUSTRATION_LOOKS,
+  OFFERED_LOOKS,
   type ComfortItem,
   type PlayerProfile,
 } from "@socialstory/core";
@@ -66,6 +68,7 @@ export function ProfileForm({
   const [otherHard, setOtherHard] = useState("");
   const [helps, setHelps] = useState("");
   const [interests, setInterests] = useState("");
+  const [initialLook, setInitialLook] = useState<string>();
 
   useEffect(() => {
     if (!id) {
@@ -78,6 +81,7 @@ export function ProfileForm({
     }
     players.load(id).then((loaded) => {
       setP(loaded);
+      setInitialLook(loaded.illustrationLook);
       setOtherHard(loaded.otherHardThings.join("\n"));
       setHelps(loaded.helps.join("\n"));
       setInterests(loaded.interests.join(", "));
@@ -239,6 +243,34 @@ export function ProfileForm({
             <span>"{name === "your child" ? "Sam" : name} goes to the doctor"</span>
           </label>
         </fieldset>
+      </section>
+
+      <section className="card form">
+        <h2>Pictures</h2>
+        <p className="muted">
+          How {name}'s stories are drawn. Every look keeps the same calm rules: gentle faces, plain backgrounds, no words in the
+          pictures, nothing frightening. One look for all of {name}'s stories, so they match.
+        </p>
+        <div className="look-grid">
+          {OFFERED_LOOKS.map((look) => (
+            <button
+              key={look}
+              className={p.illustrationLook === look ? "look on" : "look"}
+              aria-pressed={p.illustrationLook === look}
+              onClick={() => set({ illustrationLook: look })}
+            >
+              <img src={`/looks/${look}.jpg`} alt="" />
+              <strong>{ILLUSTRATION_LOOKS[look].label}</strong>
+              <span>{ILLUSTRATION_LOOKS[look].forWho}</span>
+            </button>
+          ))}
+        </div>
+        {id && initialLook && p.illustrationLook !== initialLook && (
+          <p className="hint">
+            Changing the look means {name}'s people and comfort items get drawn again in the new look, and pictures in existing
+            stories change when they're redrawn.
+          </p>
+        )}
       </section>
 
       <section className="card form">

@@ -262,3 +262,10 @@ label.button.disabled { opacity: 0.5; cursor: default; }
 .cutout img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px;
   background: repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 16px 16px; }
 .cutout figcaption { font-size: 0.75rem; color: var(--muted); text-align: center; }
+
+/* ---- Picture look picker ---- */
+.look-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.look { display: grid; gap: 6px; text-align: left; padding: 8px; border-radius: 12px; }
+.look img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; }
+.look span { color: var(--muted); font-size: 0.85rem; }
+.look.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }

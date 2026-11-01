@@ -98,6 +98,7 @@ describe("illustration looks", () => {
       expect(s).toContain("No text, letters, numbers");
       expect(s).toContain("Nothing frightening");
       expect(s).not.toMatch(/pixar|disney|dreamworks|ghibli/i);
+      expect(s).toContain("never lighten or darken skin");
     }
   });
   it("the profile's choices match the looks, and pages use the chosen look", () => {

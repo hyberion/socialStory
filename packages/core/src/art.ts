@@ -17,6 +17,8 @@ import type { StoryPage } from "./story.js";
  * Rules every look keeps, whatever it looks like (principle 4: sensory-safe).
  */
 const ALWAYS = [
+  // Nov 1 style test: watercolor drew Sam's brown skin noticeably lighter. Never again.
+  "Keep each person's skin tone, hair and features exactly as described or as shown in their reference; never lighten or darken skin, in any style.",
   "Simple, uncluttered backgrounds with only the few objects the scene needs.",
   "Calm, relaxed, natural facial expressions; nothing exaggerated, wide-eyed or zany.",
   "No text, letters, numbers, signs with writing, logos or speech bubbles anywhere in the image, including on books, magazines and walls.",
@@ -71,6 +73,13 @@ export const ILLUSTRATION_LOOKS = {
   },
 } as const;
 export type IllustrationLook = keyof typeof ILLUSTRATION_LOOKS;
+
+/**
+ * The looks offered to users (Nov 1, from the style test). The others stay
+ * defined for later: storybook was nearly the same as watercolor, realistic
+ * didn't come out realistic, and clay was the busiest page.
+ */
+export const OFFERED_LOOKS: IllustrationLook[] = ["watercolor", "simple", "animated", "graphic", "contrast"];
 export const DEFAULT_LOOK: IllustrationLook = "watercolor";
 
 /** The full style text for a look, with the rules every look keeps. */
