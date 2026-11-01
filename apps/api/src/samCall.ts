@@ -29,6 +29,17 @@ export const samSegment: Segmenter = async (photo, phrase) => {
   if (!masks.length) return undefined;
   const area = (m: (typeof masks)[number]) => (m.bounds.right - m.bounds.left) * (m.bounds.bottom - m.bounds.top);
   const best = [...masks].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0) || area(b) - area(a))[0]!;
-  return { bounds: best.bounds, raster: decodeMaskToRaster(best.mask), confidence: best.confidence };
+  // Sizes only (no image data): shows how SAM's raster relates to its box and our photo.
+  console.log(
+    `SAM: ${masks.length} mask(s); box ${best.bounds.left},${best.bounds.top}-${best.bounds.right},${best.bounds.bottom}; ` +
+      `raster ${best.mask.width}x${best.mask.height}; confidence ${best.confidence ?? "n/a"}`,
+  );
+  return {
+    bounds: best.bounds,
+    raster: decodeMaskToRaster(best.mask),
+    width: best.mask.width,
+    height: best.mask.height,
+    confidence: best.confidence,
+  };
 };
 

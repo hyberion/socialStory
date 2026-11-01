@@ -14,7 +14,7 @@ const fakeWriter = () => async () => ({
 });
 
 /** Stand-in SAM: "finds" a 10x10 square in the middle of the photo. */
-const fakeSegment: import("./sam.js").Segmenter = async () => ({ bounds: { left: 5, top: 5, right: 15, bottom: 15 }, raster: new Uint8Array(100).fill(1) });
+const fakeSegment: import("./sam.js").Segmenter = async () => ({ bounds: { left: 5, top: 5, right: 15, bottom: 15 }, raster: new Uint8Array(100).fill(1), width: 10, height: 10 });
 
 function setup(listen: ListenEvent = async () => { throw new Error("no model in tests"); }) {
   const dataDir = mkdtempSync(join(tmpdir(), "events-"));

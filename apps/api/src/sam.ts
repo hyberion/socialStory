@@ -13,8 +13,13 @@ import sharp from "sharp";
 export interface FoundObject {
   /** Half-open pixel box in the photo the mask covers. */
   bounds: { left: number; top: number; right: number; bottom: number };
-  /** Row-major 0/1 values, (right-left) x (bottom-top). */
+  /**
+   * Row-major 0/1 values, width x height. SAM's raster has its own size, which
+   * can differ from the box's; it's stretched to the box when the cutout is made.
+   */
   raster: Uint8Array;
+  width: number;
+  height: number;
   confidence?: number;
 }
 
@@ -27,12 +32,28 @@ export async function normalizePhoto(input: Buffer): Promise<Buffer> {
 
 /** A PNG of just the found object, background see-through. */
 export async function makeCutout(photo: Buffer, found: FoundObject): Promise<Buffer> {
-  const { left, top, right, bottom } = found.bounds;
-  const width = right - left;
-  const height = bottom - top;
-  if (found.raster.length !== width * height) throw new Error("Mask size doesn't match its box");
+  if (found.raster.length !== found.width * found.height) throw new Error("Mask data doesn't match its own size");
+  const meta = await sharp(photo).metadata();
+  const clamp = (v: number, max: number) => Math.max(0, Math.min(max, Math.round(v)));
+  const left = clamp(found.bounds.left, meta.width! - 1);
+  const top = clamp(found.bounds.top, meta.height! - 1);
+  const width = clamp(found.bounds.right, meta.width!) - left;
+  const height = clamp(found.bounds.bottom, meta.height!) - top;
+  if (width < 2 || height < 2) throw new Error("Mask box is outside the photo");
+
+  // Stretch SAM's raster to the box if it came at a different size.
+  let mask: Uint8Array = found.raster;
+  if (found.width !== width || found.height !== height) {
+    const grey = Buffer.from(found.raster.map((v) => (v ? 255 : 0)));
+    mask = await sharp(grey, { raw: { width: found.width, height: found.height, channels: 1 } })
+      .resize(width, height, { fit: "fill", kernel: "linear" })
+      .extractChannel(0)
+      .raw()
+      .toBuffer();
+  }
+  const on = (i: number) => (mask === found.raster ? mask[i]! > 0 : mask[i]! >= 128);
   const { data } = await sharp(photo).extract({ left, top, width, height }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  for (let i = 0; i < width * height; i++) data[i * 4 + 3] = found.raster[i] ? 255 : 0;
+  for (let i = 0; i < width * height; i++) data[i * 4 + 3] = on(i) ? 255 : 0;
   return sharp(data, { raw: { width, height, channels: 4 } }).png().toBuffer();
 }
 
