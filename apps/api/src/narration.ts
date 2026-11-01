@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { NarrationFile, pageSpeechText, type Event, type NarrationPage, type Story } from "@socialstory/core";
+import { NarrationFile, SENTENCE_PAUSE, pageSpeechText, pageSpeechWithPauses, type Event, type NarrationPage, type Story } from "@socialstory/core";
 import { DATA_DIR, imagesDir } from "./paths.js";
 
 /**
@@ -16,7 +16,7 @@ export const ELEVEN_SETTINGS = { stability: 0.75, similarity_boost: 0.75, style:
 
 /** A recording's key: its exact words and the voice reading them. */
 export const narrationKey = (text: string, voice: string) =>
-  createHash("sha256").update(`${voice}\n${ELEVEN_MODEL}\n${text}`).digest("hex").slice(0, 12);
+  createHash("sha256").update(`${voice}\n${ELEVEN_MODEL}\npause ${SENTENCE_PAUSE}\n${text}`).digest("hex").slice(0, 12);
 
 const narrationFile = (id: string, dataDir = DATA_DIR) => resolve(imagesDir(id, dataDir), "narration.json");
 
@@ -33,6 +33,11 @@ export function saveNarration(id: string, narration: NarrationFile, dataDir = DA
 /** What each page of a story will say, in order (the first page also says its date and time). */
 export function storySpeech(story: Story, event: Event): string[] {
   return story.pages.map((page, i) => pageSpeechText(page, i === 0 ? event.startsAt : undefined));
+}
+
+/** The same, as sent to the voice: with a short pause after each sentence. */
+export function storySpeechWithPauses(story: Story, event: Event): string[] {
+  return story.pages.map((page, i) => pageSpeechWithPauses(page, i === 0 ? event.startsAt : undefined));
 }
 
 /** The saved recording whose words match this page exactly, if there is one. */

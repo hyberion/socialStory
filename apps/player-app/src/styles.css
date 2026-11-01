@@ -349,11 +349,22 @@ img.picture {
   border-color: var(--soft);
 }
 
+/* Over the page, centred, no animation; the page stays visible behind it. */
+.word-card-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 50, 54, 0.25);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 10;
+}
 .word-card {
+  width: min(100%, 520px);
   border: 2px solid var(--soft);
   border-radius: 20px;
-  background: var(--bg);
-  padding: 16px 20px;
+  background: var(--surface);
+  padding: 24px 20px;
   display: grid;
   gap: 12px;
   justify-items: center;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { PublishedKit } from "@socialstory/core";
-import { dateWords, timeWords, wallClock, wordKey } from "@socialstory/core";
+import { pageSpeechText, wordKey } from "@socialstory/core";
 import { kitFileUrl } from "./api";
 import { TimeCard } from "./TimeCard";
 import { PageWords, WordCard, useReadAlong } from "./ReadAlong";
@@ -39,9 +39,7 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
     }
     if (!deviceVoice) return;
     window.speechSynthesis.cancel();
-    const t = page.when ? wallClock(page.when) : undefined;
-    const when = t ? [`${dateWords(t)}.`, `${timeWords(t)}.`] : [];
-    const utterance = new SpeechSynthesisUtterance([...page.sentences.map((s) => s.text), ...when].join(" "));
+    const utterance = new SpeechSynthesisUtterance(pageSpeechText(page, page.when));
     utterance.rate = sensory.narrationRate;
     window.speechSynthesis.speak(utterance);
   }

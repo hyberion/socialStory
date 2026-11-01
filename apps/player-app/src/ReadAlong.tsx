@@ -142,7 +142,11 @@ export function PageWords({
   );
 }
 
-/** One word, big, with "Say it" and its meaning. Closes only when the player chooses. */
+/**
+ * One word, big, with "Say it" and its meaning, over the middle of the screen
+ * so the player never has to scroll to find it (Nov 1). Closes only when the
+ * player chooses: Done, or a tap outside the card.
+ */
 export function WordCard({
   word,
   means,
@@ -157,8 +161,11 @@ export function WordCard({
   onClose: () => void;
 }) {
   const shown = word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
+  const done = useRef<HTMLButtonElement>(null);
+  useEffect(() => done.current?.focus(), []);
   return (
-    <div className="word-card" role="dialog" aria-label={`The word ${shown}`}>
+    <div className="word-card-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="word-card" role="dialog" aria-modal="true" aria-label={`The word ${shown}`}>
       <p className="big-word">{shown}</p>
       {means && <p className="means">{means}</p>}
       <div className="word-card-buttons">
@@ -167,10 +174,11 @@ export function WordCard({
             🔈 Say it
           </button>
         )}
-        <button className="choice" onClick={onClose}>
+        <button className="choice" onClick={onClose} ref={done}>
           Done
         </button>
       </div>
+    </div>
     </div>
   );
 }

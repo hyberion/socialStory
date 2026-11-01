@@ -26,7 +26,7 @@ import {
 } from "@socialstory/core";
 import { config } from "../config.js";
 import { runStructuredTask } from "../meta.js";
-import { ELEVEN_MODEL, ELEVEN_SETTINGS, loadNarration, narrationKey, recordingFor, saveNarration, storySpeech } from "../narration.js";
+import { ELEVEN_MODEL, ELEVEN_SETTINGS, loadNarration, narrationKey, recordingFor, saveNarration, storySpeech, storySpeechWithPauses } from "../narration.js";
 import { imagesDir, storiesDir } from "../paths.js";
 import { pickEvent, pickPlayer, printRequestError } from "./report.js";
 
@@ -49,6 +49,7 @@ if (!existsSync(storyFile)) {
 }
 const story = Story.parse(JSON.parse(readFileSync(storyFile, "utf8")).story);
 const speech = storySpeech(story, event);
+const sent = storySpeechWithPauses(story, event);
 const dir = imagesDir(name);
 mkdirSync(dir, { recursive: true });
 
@@ -73,7 +74,7 @@ for (const [i, text] of speech.entries()) {
       method: "POST",
       headers: { "xi-api-key": key, "Content-Type": "application/json" },
       body: JSON.stringify({
-        text,
+        text: sent[i],
         model_id: ELEVEN_MODEL,
         voice_settings: ELEVEN_SETTINGS,
         // The pages around this one keep the reading even from page to page.

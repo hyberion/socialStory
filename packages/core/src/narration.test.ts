@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   KIT_FILE_PATTERN,
+  pageSpeechWithPauses,
+  spokenDate,
+  spokenTime,
+  wallClock,
   cleanWordHelp,
   pageSpeechText,
   splitWords,
@@ -60,6 +64,30 @@ describe("read-along word timings", () => {
     expect(text).toMatch(/Tuesday/);
     // The words on screen are the first ones the voice reads.
     expect(splitWords(text).slice(0, 5)).toEqual(splitWords("We go to the doctor."));
+  });
+});
+
+describe("what the voice says", () => {
+  const at = (iso: string) => wallClock(iso)!;
+  it("spells out the date and time the way they're said", () => {
+    expect(spokenDate(at("2026-11-03T10:00:00-05:00"))).toBe("Tuesday, November third");
+    expect(spokenDate(at("2026-11-22T10:00:00-05:00"))).toBe("Sunday, November twenty-second");
+    expect(spokenDate(at("2026-11-30T10:00:00-05:00"))).toBe("Monday, November thirtieth");
+    expect(spokenTime(at("2026-11-03T10:00:00-05:00"))).toBe("ten o'clock in the morning");
+    expect(spokenTime(at("2026-11-03T14:30:00-05:00"))).toBe("two thirty in the afternoon");
+    expect(spokenTime(at("2026-11-03T09:05:00-05:00"))).toBe("nine oh five in the morning");
+    expect(spokenTime(at("2026-11-03T12:00:00-05:00"))).toBe("twelve o'clock, noon");
+  });
+
+  it("pauses after each sentence, and the pauses don't throw off the word timings", () => {
+    const page = { sentences: [{ text: "I see Kim." }, { text: "Kim waves." }] };
+    const sent = pageSpeechWithPauses(page);
+    expect(sent).toBe('I see Kim. <break time="0.7s" /> Kim waves.');
+    const plain = pageSpeechText(page);
+    const words = wordsFromAlignment(plain, align(sent));
+    expect(words).toHaveLength(5);
+    // "Kim" in "Kim waves." starts after the pause tag (character 31 of what was sent).
+    expect(words[3]!.start).toBeCloseTo(sent.indexOf("Kim waves") * 0.1);
   });
 });
 

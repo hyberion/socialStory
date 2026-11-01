@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ReadingLevel } from "./profile.js";
 import { READING_LEVEL_LABELS } from "./reading.js";
-import { dateWords, timeWords, wallClock } from "./when.js";
+import { spokenDate, spokenTime, wallClock } from "./when.js";
 
 /**
  * Read-along narration. Each page is read by a recorded voice (ElevenLabs);
@@ -73,10 +73,30 @@ export function wordKey(word: string): string {
  * only) the date and time that the calendar and clock show.
  */
 export function pageSpeechText(page: { sentences: Array<{ text: string }> }, when?: string): string {
+  return speechParts(page, when).join(" ");
+}
+
+/**
+ * The sentences a page reads, with the date and time spelled out the way
+ * they're said ("ten o'clock in the morning"): Nov 1, the voice stumbled
+ * over "10:00" and the bare date number.
+ */
+export function speechParts(page: { sentences: Array<{ text: string }> }, when?: string): string[] {
   const parts = page.sentences.map((s) => s.text.trim());
   const t = when ? wallClock(when) : undefined;
-  if (t) parts.push(`${dateWords(t)}.`, `${timeWords(t)}.`);
-  return parts.join(" ");
+  if (t) parts.push(`${spokenDate(t)}.`, `${spokenTime(t)}.`);
+  return parts;
+}
+
+/**
+ * The pause between sentences. Nov 1: without it the voice ran sentences
+ * together. Part of every recording's key, so changing it records again.
+ */
+export const SENTENCE_PAUSE = "0.7s";
+
+/** What is sent to the voice service: the same words, with a short pause after each sentence. */
+export function pageSpeechWithPauses(page: { sentences: Array<{ text: string }> }, when?: string): string {
+  return speechParts(page, when).join(` <break time="${SENTENCE_PAUSE}" /> `);
 }
 
 /** ElevenLabs' "alignment": one entry per character of what it read. */
@@ -93,9 +113,17 @@ export interface CharacterAlignment {
  * can't be found is placed between its neighbours so the count still matches.
  */
 export function wordsFromAlignment(text: string, alignment: CharacterAlignment): WordTiming[] {
-  const spoken = alignment.characters.join("");
-  const starts = alignment.character_start_times_seconds;
-  const ends = alignment.character_end_times_seconds;
+  // Pause tags (<break ... />) are instructions, not words: leave them out of the match.
+  const keep: number[] = [];
+  let inTag = false;
+  alignment.characters.forEach((ch, i) => {
+    if (ch === "<") inTag = true;
+    if (!inTag) keep.push(i);
+    if (ch === ">") inTag = false;
+  });
+  const spoken = keep.map((i) => alignment.characters[i]).join("");
+  const starts = keep.map((i) => alignment.character_start_times_seconds[i]!);
+  const ends = keep.map((i) => alignment.character_end_times_seconds[i]!);
   const words = splitWords(text);
   const found: Array<WordTiming | undefined> = [];
   let cursor = 0;

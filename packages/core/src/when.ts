@@ -40,6 +40,32 @@ export function dateWords(t: WallClock): string {
   return `${WEEKDAYS[t.weekday]}, ${MONTHS[t.month - 1]} ${t.day}`;
 }
 
+const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+  "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty"];
+const numberWords = (n: number) => (n < 20 ? ONES[n]! : `${TENS[Math.floor(n / 10)]}${n % 10 ? `-${ONES[n % 10]}` : ""}`);
+const ORDINAL: Record<string, string> = { one: "first", two: "second", three: "third", five: "fifth", eight: "eighth", nine: "ninth", twelve: "twelfth" };
+const ordinalWords = (n: number) => {
+  const w = numberWords(n);
+  const last = w.split("-").pop()!;
+  const ord = ORDINAL[last] ?? (last.endsWith("y") ? `${last.slice(0, -1)}ieth` : `${last}th`);
+  return w.slice(0, w.length - last.length) + ord;
+};
+
+/** For the voice: "Tuesday, November third". */
+export function spokenDate(t: WallClock): string {
+  return `${WEEKDAYS[t.weekday]}, ${MONTHS[t.month - 1]} ${ordinalWords(t.day)}`;
+}
+
+/** For the voice: "ten o'clock in the morning", "two thirty in the afternoon", "twelve o'clock, noon". */
+export function spokenTime(t: WallClock): string {
+  if (t.hour === 12 && t.minute === 0) return "twelve o'clock, noon";
+  const h12 = t.hour % 12 === 0 ? 12 : t.hour % 12;
+  const minutes = t.minute === 0 ? "o'clock" : t.minute < 10 ? `oh ${numberWords(t.minute)}` : numberWords(t.minute);
+  const part = t.hour < 12 ? "in the morning" : t.hour < 17 ? "in the afternoon" : t.hour < 21 ? "in the evening" : "at night";
+  return `${numberWords(h12)} ${minutes} ${part}`;
+}
+
 /** "10:00 in the morning", "2:30 in the afternoon", "12:00 noon". Literal, no "a.m." to decode. */
 export function timeWords(t: WallClock): string {
   if (t.hour === 12 && t.minute === 0) return "12:00 noon";
