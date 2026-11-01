@@ -27,6 +27,7 @@ const BLANK: Omit<PlayerProfile, "id"> = {
   readingLevel: "early-reader",
   detailLevel: "standard",
   artStyle: "illustrated",
+  illustrationLook: "watercolor",
   perspective: "first",
   sensory: { soundEnabled: true, narrationRate: 0.9, reduceMotion: true },
   reviewMode: "every-stage",

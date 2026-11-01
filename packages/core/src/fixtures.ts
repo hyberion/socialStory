@@ -14,6 +14,7 @@ export const samplePlayer: PlayerProfile = {
   readingLevel: "early-reader",
   detailLevel: "standard",
   artStyle: "hybrid",
+  illustrationLook: "watercolor",
   perspective: "first",
   sensory: { soundEnabled: true, narrationRate: 0.9, reduceMotion: true },
   reviewMode: "every-stage",

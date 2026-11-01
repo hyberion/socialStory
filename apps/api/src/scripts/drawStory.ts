@@ -169,7 +169,7 @@ for (const member of cast) {
   } else {
     const photo = loadPhoto(member);
     result = await draw(`${member.name}'s reference ${member.kind === "prop" ? "drawing" : "portrait"}${photo ? " from photo" : ""}`, file, () =>
-      generateImage("castPortrait", buildCastPortraitPrompt(member, { fromPhoto: !!photo }), photo ? [photo] : []),
+      generateImage("castPortrait", buildCastPortraitPrompt(member, { fromPhoto: !!photo, look: player.illustrationLook }), photo ? [photo] : []),
     );
   }
   castResults.set(member.id, result);
@@ -193,7 +193,7 @@ for (const [i, page] of story.pages.entries()) {
   const result = await draw(`page ${number} of ${story.pages.length}`, file, () =>
     generateImage(
       "page",
-      buildPagePrompt(page, refs, worldRules, pageSetting(page, event)),
+      buildPagePrompt(page, refs, worldRules, pageSetting(page, event), player.illustrationLook),
       refs.map((m) => portraits.get(m.id)!),
     ),
   );

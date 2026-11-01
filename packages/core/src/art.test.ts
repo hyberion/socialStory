@@ -87,3 +87,23 @@ describe("props and region", () => {
     expect(prompt).toContain("steering wheel is on the left");
   });
 });
+
+import { ILLUSTRATION_LOOKS, styleFor } from "./art.js";
+import { PlayerProfile } from "./profile.js";
+
+describe("illustration looks", () => {
+  it("every look keeps the safety rules and names no studio", () => {
+    for (const look of Object.keys(ILLUSTRATION_LOOKS) as Array<keyof typeof ILLUSTRATION_LOOKS>) {
+      const s = styleFor(look);
+      expect(s).toContain("No text, letters, numbers");
+      expect(s).toContain("Nothing frightening");
+      expect(s).not.toMatch(/pixar|disney|dreamworks|ghibli/i);
+    }
+  });
+  it("the profile's choices match the looks, and pages use the chosen look", () => {
+    expect(PlayerProfile.shape.illustrationLook.removeDefault().options.sort()).toEqual(Object.keys(ILLUSTRATION_LOOKS).sort());
+    const page = sampleStory.pages[2]!;
+    expect(buildPagePrompt(page, [], [], undefined, "clay")).toContain("clay and felt figures");
+    expect(buildCastPortraitPrompt(cast[0]!, { look: "graphic" })).toContain("Graphic-novel");
+  });
+});

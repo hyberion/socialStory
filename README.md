@@ -68,6 +68,7 @@ Then open:
 | `pnpm compare-effort [event]` | Same story at several reasoning levels, with costs |
 | `pnpm draw-story [event]` | Illustrates a written story and builds a contact sheet. Replaced images move to `history/<date-time>/`. `--pages 2,5` redraws only those pages; `--new-cast` redraws the portraits |
 | `pnpm publish-kit [event]` | Publishes the written story and its pictures to the player app as a locked copy. Warns about missing or out-of-date pictures |
+| `pnpm style-test` | Draws the same scene in all 8 illustration looks (cast sheet + page each, ~$0.24) and builds a comparison sheet. `--looks clay,graphic` for some; `--redo` to draw again |
 | `pnpm voice-questions` | Records the interview questions with ElevenLabs (once; commit the MP3s). With no voice set, lists your voices |
 | `pnpm photo-list [event]` | Shows the photo checklist for an event (free) |
 | `pnpm test` | Unit tests (the story validator lives here) |

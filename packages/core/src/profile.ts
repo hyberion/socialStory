@@ -119,6 +119,10 @@ export const PlayerProfile = z.object({
   readingLevel: ReadingLevel.default("early-reader"),
   detailLevel: DetailLevel.default("standard"),
   artStyle: ArtStyle.default("hybrid"),
+  /** Which illustration look, for drawn pictures (see ILLUSTRATION_LOOKS). One per child, so every story matches. */
+  illustrationLook: z
+    .enum(["watercolor", "simple", "animated", "storybook", "clay", "realistic", "graphic", "contrast"])
+    .default("watercolor"),
   perspective: Perspective.default("first"),
   sensory: SensorySettings.default({}),
   reviewMode: ReviewMode.default("every-stage"),

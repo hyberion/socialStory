@@ -13,14 +13,73 @@ import type { StoryPage } from "./story.js";
  * plain backgrounds, soft light, calm faces, and no text in the image.
  */
 
-export const ILLUSTRATED_STYLE = [
-  "Soft children's picture-book illustration in gentle watercolor and colored pencil.",
-  "Muted, warm, low-saturation colors. Soft, even lighting with no harsh shadows.",
+/**
+ * Rules every look keeps, whatever it looks like (principle 4: sensory-safe).
+ */
+const ALWAYS = [
   "Simple, uncluttered backgrounds with only the few objects the scene needs.",
-  "Rounded, friendly shapes. Calm, relaxed facial expressions.",
+  "Calm, relaxed, natural facial expressions; nothing exaggerated, wide-eyed or zany.",
   "No text, letters, numbers, signs with writing, logos or speech bubbles anywhere in the image, including on books, magazines and walls.",
   "Nothing frightening: no needles shown up close, no blood, no crying, no angry or scary faces.",
 ].join(" ");
+
+/**
+ * Illustration looks. Described, never named after a studio or artist (no
+ * "Pixar-style"): a look isn't anyone's to own, but names are, and image
+ * models often refuse prompts that use them.
+ */
+export const ILLUSTRATION_LOOKS = {
+  watercolor: {
+    label: "Soft watercolor",
+    forWho: "A calm, warm default.",
+    style: "Soft children's picture-book illustration in gentle watercolor and colored pencil. Muted, warm, low-saturation colors. Soft, even lighting with no harsh shadows. Rounded, friendly shapes.",
+  },
+  simple: {
+    label: "Simple and clear",
+    forWho: "Children who find busy pictures overwhelming.",
+    style: "Simple flat illustration: clean shapes, solid flat colors, very little detail and no texture. Plain single-color backgrounds. Thin, even outlines. Muted, gentle colors.",
+  },
+  animated: {
+    label: "3D animated look",
+    forWho: "A familiar, engaging look, like modern animated films.",
+    style: "Soft 3D-animated look like a modern family animated film: rounded shapes, smooth surfaces, warm soft lighting, gentle depth. Natural proportions and normal-sized eyes. Muted, warm colors.",
+  },
+  storybook: {
+    label: "Classic storybook",
+    forWho: "A traditional picture-book feel.",
+    style: "Classic picture-book illustration: hand-drawn ink outlines with soft colored washes and a gentle paper texture. Muted, warm colors. Soft, even lighting.",
+  },
+  clay: {
+    label: "Clay and felt",
+    forWho: "A warm, handmade, tactile feel.",
+    style: "Handmade clay and felt figures, like a gentle stop-motion film: soft matte textures, rounded handmade shapes, warm soft studio lighting. Muted, warm colors.",
+  },
+  realistic: {
+    label: "Realistic",
+    forWho: "Children who take cartoons too literally, or connect better with real-looking pictures.",
+    style: "Realistic painterly illustration, close to a photograph but softly painted: natural proportions, natural muted colors, gentle even lighting.",
+  },
+  graphic: {
+    label: "Graphic novel",
+    forWho: "Teens and adults; nothing childish.",
+    style: "Graphic-novel illustration for teens and adults: clean, confident ink lines, flat muted colors, simple shading, grounded and mature framing. Not cartoonish or childish.",
+  },
+  contrast: {
+    label: "High contrast",
+    forWho: "Low vision.",
+    style: "High-contrast illustration for low vision: thick dark outlines, large simple shapes, strong separation between figures and a plain light background, a few clear colors.",
+  },
+} as const;
+export type IllustrationLook = keyof typeof ILLUSTRATION_LOOKS;
+export const DEFAULT_LOOK: IllustrationLook = "watercolor";
+
+/** The full style text for a look, with the rules every look keeps. */
+export function styleFor(look: IllustrationLook = DEFAULT_LOOK): string {
+  return `${ILLUSTRATION_LOOKS[look].style} ${ALWAYS}`;
+}
+
+/** The original watercolor style, kept for anything that doesn't choose a look. */
+export const ILLUSTRATED_STYLE = styleFor("watercolor");
 
 function describe(member: CastMember): string {
   return `${member.name}, ${member.role}${member.appearance ? `: ${member.appearance}` : ""}`;
@@ -31,7 +90,7 @@ function describe(member: CastMember): string {
  * people and comfort items consistent. With `fromPhoto`, a real photo is
  * attached and the drawing must match it.
  */
-export function buildCastPortraitPrompt(member: CastMember, options: { fromPhoto?: boolean } = {}): string {
+export function buildCastPortraitPrompt(member: CastMember, options: { fromPhoto?: boolean; look?: IllustrationLook } = {}): string {
   const lines =
     member.kind === "prop"
       ? [
@@ -50,7 +109,7 @@ export function buildCastPortraitPrompt(member: CastMember, options: { fromPhoto
         : "The attached photo shows the real person. Keep their recognizable features, hair and clothing, in the illustration style below.",
     );
   }
-  lines.push(ILLUSTRATED_STYLE);
+  lines.push(styleFor(options.look));
   return lines.join("\n");
 }
 
@@ -76,6 +135,7 @@ export function buildPagePrompt(
   references: CastMember[],
   worldRules: string[] = [],
   setting?: string,
+  look?: IllustrationLook,
 ): string {
   const scene = page.sceneBrief ?? page.sentences.map((s) => s.text).join(" ");
   const people = references.filter((m) => m.kind === "person");
@@ -106,7 +166,7 @@ export function buildPagePrompt(
   }
   if (worldRules.length) lines.push("", "Real-world details:", ...worldRules.map((r) => `- ${r}`));
 
-  lines.push("", ILLUSTRATED_STYLE);
+  lines.push("", styleFor(look));
   return lines.join("\n");
 }
 
