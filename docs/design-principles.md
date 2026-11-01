@@ -175,6 +175,19 @@ Meta has no text-to-speech model (Muse Voice Transcribe is speech to text only),
 
 **Hackathon priority (Oct 30):** voice input (Muse Voice Transcribe, real-time only: audio streams over a live connection, push-to-talk) and read-along narration are both goals. If time runs short, narration is cut first, because voice input is what the hackathon rules reward. Word help is scheduled alongside the SAM feature.
 
+## 📌 Before the full build: localization (Spanish first)
+
+Pinned Nov 1. Decide the shape before the post-hackathon build, because it touches every layer and is far cheaper designed in than retrofitted.
+
+- **Two languages per family, not one.** The parent's app language and the child's story language are separate settings (bilingual families: a parent may plan in English for a child who hears stories in Spanish, or the reverse).
+- **Screens:** every user-app and player-app string moves into translation files; no text hard-coded in components. Dates and times formatted per language ("martes, 3 de noviembre, 10:00 de la mañana").
+- **Stories:** Spark writes in the child's language. The checker has English-only parts to rework: banned phrases ("must", "have to" need Spanish equivalents), the second-person check, word and sentence counting, and the reading estimate (Flesch-Kincaid is English; Spanish needs Fernández-Huerta or Szigriszt-Pazos). Gray's criteria themselves carry over.
+- **Interviews:** each question bank gets a Spanish version with its own recordings; Muse Voice Transcribe takes a language setting (Spanish is supported); the listener records answers in the language given.
+- **Voices:** ElevenLabs' multilingual model; pick a Spanish voice with the same calm, unhurried read. Narration recordings per language.
+- **Templates:** translated, and checked for local differences (a school day, a doctor visit and a haircut don't run the same everywhere); region settings already cover which side of the road cars drive on.
+- **Pictures stay text-free,** so they work in any language as they are.
+- **Review by native speakers** (ideally a parent and a professional who use Social Stories in Spanish) before any Spanish story reaches a child.
+
 ## Decisions and open questions
 
 Decided:
