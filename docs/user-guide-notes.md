@@ -76,6 +76,16 @@ Everything the parent tells us about something coming up. Defined in `packages/c
 
 **Key promise to explain to parents:** the story only states facts you gave it. If something is missing, it leaves it out rather than guessing. The more detail you give, the richer the story.
 
+## Making a new story
+
+Plan first, gather photos later. **Status:** built.
+
+1. **New story:** pick the child, then what's coming up (doctor visit, haircut, first day at a new school, meeting a new baby, or something else).
+2. **Talk it through** (or **Skip to the outline**). The same one-question-per-screen interview as the child profile: when it is, who's going, why, the template's own questions ("Is there a shot planned?"), getting there, what the place is like, anything different from the usual steps (the usual steps are shown on that card), what'll be hardest, and anything else. "Tuesday at 10" is understood. Answers that cover several questions skip the others.
+3. **The outline:** the whole plan, every part editable. Steps in order (move, add, delete; "will happen no matter what"; where; who's there), the people going and the people your child will meet (names, looks, a friendly fact), places and what they're like, getting there, hard parts, anything else. Renaming someone (e.g. "the nurse" to "Nurse Kim") renames them in the steps too.
+4. **Save it.** You get the **photo to-do list** for this event, most helpful first, every photo optional.
+5. **Write the story now**, or come back once you have photos. Saved outlines wait on the home screen ("Outline, story not written yet"). Writing takes about 10 seconds and opens the story editor.
+
 ## Starting from a template
 
 Instead of a blank form, the user can start from a common event and edit it. Defined in `packages/core/src/templates.ts`. **Status:** templates built; the picker screen comes with the event screen.

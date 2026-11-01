@@ -8,10 +8,11 @@ import { runTextTask } from "./meta.js";
 import { kitRoutes } from "./kitRoutes.js";
 import { playerRoutes } from "./playerRoutes.js";
 import { interviewRoutes } from "./interviewRoutes.js";
+import { eventRoutes } from "./eventRoutes.js";
 import { makeMetaDraftGenerator } from "./generators.js";
 import { draftRoutes } from "./draftRoutes.js";
 import { runStructuredTask } from "./meta.js";
-import { PageDraft, ProfileInterviewReply } from "@socialstory/core";
+import { EventInterviewReply, PageDraft, ProfileInterviewReply } from "@socialstory/core";
 
 export const app = new Hono().basePath("/api");
 
@@ -37,6 +38,14 @@ app.get("/dev/smoke", async (c) => {
 
 app.route("/kits", kitRoutes());
 app.route("/players", playerRoutes());
+app.route(
+  "/events",
+  eventRoutes({
+    listen: async (prompt) =>
+      (await runStructuredTask("interview", EventInterviewReply, "event_interview_answer", prompt.input, { instructions: prompt.instructions })).data,
+    writer: () => makeMetaDraftGenerator(),
+  }),
+);
 app.route(
   "/interview",
   interviewRoutes({

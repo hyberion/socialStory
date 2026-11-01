@@ -199,3 +199,17 @@ h2 { margin: 28px 0 10px; }
 .mic-button.on { background: var(--bad); border-color: var(--bad); color: #fff; }
 .mic-hint { color: var(--muted); font-size: 0.9rem; }
 .mic-error { color: var(--bad); font-size: 0.9rem; }
+
+/* ---- New story and outline ---- */
+.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.template { display: grid; gap: 4px; text-align: left; padding: 14px; border-radius: 12px; }
+.template span { color: var(--muted); font-size: 0.9rem; }
+.template.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+.person { display: grid; gap: 6px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+.steps-edit { margin: 0; padding-left: 22px; display: grid; gap: 12px; }
+.steps-edit li { display: grid; gap: 6px; }
+.step-meta { flex-wrap: wrap; align-items: center; }
+.photo-todo { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.tips { color: var(--muted); font-size: 0.9rem; }
+.usual-steps { margin: 0; padding: 10px 10px 10px 30px; background: var(--bg); border-radius: 10px; display: grid; gap: 4px; }
+.interview-title { margin: 0; font-size: 0.95rem; color: var(--muted); font-weight: 600; }

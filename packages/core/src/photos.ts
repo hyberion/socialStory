@@ -120,7 +120,8 @@ export function photoChecklist(event: Event, player: PlayerProfile): PhotoCheckl
   const firstPlace = event.places[0];
 
   // 1. The entrance of the first place: the first thing your child sees.
-  for (const [i, place] of event.places.entries()) {
+  // Later places are usually rooms inside it (an exam room has no front door).
+  for (const [i, place] of event.places.slice(0, 1).entries()) {
     if (place.photos.length) continue;
     candidates.push({
       id: `place-${place.id}-entrance`,

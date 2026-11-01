@@ -57,13 +57,14 @@ export const EVENT_TEMPLATES: Record<string, EventTemplate> = {
       person("p-doctor", "the doctor", "doctor"),
     ],
     places: [
-      place("pl-waiting", "the waiting room", ["it can be noisy", "other people wait there too"]),
+      // The building first (its front door is the first thing the child sees), then rooms inside it.
+      place("pl-office", "the doctor's office", ["the waiting room can be noisy", "other people wait there too"]),
       place("pl-exam", "the exam room", ["the bed has crinkly paper on it", "the lights are bright"]),
     ],
     steps: [
       { id: "t1", description: "We go to the doctor's office.", how: "usually" },
-      { id: "t2", description: "We check in at the front desk.", placeId: "pl-waiting", personIds: ["p-desk"], how: "usually" },
-      { id: "t3", description: "We wait in the waiting room.", placeId: "pl-waiting", how: "usually" },
+      { id: "t2", description: "We check in at the front desk.", placeId: "pl-office", personIds: ["p-desk"], how: "usually" },
+      { id: "t3", description: "We wait in the waiting room.", placeId: "pl-office", how: "usually" },
       { id: "t4", description: "The nurse calls my name and walks us to an exam room.", placeId: "pl-exam", personIds: ["p-nurse"], how: "usually" },
       { id: "t5", description: "The nurse checks how tall I am and how much I weigh.", placeId: "pl-exam", personIds: ["p-nurse"], how: "usually" },
       { id: "t6", description: "The nurse takes my temperature and puts a soft cuff on my arm that squeezes.", placeId: "pl-exam", personIds: ["p-nurse"], how: "sometimes" },
@@ -79,10 +80,9 @@ export const EVENT_TEMPLATES: Record<string, EventTemplate> = {
     ],
     comfortIdeas: ["headphones", "a favorite stuffed animal", "a fidget toy", "a book or tablet for waiting"],
     askTheUser: [
-      "What is the doctor's name? Has your child met them before?",
-      "Is there a shot or test planned?",
-      "Who is going along?",
-      "Is there anything in the waiting room your child might like (a fish tank, toys, books)?",
+      "What's the doctor's name, and what do they look like? Has your child met them before?",
+      "Is there a shot or a test planned?",
+      "Is there anything in the waiting room your child might like, like a fish tank, toys, or books?",
     ],
   },
 
@@ -112,9 +112,9 @@ export const EVENT_TEMPLATES: Record<string, EventTemplate> = {
     ],
     comfortIdeas: ["headphones", "a favorite toy to hold", "a show on a tablet"],
     askTheUser: [
-      "Scissors, clippers or both?",
-      "Has your child been to this salon or hairdresser before?",
-      "Does your child mind water sprayed on their head?",
+      "What's the hairdresser's name, and what do they look like?",
+      "Will they use scissors, clippers, or both?",
+      "Has your child been to this salon before? Do they mind water sprayed on their head?",
     ],
   },
 
@@ -126,11 +126,12 @@ export const EVENT_TEMPLATES: Record<string, EventTemplate> = {
     purpose: "to learn and make friends in a new place",
     people: [person("p-teacher", "my teacher", "teacher")],
     places: [
+      place("pl-school", "my new school", []),
       place("pl-classroom", "my classroom", ["lots of kids talk at once", "there are many things on the walls"]),
       place("pl-cafeteria", "the cafeteria", ["it can be very loud"]),
     ],
     steps: [
-      { id: "t1", description: "I go to my new school.", how: "usually" },
+      { id: "t1", description: "I go to my new school.", placeId: "pl-school", how: "usually" },
       { id: "t2", description: "My teacher says hello and shows me my classroom.", placeId: "pl-classroom", personIds: ["p-teacher"], how: "usually" },
       { id: "t3", description: "I put my backpack in my cubby or on my hook.", placeId: "pl-classroom", how: "usually" },
       { id: "t4", description: "The class does the morning routine together.", placeId: "pl-classroom", personIds: ["p-teacher"], how: "usually" },
@@ -145,10 +146,9 @@ export const EVENT_TEMPLATES: Record<string, EventTemplate> = {
     ],
     comfortIdeas: ["headphones", "a small comfort item in the backpack", "a photo from home"],
     askTheUser: [
-      "What is the teacher's name? Can you get a photo of them?",
-      "How does your child get there: car, bus, walking?",
+      "What's the teacher's name, and what do they look like?",
       "Does the school have bells?",
-      "Is there a quiet place your child can go if it gets too much?",
+      "Is there a quiet place your child can go if it gets to be too much?",
     ],
   },
 
@@ -175,8 +175,8 @@ export const EVENT_TEMPLATES: Record<string, EventTemplate> = {
     ],
     comfortIdeas: ["headphones", "a favorite toy", "a quiet activity to bring"],
     askTheUser: [
-      "What is the baby's name, and how is the baby related to your child?",
-      "Will the visit be at a hospital or a home?",
+      "What's the baby's name, and how is the baby related to your child?",
+      "Will the visit be at a hospital or at someone's home?",
       "Will your child be offered a chance to hold the baby?",
     ],
   },

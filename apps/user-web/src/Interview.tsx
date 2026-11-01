@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import { EMPTY_PROFILE_DRAFT, profileFromDraft, summarizeProfileDraft, type PlayerProfile, type ProfileInterviewDraft } from "@socialstory/core";
+import { EMPTY_PROFILE_DRAFT, profileFromDraft, summarizeProfileDraft, type PlayerProfile } from "@socialstory/core";
 import { MicButton, type MicHandle } from "./voice/MicButton";
 
 interface Question {
   id: string;
   spoken: string;
   screen: string;
+  /** Show the usual steps on this card. */
+  showSteps?: boolean;
 }
 
 /** One point in the interview: what's known, what's been asked, and what to ask next. */
 interface Step {
-  draft: ProfileInterviewDraft;
+  draft: unknown;
   asked: string[];
   next: Question | null;
   progress: { number: number; total: number };
@@ -18,8 +20,8 @@ interface Step {
   answer?: string;
 }
 
-async function post(body: object): Promise<Step> {
-  const res = await fetch("/api/interview/profile", {
+async function post(endpoint: string, body: object): Promise<Step> {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -47,14 +49,52 @@ const pref = {
   },
 };
 
+/** Setting up a child by talking it through. */
+export function ProfileInterview({ onReview, onCancel }: { onReview: (p: Omit<PlayerProfile, "id">) => void; onCancel: () => void }) {
+  return (
+    <Interview
+      title="Tell us about your child"
+      endpoint="/api/interview/profile"
+      summarize={(d) => summarizeProfileDraft(d as typeof EMPTY_PROFILE_DRAFT)}
+      finishText="That's everything. Next, check the profile and change anything that's not quite right."
+      finishLabel="Review the profile"
+      onFinish={(d) => onReview(profileFromDraft((d as typeof EMPTY_PROFILE_DRAFT | undefined) ?? EMPTY_PROFILE_DRAFT))}
+      onCancel={onCancel}
+    />
+  );
+}
+
 /**
- * Setting up a child by talking it through: one question per screen.
- * Questions come from a fixed bank with pre-recorded audio (nothing about
- * the child goes to a voice service). Tap Talk, then Stop sends the answer;
- * hands-free mode opens the mic after each question and sends when you stop
- * talking. Everything is reviewed as a form before it's saved.
+ * The interview screen, used for the child profile and for events: one
+ * question per screen. Questions come from a fixed bank with pre-recorded
+ * audio (nothing about the child goes to a voice service). Tap Talk, then
+ * Stop sends the answer; hands-free mode opens the mic after each question
+ * and sends when you stop talking. The result is always reviewed as a form
+ * before anything is saved.
  */
-export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerProfile, "id">) => void; onCancel: () => void }) {
+export function Interview({
+  title,
+  endpoint,
+  extra = {},
+  summarize,
+  usualSteps,
+  finishText,
+  finishLabel,
+  onFinish,
+  onCancel,
+}: {
+  title: string;
+  endpoint: string;
+  /** Sent with every step (template, child, today's date). */
+  extra?: object;
+  summarize: (draft: unknown) => string[];
+  /** Listed on cards that ask about the usual steps. */
+  usualSteps?: string[];
+  finishText: string;
+  finishLabel: string;
+  onFinish: (draft: unknown) => void;
+  onCancel: () => void;
+}) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [answer, setAnswer] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -69,7 +109,7 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
   const question = step?.next ?? null;
 
   useEffect(() => {
-    post({}).then((s) => setSteps([s])).catch((e: Error) => setError(e.message));
+    post(endpoint, extra).then((s) => setSteps([s])).catch((e: Error) => setError(e.message));
     return () => stopSpeaking();
   }, []);
 
@@ -118,7 +158,7 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
     setThinking(true);
     setError(undefined);
     try {
-      const next = await post({ draft: step.draft, asked: step.asked, answer: { questionId: question.id, text: clean } });
+      const next = await post(endpoint, { ...extra, draft: step.draft, asked: step.asked, answer: { questionId: question.id, text: clean } });
       setSteps([...steps.slice(0, -1), { ...step, answer: clean }, next]);
       setAnswer("");
     } catch (e) {
@@ -141,9 +181,9 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
   const review = () => {
     stopSpeaking();
     mic.current?.cancel();
-    onReview(profileFromDraft(step?.draft ?? EMPTY_PROFILE_DRAFT));
+    onFinish(step?.draft);
   };
-  const summary = step ? summarizeProfileDraft(step.draft) : [];
+  const summary = step ? summarize(step.draft) : [];
 
   return (
     <main className="page interview">
@@ -169,12 +209,16 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
 
       {question ? (
         <section className="card question-card" aria-live="polite">
+          <h1 className="interview-title">{title}</h1>
           <p className="question">
             {question.screen}
             {readAloud && (
               <button className="icon hear" aria-label="Hear the question again" onClick={() => speak(question, () => {})}>🔊</button>
             )}
           </p>
+          {question.showSteps && usualSteps && (
+            <ol className="usual-steps">{usualSteps.map((s) => <li key={s}>{s}</li>)}</ol>
+          )}
           <textarea
             className="answer"
             rows={3}
@@ -216,8 +260,8 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
       ) : (
         step && (
           <section className="card question-card done">
-            <p className="question">That's everything. Next, check the profile and change anything that's not quite right.</p>
-            <button className="primary big" onClick={review}>Review the profile</button>
+            <p className="question">{finishText}</p>
+            <button className="primary big" onClick={review}>{finishLabel}</button>
           </section>
         )
       )}

@@ -16,7 +16,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { PROFILE_QUESTIONS } from "@socialstory/core";
+import { PROFILE_QUESTIONS, allEventQuestions } from "@socialstory/core";
 import { config } from "../config.js";
 
 const { values } = parseArgs({ options: { voice: { type: "string" }, all: { type: "boolean", default: false } } });
@@ -60,7 +60,8 @@ const sameVoice = manifest.voice === voice && manifest.model === MODEL;
 
 let made = 0;
 let chars = 0;
-for (const q of PROFILE_QUESTIONS) {
+// Profile questions plus every event question (general ones and each template's own).
+for (const q of [...PROFILE_QUESTIONS, ...allEventQuestions()]) {
   const file = resolve(outDir, `${q.id}.mp3`);
   if (!values.all && sameVoice && manifest.clips[q.id] === q.spoken && existsSync(file)) continue;
   process.stdout.write(`  Recording ${q.id}… `);

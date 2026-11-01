@@ -1,6 +1,7 @@
 import type { DetailLevel, PlayerProfile, ReadingLevel } from "./profile.js";
 import { READING_LIMITS } from "./reading.js";
 import { HARD_THING_PROMPTS } from "./onboarding.js";
+import { dateWords, timeWords, wallClock } from "./when.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
@@ -88,13 +89,9 @@ Scene briefs
 function formatEvent(event: Event, player: PlayerProfile): string {
   const people = new Map(event.people.map((p) => [p.id, p]));
   const places = new Map(event.places.map((p) => [p.id, p]));
-  const when = new Date(event.startsAt).toLocaleString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  // The event's own wall-clock time (not the server's time zone); empty = not decided.
+  const t = wallClock(event.startsAt);
+  const when = t ? `${dateWords(t)}, ${timeWords(t)}` : "not decided yet (do not mention a day or time)";
   const comforts = comfortsFor(event, player).map((c) => c.name);
 
   const lines = [
@@ -128,6 +125,8 @@ function formatEvent(event: Event, player: PlayerProfile): string {
     }),
     "",
     event.transport ? `Getting there: ${event.transport.mode}, called "${event.transport.name}"` : null,
+    "",
+    event.notes ? `Other details from the user (true facts you may use): ${event.notes}` : null,
     "",
     "Hard parts to expect:",
     ...(event.hardParts.length ? event.hardParts.map((h) => `- ${h.description}`) : ["- none listed"]),

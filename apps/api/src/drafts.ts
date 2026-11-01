@@ -18,6 +18,7 @@ import {
 import { pageFile, readDrawnFrom, writeDrawnFrom } from "./kits.js";
 import { DATA_DIR, imagesDir, storiesDir } from "./paths.js";
 import { loadPlayer } from "./players.js";
+import { loadEvent } from "./events.js";
 
 /**
  * Drafts: a written story plus its pictures, before publishing. This is what
@@ -32,7 +33,8 @@ import { loadPlayer } from "./players.js";
 
 /** Who the story is for. One fake family until accounts exist. */
 export function draftContext(id: string, dataDir = DATA_DIR): { event: Event; player: PlayerProfile } | undefined {
-  const event = sampleEvents[id];
+  // Events the user made come first; the sample events are always there too.
+  const event = loadEvent(id, dataDir) ?? sampleEvents[id];
   if (!event) return undefined;
   return { event, player: loadPlayer(event.playerId, dataDir) ?? samplePlayer };
 }

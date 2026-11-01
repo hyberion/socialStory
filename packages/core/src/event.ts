@@ -133,6 +133,8 @@ export const Event = z.object({
   hardParts: z.array(HardPart).default([]),
   /** Comfort items for this event (merged with the player's standing comforts). */
   comforts: z.array(ComfortItem).default([]),
+  /** Other plain facts from the user about the day. */
+  notes: z.string().max(2000).optional(),
   status: EventStatus.default("draft"),
   reflection: Reflection.optional(),
 });
