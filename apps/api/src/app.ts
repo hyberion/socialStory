@@ -40,7 +40,7 @@ app.get("/dev/smoke", async (c) => {
 });
 
 app.route("/kits", kitRoutes());
-app.route("/players", playerRoutes());
+app.route("/players", playerRoutes(undefined, samSegment));
 app.route(
   "/events",
   eventRoutes({

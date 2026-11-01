@@ -269,3 +269,5 @@ label.button.disabled { opacity: 0.5; cursor: default; }
 .look img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; }
 .look span { color: var(--muted); font-size: 0.85rem; }
 .look.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+.child-photo { display: grid; grid-template-columns: 160px 160px; gap: 10px; }
+.child-photo > img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }

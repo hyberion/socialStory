@@ -69,6 +69,8 @@ export function ProfileForm({
   const [helps, setHelps] = useState("");
   const [interests, setInterests] = useState("");
   const [initialLook, setInitialLook] = useState<string>();
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoNote, setPhotoNote] = useState<string>();
 
   useEffect(() => {
     if (!id) {
@@ -109,6 +111,40 @@ export function ProfileForm({
       setError((e as Error).message);
     } finally {
       setSaving(false);
+    }
+  }
+
+  /** The photo saves straight away (it's its own action), without touching unsaved form edits. */
+  async function addPhoto(file: File) {
+    if (!p?.id) return;
+    setPhotoBusy(true);
+    setPhotoNote(undefined);
+    try {
+      const r = await players.addPhoto(p.id, file);
+      setP({ ...p, photo: r.player.photo });
+      setPhotoNote(
+        r.cutout === "made"
+          ? `SAM 3.1 cut ${name} out of the photo. That cutout is what ${name}'s pictures are drawn from (redraw the portrait to use it).`
+          : r.cutout === "not-found"
+            ? `Added, but SAM couldn't find ${name} clearly, so the whole photo will be used. A closer photo with just ${name} in it cuts out better.`
+            : "Added. The cutout didn't work this time, so the whole photo will be used.",
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
+  async function removePhoto() {
+    if (!p?.id) return;
+    setPhotoBusy(true);
+    try {
+      await players.removePhoto(p.id);
+      const { photo: _gone, ...rest } = p;
+      setP(rest);
+      setPhotoNote(undefined);
+    } finally {
+      setPhotoBusy(false);
     }
   }
 
@@ -195,6 +231,48 @@ export function ProfileForm({
             {p.birthYear && age ? `${name} is ${age}. ` : ""}
             Month and year keep the age up to date on their own; we don't need the exact day.
           </small>
+        </fieldset>
+        <fieldset>
+          <legend>Photo of {name} (optional)</legend>
+          {!p.id ? (
+            <p className="muted">Save the profile first, then you can add a photo here.</p>
+          ) : (
+            <>
+              <p className="muted">
+                Only used to draw {name}, so the pictures look like {name}. It stays in this app and is never posted or shared;
+                to draw from it, it's sent to an AI service. You can remove it any time.
+              </p>
+              {p.photo && (
+                <div className="child-photo">
+                  <img src={`/api/photos/${p.photo.src}`} alt={`Photo of ${name}`} />
+                  {p.photo.cutout && (
+                    <figure className="cutout">
+                      <img src={`/api/photos/${p.photo.cutout}`} alt={`${name}, cut out`} />
+                      <figcaption>Cut out by SAM 3.1</figcaption>
+                    </figure>
+                  )}
+                </div>
+              )}
+              <div className="todo-actions">
+                <label className={photoBusy ? "button disabled" : "button"}>
+                  {photoBusy ? "Adding…" : p.photo ? "📷 Change photo" : "📷 Add a photo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    disabled={photoBusy}
+                    onChange={(x) => {
+                      const f = x.target.files?.[0];
+                      if (f) void addPhoto(f);
+                      x.target.value = "";
+                    }}
+                  />
+                </label>
+                {p.photo && <button className="small" onClick={() => void removePhoto()} disabled={photoBusy}>Remove photo</button>}
+              </div>
+              {photoNote && <p className="hint">{photoNote}</p>}
+            </>
+          )}
         </fieldset>
         {suggestion && (suggestion.readingLevel !== p.readingLevel || suggestion.detailLevel !== p.detailLevel) && (
           <p className="hint">

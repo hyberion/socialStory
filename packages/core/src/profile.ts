@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ComfortItem } from "./event.js";
+import { ComfortItem, PhotoRef } from "./event.js";
 
 /**
  * Everything about how content is shaped for one player.
@@ -132,6 +132,11 @@ export const PlayerProfile = z.object({
   comforts: z.array(ComfortItem).default([]),
   /** Interests that can make content more engaging (trains, dinosaurs...). */
   interests: z.array(z.string()).default([]),
+  /**
+   * Optional photo of the player, only used to draw them (the SAM cutout is the
+   * portrait's reference). Stays in the app; removable any time.
+   */
+  photo: PhotoRef.optional(),
   /** Optional. Only ever used to suggest starting settings, never to lock them. */
   age: z.number().int().min(1).max(120).optional(),
   /**

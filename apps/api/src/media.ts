@@ -39,6 +39,41 @@ export interface AddPhotoResult {
   cutout: "made" | "not-found" | "not-needed" | "failed";
 }
 
+/** Saves the child's own photo on their profile, with a SAM cutout to draw them from. */
+export async function addPlayerPhoto(
+  args: { player: PlayerProfile; upload: Buffer; segment: Segmenter },
+  dataDir = DATA_DIR,
+): Promise<{ player: PlayerProfile; cutout: AddPhotoResult["cutout"] }> {
+  const photo = await normalizePhoto(args.upload);
+  const base = `players/${args.player.id}/photo`;
+  const dir = resolve(photosDir(dataDir), `players/${args.player.id}`);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(resolve(photosDir(dataDir), `${base}.jpg`), photo);
+  rmSync(resolve(photosDir(dataDir), `${base}-cutout.png`), { force: true });
+  const ref: PhotoRef = { id: "player-photo", src: `${base}.jpg` };
+  let cutout: AddPhotoResult["cutout"] = "not-found";
+  try {
+    const found = await args.segment(photo, phraseFor("person"));
+    if (found) {
+      writeFileSync(resolve(photosDir(dataDir), `${base}-cutout.png`), await makeCutout(photo, found));
+      ref.cutout = `${base}-cutout.png`;
+      cutout = "made";
+    }
+  } catch (err) {
+    console.warn("SAM cutout failed:", (err as Error).message);
+    cutout = "failed";
+  }
+  return { player: { ...args.player, photo: ref }, cutout };
+}
+
+export function removePlayerPhoto(player: PlayerProfile, dataDir = DATA_DIR): PlayerProfile {
+  for (const rel of [player.photo?.src, player.photo?.cutout]) {
+    if (rel && PHOTO_PATH.test(rel)) rmSync(resolve(photosDir(dataDir), rel), { force: true });
+  }
+  const { photo: _p, ...rest } = player;
+  return rest as PlayerProfile;
+}
+
 /** Saves a photo for one to-do item, cutting the person or object out with SAM where that helps. */
 export async function addPhoto(
   args: { event: Event; player: PlayerProfile; itemId: string; upload: Buffer; segment: Segmenter },

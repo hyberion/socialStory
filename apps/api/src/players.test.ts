@@ -40,3 +40,29 @@ describe("child profiles", () => {
     expect(bad.status).toBe(400);
   });
 });
+
+import sharp from "sharp";
+import { existsSync } from "node:fs";
+import { castFor, sampleEvent } from "@socialstory/core";
+
+describe("the child's own photo", () => {
+  it("gets a SAM cutout, draws their portrait, and can be removed", async () => {
+    const dataDir = mkdtempSync(join(tmpdir(), "players-photo-"));
+    const fakeSegment = async () => ({ bounds: { left: 2, top: 2, right: 12, bottom: 12 }, raster: new Uint8Array(100).fill(1) });
+    const app = new Hono().route("/api/players", playerRoutes(dataDir, fakeSegment));
+    const photo = await sharp({ create: { width: 30, height: 30, channels: 3, background: "#a07050" } }).jpeg().toBuffer();
+    const r = (await (await app.request(`/api/players/${samplePlayer.id}/photo`, { method: "POST", body: photo, headers: { "Content-Type": "image/jpeg" } })).json()) as {
+      player: { photo?: { src: string; cutout?: string } };
+      cutout: string;
+    };
+    expect(r.cutout).toBe("made");
+    expect(r.player.photo?.cutout).toBe("players/player-sam/photo-cutout.png");
+    expect(existsSync(join(dataDir, "photos", "players/player-sam/photo-cutout.png"))).toBe(true);
+    const saved = loadPlayer(samplePlayer.id, dataDir)!;
+    expect(castFor(sampleEvent, saved).find((m) => m.id === "player")?.photo?.cutout).toBeDefined();
+
+    await app.request(`/api/players/${samplePlayer.id}/photo`, { method: "DELETE" });
+    expect(loadPlayer(samplePlayer.id, dataDir)?.photo).toBeUndefined();
+    expect(existsSync(join(dataDir, "photos", "players/player-sam/photo.jpg"))).toBe(false);
+  });
+});

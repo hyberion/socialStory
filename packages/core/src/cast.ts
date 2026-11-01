@@ -45,7 +45,7 @@ function applyPlans(event: Event, members: CastMember[]): CastMember[] {
 
 export function castFor(event: Event, player: PlayerProfile): CastMember[] {
   return applyPlans(event, [
-    { id: PLAYER_CAST_ID, kind: "person", name: player.displayName, role: "the child", appearance: player.appearance },
+    { id: PLAYER_CAST_ID, kind: "person", name: player.displayName, role: "the child", appearance: player.appearance, photo: player.photo },
     ...event.companions.map((c) => ({
       id: c.id,
       kind: "person" as const,

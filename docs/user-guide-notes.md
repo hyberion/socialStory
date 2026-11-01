@@ -133,7 +133,7 @@ If you change a page's words, its picture is marked "may not match anymore" so y
 
 ## The cast sheet (pictures)
 
-Before drawing any pages, the app draws one portrait of each person (your child, whoever comes along, the people they'll meet) and one drawing of each comfort item. If you added a photo of a comfort item, its drawing is made from that photo. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
+Before drawing any pages, the app draws one portrait of each person (your child, whoever comes along, the people they'll meet) and one drawing of each comfort item. If you added a photo of a comfort item, its drawing is made from that photo. If you added a **photo of your child** (on their profile, under "Photo of …"), SAM 3.1 cuts them out of it and their portrait is drawn from that cutout, so the pictures look like them. It's only used to draw them, stays in the app, and **Remove photo** deletes it. Every page is then drawn to match those portraits, so everyone looks the same throughout. **Planned:** you approve or redraw the cast sheet before pages are drawn.
 
 Pictures can only show people you listed. If the story writer tries to put anyone else in a picture, the app rejects it automatically.
 
