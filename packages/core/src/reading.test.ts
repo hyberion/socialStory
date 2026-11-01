@@ -82,3 +82,11 @@ describe("age", () => {
     expect(suggestFromAge(26).readingLevel).toBe("fluent-reader");
   });
 });
+
+describe("parent notes", () => {
+  it("are background only", () => {
+    const p = buildStoryPrompt(sampleEvent, { ...samplePlayer, notes: "He likes to know who will be there." }).instructions;
+    expect(p).toContain("never a source of facts about the event");
+    expect(p).toContain("He likes to know who will be there.");
+  });
+});

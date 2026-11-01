@@ -156,6 +156,9 @@ function formatPlayer(player: PlayerProfile): string {
     player.communication && player.communication !== "full-sentences"
       ? "The child may not use many spoken words. Never write choices that depend on speaking (\"I can tell the doctor\"); offer choices the child can show instead (pointing, a card, a hand squeeze, looking away)."
       : "";
+  const notesRule = player.notes?.trim()
+    ? `Background from the parent, to help you understand the child (never a source of facts about the event): ${player.notes.trim()}`
+    : "";
   const interests = player.interests.length
     ? `The child likes: ${player.interests.join(", ")}. These may shape word choice only; never add them to the event as things that will happen or be seen.`
     : "";
@@ -166,6 +169,7 @@ function formatPlayer(player: PlayerProfile): string {
     hardRule,
     helpsRule,
     communicationRule,
+    notesRule,
     interests,
   ]
     .filter(Boolean)

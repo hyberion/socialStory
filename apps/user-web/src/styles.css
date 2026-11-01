@@ -175,24 +175,23 @@ body.dragging-sentence { user-select: none; -webkit-user-select: none; cursor: g
 .story-link.add { font-weight: 400; color: var(--accent); }
 h2 { margin: 28px 0 10px; }
 
-/* ---- Interview ---- */
-.interview-grid { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
-@media (max-width: 800px) { .interview-grid { grid-template-columns: 1fr; } .so-far { order: -1; } }
-.chat { display: grid; gap: 8px; }
-.bubble { margin: 0; padding: 10px 14px; border-radius: 14px; max-width: 85%; line-height: 1.45; }
-.bubble.q { background: var(--surface); border: 1px solid var(--line); justify-self: start; }
-.bubble.a { background: var(--accent); color: #fff; justify-self: end; margin-left: auto; }
-.chat > .turn { display: grid; gap: 8px; }
-.thinking { color: var(--muted); }
-.answer-row { display: flex; gap: 8px; align-items: stretch; margin-top: 8px; }
-.answer-row textarea { flex: 1; resize: vertical; }
-.quick { display: flex; gap: 8px; flex-wrap: wrap; }
-.so-far { position: sticky; top: 16px; }
-.so-far h2 { margin: 0 0 8px; font-size: 1.1rem; }
+/* ---- Interview: one question per screen ---- */
+.interview { display: grid; gap: 16px; }
+.interview-top { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.toggle { display: flex; gap: 6px; align-items: center; font-size: 0.9rem; color: var(--muted); }
+.question-card { display: grid; gap: 16px; padding: 24px; }
+.question { margin: 0; font-size: clamp(1.3rem, 3vw, 1.7rem); line-height: 1.35; font-weight: 600; }
+.hear { margin-left: 8px; vertical-align: middle; }
+.answer { font-size: 1.15rem; padding: 12px; resize: vertical; }
+.answer-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.answer-actions .mic-button { min-width: 180px; padding: 12px 18px; font-size: 1.1rem; }
+.got-it { margin: 0; }
+.question-card.done .big { justify-self: start; padding: 12px 22px; font-size: 1.1rem; }
+.interview-bottom { display: flex; gap: 10px; justify-content: space-between; }
+.so-far h2 { margin: 0 0 8px; font-size: 1.05rem; }
 .so-far ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 .add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 600px) { .add-row { grid-template-columns: 1fr; } }
-.born .row { display: flex; gap: 12px; flex-wrap: wrap; } .born .row label { flex: 0 1 150px; }
 
 /* ---- Microphone ---- */
 .mic { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }

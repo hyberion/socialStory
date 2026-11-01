@@ -3,17 +3,26 @@ import { Communication, HardThing, PlayerProfile, ReadingLevel, WayIn } from "./
 import { HARD_THING_LABELS } from "./onboarding.js";
 
 /**
- * Interviews: Spark asks one question at a time, updates a draft from each
- * answer, and says when it has enough. The user reviews the result as a
- * form before anything is saved. First used for the child profile.
+ * Interviews run on a fixed question bank (Oct 31 decision):
+ * - Every question maps to fields we actually store, so nothing is asked
+ *   that goes nowhere, and the wording never drifts.
+ * - Each question has pre-recorded audio (generic: "your child") while the
+ *   screen shows the child's name, so nothing about the child is sent to
+ *   the voice service.
+ * - Spark only listens: it fills the profile from each answer (any field the
+ *   answer covers, not just the one asked about). Code picks the next
+ *   question: the first one whose fields are still empty and that hasn't
+ *   been asked.
+ * The user reviews everything as a form before it's saved.
  */
 
 export interface InterviewTurn {
-  question: string;
+  /** Question id from the bank. */
+  questionId: string;
   answer: string;
 }
 
-/** The profile in the strict shape the model fills ("unknown", 0 and [] mean not answered yet). */
+/** The profile in the strict shape the model fills ("unknown", 0, "" and [] mean not answered yet). */
 export const ProfileInterviewDraft = z.object({
   displayName: z.string(),
   appearance: z.string(),
@@ -30,15 +39,13 @@ export const ProfileInterviewDraft = z.object({
   canDrag: z.enum(["yes", "no", "unknown"]),
   canType: z.enum(["yes", "no", "unknown"]),
   waysIn: z.array(WayIn),
+  /** "Anything else": background in the parent's words. */
+  notes: z.string(),
 });
 export type ProfileInterviewDraft = z.infer<typeof ProfileInterviewDraft>;
 
-export const ProfileInterviewReply = z.object({
-  draft: ProfileInterviewDraft,
-  /** The next question, or a short closing line when done. */
-  nextQuestion: z.string(),
-  done: z.boolean(),
-});
+/** What Spark returns for each answer: just the updated draft. */
+export const ProfileInterviewReply = z.object({ draft: ProfileInterviewDraft });
 export type ProfileInterviewReply = z.infer<typeof ProfileInterviewReply>;
 
 export const EMPTY_PROFILE_DRAFT: ProfileInterviewDraft = {
@@ -56,50 +63,150 @@ export const EMPTY_PROFILE_DRAFT: ProfileInterviewDraft = {
   canDrag: "unknown",
   canType: "unknown",
   waysIn: [],
+  notes: "",
 };
 
-/** Asked without a model call, so starting an interview is free and instant. */
-export const PROFILE_OPENING_QUESTION = "Let's set up your child's profile. What's their name, or the nickname you use?";
+export interface BankQuestion {
+  id: string;
+  /** Recorded once; generic so it fits every child ("your child"). */
+  spoken: string;
+  /** Shown on screen; "{name}" becomes the child's name once known. */
+  screen: string;
+  /** True when the draft already holds this answer, so the question is skipped. */
+  answered: (d: ProfileInterviewDraft) => boolean;
+}
 
-/** Most questions before the interview wraps up, whatever the model says. */
-export const PROFILE_INTERVIEW_MAX_TURNS = 14;
+/** The profile interview, in order. Audio files: /voice/questions/<id>.mp3. */
+export const PROFILE_QUESTIONS: BankQuestion[] = [
+  {
+    id: "profile-name",
+    spoken: "Let's set up your child's profile. What's your child's name, or the nickname you use?",
+    screen: "Let's set up your child's profile. What's their name, or the nickname you use?",
+    answered: (d) => !!d.displayName.trim(),
+  },
+  {
+    id: "profile-looks",
+    spoken: "What does your child look like? Things like hair, skin, and favorite clothes. This keeps them looking the same in every picture.",
+    screen: "What does {name} look like? Things like hair, skin and favorite clothes. This keeps {name} looking the same in every picture.",
+    answered: (d) => !!d.appearance.trim(),
+  },
+  {
+    id: "profile-age",
+    spoken: "How old is your child? You can skip this one.",
+    screen: "How old is {name}? You can skip this one.",
+    answered: (d) => d.age > 0,
+  },
+  {
+    id: "profile-reading",
+    spoken: "How does your child do with reading? For example: not reading yet, short simple sentences, or reads well.",
+    screen: "How does {name} do with reading? For example: not reading yet, short simple sentences, or reads well.",
+    answered: (d) => d.readingLevel !== "unknown",
+  },
+  {
+    id: "profile-communication",
+    spoken: "How does your child usually communicate? For example: full sentences, short phrases, single words, or a device or app.",
+    screen: "How does {name} usually communicate? For example: full sentences, short phrases, single words, or a device or app.",
+    answered: (d) => d.communication !== "unknown",
+  },
+  {
+    id: "profile-hard",
+    spoken: "What's hard for your child? Things like loud places, sudden noises, waiting, being touched, or meeting new people.",
+    screen: "What's hard for {name}? Things like loud places, sudden noises, waiting, being touched, or meeting new people.",
+    answered: (d) => d.hardThings.length > 0 || d.otherHardThings.length > 0,
+  },
+  {
+    id: "profile-helps",
+    spoken: "What helps your child when things get hard?",
+    screen: "What helps {name} when things get hard?",
+    answered: (d) => d.helps.length > 0,
+  },
+  {
+    id: "profile-comfort",
+    spoken: "Does your child have a comfort item, like a stuffed animal, a blanket, or headphones? If so, what does it look like?",
+    screen: "Does {name} have a comfort item, like a stuffed animal, a blanket or headphones? If so, what does it look like?",
+    answered: (d) => d.comforts.length > 0 && d.comforts.every((c) => !!c.appearance.trim()),
+  },
+  {
+    id: "profile-loves",
+    spoken: "What does your child love? Favorite things, topics, or characters.",
+    screen: "What does {name} love? Favorite things, topics or characters.",
+    answered: (d) => d.interests.length > 0,
+  },
+  {
+    id: "profile-screen",
+    spoken: "On a phone or tablet, what can your child do comfortably? Tap things, drag things around, or type?",
+    screen: "On a phone or tablet, what can {name} do comfortably? Tap things, drag things around, or type?",
+    answered: (d) => d.canTap !== "unknown" || d.canDrag !== "unknown" || d.canType !== "unknown",
+  },
+  {
+    id: "profile-ways-in",
+    spoken: "Does your child take in stories best by reading, by listening, or by playing games?",
+    screen: "Does {name} take in stories best by reading, by listening, or by playing games?",
+    answered: (d) => d.waysIn.length > 0,
+  },
+  {
+    id: "profile-anything-else",
+    spoken: "Is there anything else that would help us understand your child?",
+    screen: "Is there anything else that would help us understand {name}?",
+    answered: (d) => !!d.notes.trim(),
+  },
+];
 
-const PROFILE_INTERVIEW_RULES = `You are helping a parent, caregiver or teacher set up a profile for an autistic child in an app that prepares children for new events with calm, honest picture stories.
+export const questionById = (id: string) => PROFILE_QUESTIONS.find((q) => q.id === id);
 
-How to interview
-- Ask exactly one short, warm, plain question at a time. No lists of questions, no jargon.
-- Cover these topics, in roughly this order, skipping any already answered: the child's name or nickname; what they look like (for the pictures); age (optional); how well they read; how they usually communicate; what is hard for them (sounds, lights, touch, waiting, new people, crowds, smells, changes in plans, being away from family, or anything else); what helps them, including comfort items and what those look like; things they love; what they can comfortably do on a screen (tap, drag, type); whether they take in stories best by reading, listening or playing.
-- "I don't know", "not sure" or "skip" are always fine. Leave that field as it is and move on. Never ask the same thing twice.
-- After about 10 questions, or when the topics are covered, set done to true and make nextQuestion a short closing line saying they can review everything next.
+/** The next question: the first one that hasn't been asked and isn't already answered. Undefined = done. */
+export function nextProfileQuestion(draft: ProfileInterviewDraft, askedIds: string[]): BankQuestion | undefined {
+  const asked = new Set(askedIds);
+  return PROFILE_QUESTIONS.find((q) => !asked.has(q.id) && !q.answered(draft));
+}
 
-What to record
-- Record only what the user actually said, in the draft fields. Never guess or fill in typical values. Keep everything already in the draft unless the user corrects it.
+/** The question as shown on screen, with the child's name filled in. */
+export function screenText(q: BankQuestion, draft: ProfileInterviewDraft): string {
+  const name = draft.displayName.trim();
+  return name ? q.screen.replaceAll("{name}", name) : q.spoken;
+}
+
+const PROFILE_LISTENER_RULES = `You help a parent, caregiver or teacher set up a profile for an autistic child, in an app that prepares children for new events with calm, honest picture stories. The app asks fixed questions; your job is only to record the answers.
+
+You get the profile so far, the question just asked, and the answer. Return the updated profile.
+
+- Fill in every field the answer covers, not only the one the question was about. ("He's 9, loud places are tough, a timer helps" fills age, hardThings and helps.)
+- Record only what the user actually said. Never guess or fill in typical values. Keep everything already in the profile unless the answer corrects it.
+- "I don't know", "not sure", "skip" or "no": change nothing.
 - Map what they describe onto the fixed lists where it fits (e.g. "covers his ears when the blender goes" is sudden-noises); put anything else in otherHardThings or helps in their own words, briefly.
-- Never record a diagnosis or medical condition (autism, ADHD, anxiety disorder and so on), even if the user mentions one. Record only what they describe the child doing, needing or finding hard. Do not ask about diagnoses, medications or therapies.
-- readingLevel: pre-verbal (not reading yet), early-reader (short simple sentences), reader (reads well), fluent-reader (strong reader, older child or teen). Use "unknown" if not clear.
-- age: 0 unless the user gives one.`;
+- Never record a diagnosis or medical condition (autism, ADHD, anxiety disorder and so on), even if the user mentions one. Record only what they describe the child doing, needing or finding hard.
+- readingLevel: pre-verbal (not reading yet), early-reader (short simple sentences), reader (reads well), fluent-reader (strong reader, older child, teen or adult). Use "unknown" if not clear.
+- communication: full-sentences, short-phrases, single-words, aac (a device or app), mostly-nonspeaking.
+- comforts: each comfort item with its name and what it looks like ("" if not described).
+- notes: for the "anything else" question, a short plain summary of what they said that doesn't fit another field. Leave diagnoses out.`;
 
-export function buildProfileInterviewPrompt(draft: ProfileInterviewDraft, turns: InterviewTurn[]) {
+export function buildProfileListenerPrompt(draft: ProfileInterviewDraft, questionId: string, answer: string) {
+  const q = questionById(questionId);
   return {
-    instructions: PROFILE_INTERVIEW_RULES,
+    instructions: PROFILE_LISTENER_RULES,
     input: [
       "The profile so far (JSON):",
       JSON.stringify(draft, null, 2),
       "",
-      "The conversation so far:",
-      ...turns.map((t) => `Q: ${t.question}\nA: ${t.answer}`),
-      "",
-      "Update the draft from the latest answer, then ask the next question (or finish).",
+      `Question: ${q ? screenText(q, draft) : questionId}`,
+      `Answer: ${answer}`,
     ].join("\n"),
   };
 }
 
 /**
  * Safety net under the prompt rule: diagnosis words never reach a saved
- * profile, even if the model slips. Drops any free-text line that names one.
+ * profile, even if the model slips. Drops any free-text line (or notes
+ * sentence) that names one.
  */
 const DIAGNOSIS = /\b(autis\w*|asd|adhd|aspergers?|asperger's|pda|ocd|spd|anxiety disorder|disorder|diagnos\w*|syndrome|spectrum|medication|meds)\b/i;
 export const stripDiagnoses = (items: string[]) => items.filter((s) => !DIAGNOSIS.test(s));
+const stripDiagnosisSentences = (text: string) =>
+  text
+    .split(/(?<=[.!?])\s+/)
+    .filter((s) => !DIAGNOSIS.test(s))
+    .join(" ")
+    .trim();
 
 export function cleanProfileDraft(draft: ProfileInterviewDraft): ProfileInterviewDraft {
   return {
@@ -107,6 +214,7 @@ export function cleanProfileDraft(draft: ProfileInterviewDraft): ProfileIntervie
     otherHardThings: stripDiagnoses(draft.otherHardThings),
     helps: stripDiagnoses(draft.helps),
     appearance: DIAGNOSIS.test(draft.appearance) ? "" : draft.appearance,
+    notes: stripDiagnosisSentences(draft.notes),
   };
 }
 
@@ -125,10 +233,13 @@ export function profileFromDraft(draft: ProfileInterviewDraft): Omit<PlayerProfi
     hardThings: [...new Set(d.hardThings)],
     otherHardThings: d.otherHardThings,
     helps: d.helps,
-    comforts: d.comforts.filter((c) => c.name.trim()).map((c) => ({ id: slug(c.name), name: c.name.trim(), appearance: c.appearance.trim() || undefined })),
+    comforts: d.comforts
+      .filter((c) => c.name.trim())
+      .map((c) => ({ id: slug(c.name), name: c.name.trim(), appearance: c.appearance.trim() || undefined })),
     interests: d.interests,
     screen: { tap: yes(d.canTap, true), drag: yes(d.canDrag, false), type: yes(d.canType, false) },
     waysIn: d.waysIn.length ? [...new Set(d.waysIn)] : undefined,
+    notes: d.notes.trim() || undefined,
   });
 }
 
@@ -147,5 +258,7 @@ export function summarizeProfileDraft(d: ProfileInterviewDraft): string[] {
   if (d.interests.length) out.push(`Loves: ${d.interests.join(", ")}`);
   const screen = (["canTap", "canDrag", "canType"] as const).filter((k) => d[k] === "yes").map((k) => k.slice(3).toLowerCase());
   if (screen.length) out.push(`Can: ${screen.join(", ")}`);
+  const notes = stripDiagnosisSentences(d.notes);
+  if (notes) out.push(`Also: ${notes}`);
   return out;
 }

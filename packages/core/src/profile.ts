@@ -144,5 +144,10 @@ export const PlayerProfile = z.object({
   helps: z.array(z.string()).default([]),
   screen: ScreenAbilities.default({}),
   waysIn: z.array(WayIn).default(["read", "listen"]),
+  /**
+   * "Anything else" in the parent's words. Background for the story writer
+   * only: never a source of new facts about an event.
+   */
+  notes: z.string().max(1000).optional(),
 });
 export type PlayerProfile = z.infer<typeof PlayerProfile>;

@@ -39,10 +39,14 @@ One profile per player (child). Every setting can be changed at any time; nothin
 
 Two ways, same result: **talk it through** (an interview) or **fill in a form.**
 
-- **The interview** asks one short question at a time: name, looks, age (optional), reading, how your child communicates, what's hard, what helps, comfort items, favorite things, what they can do on a screen, and how they take in stories best. "I don't know" and "Skip" are always there, and "Stop here and review" ends it whenever you like. A "So far" panel shows what's been understood. **Status:** built, typing or talking.
-- **Talking:** tap **🎤 Talk**, speak, tap **Stop**. Your words appear in the answer box as you speak (added after anything you'd already typed), so you can fix a misheard word before you press Send. One recording can be up to 3 minutes. The microphone works on the computer running the app (or any https address once it's online); browsers block microphones on plain http addresses.
+- **One question per screen,** about 12 in all: name, looks, age (optional), reading, how your child communicates, what's hard, what helps, comfort items, favorite things, what they can do on a screen, how they take in stories best, and "anything else." Answer one question with lots of detail and the app skips the questions you already covered.
+- **Talk or type.** Tap **🎤 Talk**, speak, then **Stop and send**: your answer goes straight in. Typed answers send with Enter. "I don't know" and "Skip" are always there; **Previous question** brings back your last answer to change; **Stop here and review** ends it whenever you like.
+- **Questions are read aloud** by a recorded voice (turn it off with "Read questions aloud"). The recordings say "your child"; the screen shows your child's name. **Nothing about your child is sent to the voice service:** the questions were recorded once, ahead of time.
+- **Hands-free** (optional): after each question is read, the microphone opens by itself, and your answer is sent when you stop talking. No tapping. Best in a quiet room.
 - **Nothing is saved until you check it.** The interview ends on the same form, filled in, for you to correct and save.
 - **We never ask for a diagnosis, and never store one.** If you mention one, the app records only what you describe your child doing, needing or finding hard. (There's a safety net in the code too, not just an instruction to the AI.)
+- **"Anything else"** is kept as a short note on the profile. The story writer reads it as background only; it never becomes a fact in a story.
+- The microphone works on the computer running the app (or any https address once it's online); browsers block microphones on plain http addresses.
 
 ## Your settings (the user)
 

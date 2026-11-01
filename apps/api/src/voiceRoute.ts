@@ -16,7 +16,8 @@ export function addVoiceRoute(
 ) {
   app.get(
     "/voice",
-    upgradeWebSocket(() => {
+    upgradeWebSocket((c) => {
+      const handsFree = c.req.query("handsFree") === "1";
       let transcriber: MuseTranscriber | undefined;
       return {
         onOpen(_event, ws) {
@@ -27,7 +28,7 @@ export function addVoiceRoute(
               /* browser already gone */
             }
           };
-          transcriber = new MuseTranscriber(options(), {
+          transcriber = new MuseTranscriber({ ...options(), handsFree }, {
             onText: (text) => send({ type: "text", text }),
             onDone: (text) => {
               send({ type: "done", text });

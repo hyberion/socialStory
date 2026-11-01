@@ -90,3 +90,35 @@ describe("/api/voice", () => {
     expect((meta.got.setup?.authorization as { accessToken: string }).accessToken).toBe("Bearer server-only-key");
   });
 });
+
+describe("hands-free", () => {
+  it("asks Meta to detect the end of speech, and finishes when the turn completes", async () => {
+    const wss = new WebSocketServer({ port: 0 });
+    let mode = "";
+    let ended = false;
+    wss.on("connection", (ws) => {
+      ws.on("message", (d, bin) => {
+        if (bin) return;
+        const m = JSON.parse(d.toString());
+        if (m.authorization) {
+          mode = m.mode;
+          ws.send(JSON.stringify({ sessionId: "s" }));
+          setTimeout(() => ws.send(JSON.stringify({ type: "speechComplete", turnId: "t1", transcript: "He is nine." })), 30);
+        }
+        if (m.type === "endStream") {
+          ended = true;
+          ws.close(1000);
+        }
+      });
+    });
+    cleanup.push(() => wss.close());
+    const url = `ws://127.0.0.1:${(wss.address() as AddressInfo).port}`;
+    const text = await new Promise<string>((resolve, reject) => {
+      const t = new MuseTranscriber({ apiKey: "k", url, frameMs: 5, handsFree: true }, { onText: () => {}, onDone: resolve, onError: reject });
+      t.push(Buffer.alloc(FRAME_BYTES * 2));
+    });
+    expect(mode).toBe("ENDPOINTING");
+    expect(ended).toBe(true);
+    expect(text).toBe("He is nine.");
+  });
+});

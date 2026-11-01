@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 type State = "idle" | "starting" | "listening" | "finishing";
 
@@ -7,17 +7,26 @@ type State = "idle" | "starting" | "listening" | "finishing";
  * server (/api/voice), which relays it to Muse Voice Transcribe. Words
  * appear while you talk via onText; onDone gives the final text.
  */
-export function MicButton({
-  onStart,
-  onText,
-  onDone,
-  disabled,
-}: {
-  onStart?: () => void;
-  onText: (text: string) => void;
-  onDone: (text: string) => void;
-  disabled?: boolean;
-}) {
+export interface MicHandle {
+  /** Start listening (hands-free mode starts the mic after the question is read). */
+  start: () => void;
+  /** Throw away a recording in progress (the user typed, skipped or went back instead). */
+  cancel: () => void;
+}
+
+export const MicButton = forwardRef<
+  MicHandle,
+  {
+    onStart?: () => void;
+    onText: (text: string) => void;
+    onDone: (text: string) => void;
+    disabled?: boolean;
+    /** Meta ends the recording when the user stops talking. */
+    handsFree?: boolean;
+    /** Button label while listening; e.g. "Stop and send". */
+    stopLabel?: string;
+  }
+>(function MicButton({ onStart, onText, onDone, disabled, handsFree, stopLabel = "Stop" }, ref) {
   const [state, setState] = useState<State>("idle");
   const [error, setError] = useState<string>();
   const parts = useRef<{ ws?: WebSocket; stream?: MediaStream; ctx?: AudioContext }>({});
@@ -52,7 +61,9 @@ export function MicButton({
       const node = new AudioWorkletNode(ctx, "pcm-capture");
       ctx.createMediaStreamSource(stream).connect(node);
 
-      const ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/api/voice`);
+      const ws = new WebSocket(
+        `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/api/voice${handsFree ? "?handsFree=1" : ""}`,
+      );
       ws.binaryType = "arraybuffer";
       parts.current = { ws, stream, ctx };
 
@@ -91,13 +102,30 @@ export function MicButton({
     }
   }
 
+  useImperativeHandle(ref, () => ({
+    start: () => {
+      if (state === "idle" && !disabled) void start();
+    },
+    cancel: () => {
+      const ws = parts.current.ws;
+      if (ws) {
+        ws.onmessage = null;
+        ws.onclose = null;
+        ws.close();
+      }
+      parts.current.ws = undefined;
+      release();
+      setState("idle");
+    },
+  }));
+
   function stop() {
     setState("finishing");
     release(); // stop capturing right away; the server finishes the text
     parts.current.ws?.send(JSON.stringify({ type: "stop" }));
   }
 
-  const label = { idle: "🎤 Talk", starting: "Starting…", listening: "■ Stop", finishing: "Finishing…" }[state];
+  const label = { idle: "🎤 Talk", starting: "Starting…", listening: `■ ${stopLabel}`, finishing: "Finishing…" }[state];
   return (
     <span className="mic">
       <button
@@ -109,8 +137,12 @@ export function MicButton({
       >
         {label}
       </button>
-      {state === "listening" && <span className="mic-hint">Listening… tap Stop when you're done.</span>}
+      {state === "listening" && (
+        <span className="mic-hint">
+          {handsFree ? "Listening… just stop talking when you're done." : `Listening… tap ${stopLabel} when you're done.`}
+        </span>
+      )}
       {error && <span className="mic-error">{error}</span>}
     </span>
   );
-}
+});

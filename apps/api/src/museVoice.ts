@@ -40,6 +40,11 @@ export interface TranscriberOptions {
   language?: string;
   /** For tests: how often to send a frame (real time is 80 ms). */
   frameMs?: number;
+  /**
+   * Hands-free: Meta listens for the end of speech (ENDPOINTING mode) and
+   * the recording stops by itself when the user finishes talking.
+   */
+  handsFree?: boolean;
 }
 
 export class MuseTranscriber {
@@ -66,8 +71,9 @@ export class MuseTranscriber {
           authorization: { accessToken: `Bearer ${options.apiKey}` },
           audioEncoding: "PCM_16KHZ",
           model: MODEL_IDS.transcribe,
-          // The user taps to start and stop, so Meta shouldn't cut turns on pauses.
-          mode: "PUSH_TO_TALK",
+          // Tap-to-talk: the user decides when they're done, so Meta shouldn't cut on pauses.
+          // Hands-free: Meta's end-of-speech detection ends the answer.
+          mode: options.handsFree ? "ENDPOINTING" : "PUSH_TO_TALK",
           partialMode: "CUMULATIVE",
           emitAudioProgress: false,
           languageBias: [options.language ?? "English"],
@@ -152,6 +158,8 @@ export class MuseTranscriber {
           this.events.onText(this.text);
         }
         if (!turnId && (msg.final === true || msg.type === "speechComplete")) this.untitled++;
+        // Hands-free: the first finished turn is the whole answer.
+        if (this.options.handsFree && msg.type === "speechComplete") this.stop();
         break;
       case "error":
         this.fail("The transcription service had a problem. Please try again.");

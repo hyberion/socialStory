@@ -30,6 +30,8 @@ const Env = z.object({
   DATABASE_URL: z.string().optional(),
   /** Read-along narration. Optional: without it the player falls back to the device voice. */
   ELEVENLABS_API_KEY: z.string().optional(),
+  /** The voice that reads interview questions (and later, stories). */
+  ELEVENLABS_VOICE_ID: z.string().optional(),
   /** Testing only: send live voice to a stand-in instead of Meta. */
   MUSE_VOICE_URL: z.string().url().optional(),
 });

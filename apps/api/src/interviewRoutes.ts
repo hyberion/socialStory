@@ -1,39 +1,55 @@
 import { Hono } from "hono";
 import {
   EMPTY_PROFILE_DRAFT,
-  PROFILE_INTERVIEW_MAX_TURNS,
-  PROFILE_OPENING_QUESTION,
+  PROFILE_QUESTIONS,
   ProfileInterviewDraft,
-  buildProfileInterviewPrompt,
+  buildProfileListenerPrompt,
   cleanProfileDraft,
-  type InterviewTurn,
+  nextProfileQuestion,
+  questionById,
+  screenText,
   type ProfileInterviewReply,
 } from "@socialstory/core";
 
-export type AskNext = (prompt: { instructions: string; input: string }) => Promise<ProfileInterviewReply>;
+export type Listen = (prompt: { instructions: string; input: string }) => Promise<ProfileInterviewReply>;
+
+/** Answers that change nothing, so they don't need a model call. */
+const NOTHING = /^\s*(i don'?t know|not sure|no idea|skip( this one)?|pass|none|no|n\/a)[.!]?\s*$/i;
 
 /**
- * Interview steps. The client keeps the conversation and draft and sends
+ * One interview step. The client keeps the conversation and draft and sends
  * them each time, so nothing is stored until the user saves the profile.
+ * The questions come from a fixed bank; Spark only fills in the draft.
  */
-export function interviewRoutes(options: { askNext: AskNext }) {
+export function interviewRoutes(options: { listen: Listen }) {
   const routes = new Hono();
 
   routes.post("/profile", async (c) => {
-    const body = (await c.req.json().catch(() => ({}))) as { draft?: unknown; turns?: InterviewTurn[] };
-    const turns = (body.turns ?? []).filter((t) => typeof t?.question === "string" && typeof t?.answer === "string").slice(-30);
+    const body = (await c.req.json().catch(() => ({}))) as {
+      draft?: unknown;
+      asked?: unknown;
+      answer?: { questionId?: unknown; text?: unknown };
+    };
     const parsed = ProfileInterviewDraft.safeParse(body.draft);
-    const draft = parsed.success ? parsed.data : EMPTY_PROFILE_DRAFT;
+    let draft = parsed.success ? parsed.data : EMPTY_PROFILE_DRAFT;
+    const asked = Array.isArray(body.asked) ? body.asked.filter((x): x is string => typeof x === "string" && !!questionById(x)) : [];
 
-    // The first question is fixed: free and instant.
-    if (turns.length === 0) return c.json({ draft, nextQuestion: PROFILE_OPENING_QUESTION, done: false });
+    const questionId = typeof body.answer?.questionId === "string" ? body.answer.questionId : undefined;
+    const text = typeof body.answer?.text === "string" ? body.answer.text.slice(0, 2000).trim() : "";
+    if (questionId && questionById(questionId)) {
+      if (text && !NOTHING.test(text)) {
+        draft = cleanProfileDraft((await options.listen(buildProfileListenerPrompt(draft, questionId, text))).draft);
+      }
+      if (!asked.includes(questionId)) asked.push(questionId);
+    }
 
-    const reply = await options.askNext(buildProfileInterviewPrompt(draft, turns.map((t) => ({ question: t.question, answer: t.answer.slice(0, 2000) }))));
-    const done = reply.done || turns.length >= PROFILE_INTERVIEW_MAX_TURNS;
+    const next = nextProfileQuestion(draft, asked);
+    const remaining = PROFILE_QUESTIONS.filter((q) => !asked.includes(q.id) && !q.answered(draft)).length;
     return c.json({
-      draft: cleanProfileDraft(reply.draft),
-      nextQuestion: done && !reply.done ? "Thanks, that's plenty to start with. Next you can review everything." : reply.nextQuestion,
-      done,
+      draft,
+      asked,
+      next: next ? { id: next.id, spoken: next.spoken, screen: screenText(next, draft) } : null,
+      progress: { number: asked.length + 1, total: asked.length + remaining },
     });
   });
 

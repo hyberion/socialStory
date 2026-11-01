@@ -40,8 +40,8 @@ app.route("/players", playerRoutes());
 app.route(
   "/interview",
   interviewRoutes({
-    askNext: async (prompt) =>
-      (await runStructuredTask("interview", ProfileInterviewReply, "interview_step", prompt.input, { instructions: prompt.instructions })).data,
+    listen: async (prompt) =>
+      (await runStructuredTask("interview", ProfileInterviewReply, "interview_answer", prompt.input, { instructions: prompt.instructions })).data,
   }),
 );
 
