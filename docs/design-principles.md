@@ -72,6 +72,8 @@ Parents plan before they have photos, so the app is built around a gap in the mi
 5. **Story.** Written from the outline and the media; edited and reviewed in the editor.
 6. **Pictures, then publish.**
 
+**After the hackathon: editing during the interview (Brad, Nov 1 testing).** Transcription is about 90% accurate and the listener keeps only what makes sense, but users should be able to fix an answer in place: show the transcript for a moment before it's sent, with "Edit" and "Say it again" (a retake), and let any earlier answer be opened and changed from the "So far" list. In hands-free mode, a short visible pause before sending ("Sending… Edit") gives the same chance.
+
 **After the hackathon: birthdays.** An optional birthday (month and day) used only to nudge the parent ("Ben's birthday is in 3 weeks. Want to make a birthday story?"), plus a birthday template. Birthdays are a classic hard event (surprises, noise, attention), so the nudge goes to the parent, never the player.
 
 **Not only for kids.** Players can be teens or adults; nothing in the app should assume a child or talk down.
