@@ -22,6 +22,7 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 | Published demo kits | Judges see a finished story and game instantly, no waiting or cost | **Have** (doctor); haircut fixture still to write |
 | Dev-only routes stay off in production | `/api/dev/*` must not exist publicly | **Have** (blocked when `NODE_ENV=production`); verify on the droplet |
 | Logs contain no story text or photos | Good habit from day one | **Check** (the request logger logs paths only; verify) |
+| No branded characters in public demo material (video, demo kits, screenshots) | A family drawing their own child's Elmo for private use is one thing; an AI-drawn Elmo in a public, judged submission is another. Use generic toys (Sam's bunny) | **Have** for the fixtures; **check** the video before upload (Nov 1: Benjamin's "All about me" test drew a very recognizable Elmo) |
 
 ## Stage B: public prototype (real families)
 
@@ -47,6 +48,7 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 | Meta's terms for children's data and images | Confirm the Model API allows this use and how long Meta keeps inputs | **Check** (read current terms; record the answer in this file) |
 | FERPA and district privacy agreements | Only when schools join | **Later** |
 | Photo letter's promises verified against the above | Every line must be true | **Check** |
+| Branded toys and characters in a family's own stories (Brad, Nov 1) | A child's comfort item is often a licensed character (Elmo). Brad's view: private, never sold or published, much like a family photo of the child holding the toy. Decide whether to draw it as it is or as a look-alike, and get a lawyer's view | **Check** with a lawyer; **Build** a notice in the terms and the app: "Characters, brands and products shown are the property of their respective owners." (A notice is good practice, not legal protection) |
 
 ### Safety and cost
 
