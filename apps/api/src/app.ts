@@ -1,4 +1,6 @@
 import { Hono } from "hono";
+import { createNodeWebSocket } from "@hono/node-ws";
+import { addVoiceRoute } from "./voiceRoute.js";
 import { logger } from "hono/logger";
 import { sampleStory, validateStory } from "@socialstory/core";
 import { config } from "./config.js";
@@ -12,6 +14,10 @@ import { runStructuredTask } from "./meta.js";
 import { PageDraft, ProfileInterviewReply } from "@socialstory/core";
 
 export const app = new Hono().basePath("/api");
+
+// Live voice: the browser streams microphone audio here; we relay it to Meta.
+export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
+addVoiceRoute(app, upgradeWebSocket, () => ({ apiKey: config.MODEL_API_KEY, url: config.MUSE_VOICE_URL }));
 
 app.use(logger());
 

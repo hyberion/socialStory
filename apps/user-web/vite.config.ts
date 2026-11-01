@@ -10,6 +10,7 @@ export default defineConfig({
     // and lets you open the app from another device on your network.
     host: true,
     // In dev, /api calls go to the local API server; no CORS setup needed.
-    proxy: { "/api": "http://localhost:8787" },
+    // ws: true carries the live-voice WebSocket through too.
+    proxy: { "/api": { target: "http://localhost:8787", ws: true } },
   },
 });

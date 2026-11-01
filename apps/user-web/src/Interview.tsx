@@ -7,6 +7,7 @@ import {
   type PlayerProfile,
   type ProfileInterviewDraft,
 } from "@socialstory/core";
+import { MicButton } from "./voice/MicButton";
 
 interface Step {
   draft: ProfileInterviewDraft;
@@ -38,6 +39,8 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
   const [thinking, setThinking] = useState(false);
   const [error, setError] = useState<string>();
   const bottom = useRef<HTMLDivElement>(null);
+  // Text typed before talking; spoken words are added after it.
+  const typedBefore = useRef("");
 
   useEffect(() => {
     void ask(EMPTY_PROFILE_DRAFT, []).then((s) => setQuestion(s.nextQuestion)).catch((e: Error) => setError(e.message));
@@ -113,6 +116,14 @@ export function Interview({ onReview, onCancel }: { onReview: (p: Omit<PlayerPro
                 />
                 <button className="primary" onClick={() => send(answer)} disabled={!answer.trim() || thinking}>Send</button>
               </div>
+              <MicButton
+                disabled={!question || thinking}
+                onStart={() => {
+                  typedBefore.current = answer.trim();
+                }}
+                onText={(spoken) => setAnswer([typedBefore.current, spoken].filter(Boolean).join(" "))}
+                onDone={(spoken) => setAnswer([typedBefore.current, spoken].filter(Boolean).join(" "))}
+              />
               <div className="quick">
                 <button className="small" onClick={() => send("I don't know")} disabled={thinking || !question}>I don't know</button>
                 <button className="small" onClick={() => send("Skip this one")} disabled={thinking || !question}>Skip</button>

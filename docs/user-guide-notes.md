@@ -39,7 +39,8 @@ One profile per player (child). Every setting can be changed at any time; nothin
 
 Two ways, same result: **talk it through** (an interview) or **fill in a form.**
 
-- **The interview** asks one short question at a time: name, looks, age (optional), reading, how your child communicates, what's hard, what helps, comfort items, favorite things, what they can do on a screen, and how they take in stories best. "I don't know" and "Skip" are always there, and "Stop here and review" ends it whenever you like. A "So far" panel shows what's been understood. **Status:** built (typing); the microphone comes with voice input.
+- **The interview** asks one short question at a time: name, looks, age (optional), reading, how your child communicates, what's hard, what helps, comfort items, favorite things, what they can do on a screen, and how they take in stories best. "I don't know" and "Skip" are always there, and "Stop here and review" ends it whenever you like. A "So far" panel shows what's been understood. **Status:** built, typing or talking.
+- **Talking:** tap **🎤 Talk**, speak, tap **Stop**. Your words appear in the answer box as you speak (added after anything you'd already typed), so you can fix a misheard word before you press Send. One recording can be up to 3 minutes. The microphone works on the computer running the app (or any https address once it's online); browsers block microphones on plain http addresses.
 - **Nothing is saved until you check it.** The interview ends on the same form, filled in, for you to correct and save.
 - **We never ask for a diagnosis, and never store one.** If you mention one, the app records only what you describe your child doing, needing or finding hard. (There's a safety net in the code too, not just an instruction to the AI.)
 
@@ -163,6 +164,7 @@ Things users should know about the player app, so nothing surprises them.
 
 - Stories and pictures are made by Meta's AI models. What you enter and upload is sent to Meta to make them.
 - We use Meta's standard service, **not** the discounted mode that lets Meta train its models on what you send.
+- When you talk instead of typing, your voice goes to Meta's transcription service (Muse Voice Transcribe) to be turned into text, through our server. We don't save the recording; only the text you send becomes part of the profile or event.
 - Pictures are made only from what you enter. The picture maker's web and image search are turned off, so it never looks up the real people or places you name online, and Meta isn't asked to keep the conversation.
 - Never required: your child's real name (a nickname works), last names, addresses or medical details beyond what the story needs.
 - **Open:** how long uploads are kept, and how a parent deletes everything. Decide before any real families use it.
