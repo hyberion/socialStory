@@ -318,3 +318,60 @@ img.picture {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- Read-along ---- */
+
+/* Words look like plain text; every word can be tapped. */
+.word {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  margin: 0 -2px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.word:focus-visible {
+  outline: 3px solid var(--soft);
+}
+/* The word being read: a steady, soft background. No flashing, no movement. */
+.word.reading {
+  background: #dfeae5;
+}
+/* Words with help: a quiet dotted underline. */
+.word.has-help {
+  text-decoration: underline dotted var(--soft);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+.nav.on {
+  border-color: var(--soft);
+}
+
+.word-card {
+  border: 2px solid var(--soft);
+  border-radius: 20px;
+  background: var(--bg);
+  padding: 16px 20px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+.big-word {
+  margin: 0;
+  font-size: clamp(2.4rem, 9vw, 3.6rem);
+  font-weight: 600;
+}
+.means {
+  margin: 0;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  line-height: 1.4;
+}
+.word-card-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

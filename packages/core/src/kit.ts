@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { KitNarration } from "./narration.js";
 import { SensorySettings } from "./profile.js";
 import { Sentence, StorySection } from "./story.js";
 
@@ -20,6 +21,8 @@ export const KitPage = z.object({
   imageAlt: z.string().optional(),
   /** When set, the player shows a calendar with this date circled and a clock at this time (ISO). */
   when: z.string().optional(),
+  /** Recorded read-along, when the page has one that matches its current words. */
+  narration: KitNarration.optional(),
 });
 export type KitPage = z.infer<typeof KitPage>;
 
@@ -77,7 +80,7 @@ export function summarizeKit(kit: PublishedKit): KitSummary {
 }
 
 /** Only these file names may be served from a kit folder (no paths, no tricks). */
-export const KIT_FILE_PATTERN = /^(page-\d{2}|cast-[a-z0-9-]+)\.png$/;
+export const KIT_FILE_PATTERN = /^(page-\d{2}\.(png|mp3)|cast-[a-z0-9-]+\.png)$/;
 
 /**
  * A short fingerprint of what a page's picture was drawn from: the picture

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import type { PublishedKit } from "@socialstory/core";
-import { dateWords, timeWords, wallClock } from "@socialstory/core";
+import { dateWords, timeWords, wallClock, wordKey } from "@socialstory/core";
 import { kitFileUrl } from "./api";
 import { TimeCard } from "./TimeCard";
+import { PageWords, WordCard, useReadAlong } from "./ReadAlong";
 
 /**
  * The player-facing story reader. Rules it follows (see AGENTS.md):
@@ -18,13 +19,25 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
   const isFirst = index === 0;
   const isLast = index === kit.pages.length - 1;
 
-  const canSpeak = sensory.soundEnabled && "speechSynthesis" in window;
+  const narration = sensory.soundEnabled ? page.narration : undefined;
+  const read = useReadAlong(narration ? kitFileUrl(kit.id, narration.audio) : undefined, narration, sensory.narrationRate);
+  const deviceVoice = sensory.soundEnabled && "speechSynthesis" in window;
+  const canSpeak = read.ready || deviceVoice;
+  const [card, setCard] = useState<{ index: number; word: string }>();
 
-  // Stop any narration when the page changes or the reader closes.
-  useEffect(() => () => window.speechSynthesis?.cancel(), [index]);
+  // Stop any reading and close the word card when the page changes or the reader closes.
+  useEffect(() => {
+    setCard(undefined);
+    return () => window.speechSynthesis?.cancel();
+  }, [index]);
 
   function readAloud() {
-    if (!canSpeak) return;
+    if (read.ready) {
+      if (read.playing) read.stop();
+      else read.play();
+      return;
+    }
+    if (!deviceVoice) return;
     window.speechSynthesis.cancel();
     const t = page.when ? wallClock(page.when) : undefined;
     const when = t ? [`${dateWords(t)}.`, `${timeWords(t)}.`] : [];
@@ -56,11 +69,31 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
           )}
           {page.when && <TimeCard when={page.when} />}
         </div>
-        <div className="words">
-          {page.sentences.map((s, i) => (
-            <p key={i}>{s.text}</p>
-          ))}
-        </div>
+        <PageWords
+          sentences={page.sentences}
+          current={read.current}
+          help={page.narration?.help ?? []}
+          onWord={(i, word) => {
+            read.stop();
+            setCard({ index: i, word });
+          }}
+        />
+        {card && (
+          <WordCard
+            word={card.word}
+            means={page.narration?.help.find((h) => h.word === wordKey(card.word))?.means}
+            canSay={read.ready || deviceVoice}
+            onSay={() => {
+              if (!read.sayWord(card.index) && deviceVoice) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(card.word);
+                u.rate = sensory.narrationRate;
+                window.speechSynthesis.speak(u);
+              }
+            }}
+            onClose={() => setCard(undefined)}
+          />
+        )}
       </section>
 
       <nav className="controls">
@@ -75,8 +108,12 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
         </div>
 
         {canSpeak && (
-          <button className="nav" onClick={readAloud} aria-label="Read this page to me">
-            🔈
+          <button
+            className={read.playing ? "nav on" : "nav"}
+            onClick={readAloud}
+            aria-label={read.playing ? "Stop reading" : "Read this page to me"}
+          >
+            {read.playing ? "■" : "🔈"}
           </button>
         )}
 

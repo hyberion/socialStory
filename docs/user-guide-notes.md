@@ -177,14 +177,15 @@ Things users should know about the player app, so nothing surprises them.
 | Countdown to the day ("2 sleeps until Dr. Patel"). | Planned |
 | Day-of mode: step-by-step cards to use during the event itself. | Planned |
 | **Who's who?** A game on the shelf under each story: your child sees a portrait from the cast sheet, taps a name, and the app shows who it is ("Dr. Patel is the doctor.") plus any friendly facts you added. Any tap shows the answer the same calm way; nothing is ever marked wrong, counted or timed. Appears once at least two portraits are drawn. | Built |
-| **Read-along:** a real recorded voice (you choose from a few calm voices) reads each page, highlighting each word as it's spoken. Recorded once when you publish, so it sounds exactly the same every time and works offline. You can listen before publishing. | Planned (hackathon stretch) |
-| **Word help:** your child taps a word to see a short, kid-sized meaning and how to say it ("doctor: a person whose job is to help keep my body healthy. DOK-ter"), and can hear it said slowly. You choose which words get help in the editor. | Planned (hackathon) |
+| **Read-along:** a real recorded voice reads the page when your child taps 🔈, and the word being read gets a soft, steady highlight (no flashing or movement). Tap ■ to stop. It never starts on its own. Recorded once (`pnpm narrate`, for now), so it sounds exactly the same every time and works offline once opened. A page whose words you change afterwards goes back to the device's own voice until it's recorded again. Turning sound off in the sensory settings hides it. Choosing from a few voices and listening before publishing are planned. | Built (one voice; recorded with a command) |
+| **Word help:** your child taps any word to see it big with **🔈 Say it**, which plays just that word in the same voice. Words that may be new at your child's reading level (picked by Spark, at most 3 a page) have a quiet dotted underline, and their card also shows a short, literal meaning ("A nurse is a person who helps the doctor and helps you."). Choosing which words get help, and sounding words out, are planned. | Built |
 | Games built from your own photos. | Planned |
 | Games built from the story's words (match, drag the word, fill in the blank). Never scored or timed; a miss just shows the answer. | Planned (after the hackathon) |
 | A tour of the place with no people in it. | Planned (after the hackathon) |
 
 ## Privacy (the guide needs a plain section on this)
 
+- **Read-along recordings:** to record a page, its words (which include your child's name) are sent to ElevenLabs, the voice service. Interview questions are different: they were recorded ahead of time and say "your child". Word help is picked by Meta's Spark from the same words the story was written from.
 - Stories and pictures are made by Meta's AI models. What you enter and upload is sent to Meta to make them.
 - We use Meta's standard service, **not** the discounted mode that lets Meta train its models on what you send.
 - When you talk instead of typing, your voice goes to Meta's transcription service (Muse Voice Transcribe) to be turned into text, through our server. We don't save the recording; only the text you send becomes part of the profile or event.

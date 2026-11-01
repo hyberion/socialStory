@@ -12,6 +12,7 @@ import {
   type PlayerProfile,
   type Story,
 } from "@socialstory/core";
+import { loadNarration, recordingFor, storySpeech } from "./narration.js";
 import { DATA_DIR, imagesDir, publishedDir } from "./paths.js";
 
 /**
@@ -57,6 +58,10 @@ export function publishKit(
   const sourceDir = imagesDir(id, dataDir);
   const drawn = readDrawnFrom(id, dataDir);
   const warnings: PublishWarning[] = [];
+  const narration = loadNarration(id, dataDir);
+  const speech = storySpeech(story, event);
+  /** kit file name -> source recording, copied in below */
+  const audio = new Map<string, string>();
 
   const pages = story.pages.map((page, i) => {
     const file = pageFile(i);
@@ -69,10 +74,16 @@ export function publishKit(
         message: `Page ${i + 1}'s picture was drawn for a different picture description. Redraw it (draw-story --pages ${i + 1}) or keep it.`,
       });
     }
+    // Read-along only when a recording of these exact words exists.
+    const rec = recordingFor(narration, speech[i]!);
+    const audioFile = file.replace(/\.png$/, ".mp3");
+    if (rec && existsSync(resolve(sourceDir, rec.audio))) audio.set(audioFile, rec.audio);
+    else if (narration) warnings.push({ page: i, message: `Page ${i + 1} has no read-along for its current words (run pnpm narrate ${id}).` });
     return {
       section: page.section,
       sentences: page.sentences,
       image: hasImage ? file : undefined,
+      narration: audio.has(audioFile) ? { audio: audioFile, words: rec!.words, help: rec!.help } : undefined,
       imageAlt: page.sceneBrief,
       // The introduction answers "when", so it carries the calendar and clock.
       when: i === 0 ? event.startsAt : undefined,
@@ -113,6 +124,7 @@ export function publishKit(
   mkdirSync(tempDir, { recursive: true });
   const files = [...kit.pages.map((p) => p.image), ...kit.cast.map((m) => m.portrait)];
   for (const file of files) if (file) copyFileSync(resolve(sourceDir, file), resolve(tempDir, file));
+  for (const [kitName, source] of audio) copyFileSync(resolve(sourceDir, source), resolve(tempDir, kitName));
   writeFileSync(resolve(tempDir, "kit.json"), JSON.stringify(kit, null, 2));
   rmSync(finalDir, { recursive: true, force: true });
   renameSync(tempDir, finalDir);

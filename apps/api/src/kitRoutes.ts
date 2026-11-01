@@ -23,7 +23,10 @@ export function kitRoutes(dataDir = DATA_DIR) {
     if (!path) return c.json({ error: "Not found" }, 404);
     // A published kit never changes in place (publishing again replaces the
     // folder), but its URLs stay the same, so let the browser check back.
-    return c.body(readFileSync(path), 200, { "Content-Type": "image/png", "Cache-Control": "no-cache" });
+    return c.body(readFileSync(path), 200, {
+      "Content-Type": path.endsWith(".mp3") ? "audio/mpeg" : "image/png",
+      "Cache-Control": "no-cache",
+    });
   });
 
   return routes;

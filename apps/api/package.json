@@ -16,6 +16,7 @@
     "draw-story": "tsx src/scripts/drawStory.ts",
     "photo-list": "tsx src/scripts/photoList.ts",
     "publish-kit": "tsx src/scripts/publishKit.ts",
+    "narrate": "tsx src/scripts/narrate.ts",
     "voice-questions": "tsx src/scripts/voiceQuestions.ts",
     "style-test": "tsx src/scripts/styleTest.ts"
   },

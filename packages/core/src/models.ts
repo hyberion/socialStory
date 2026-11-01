@@ -58,6 +58,12 @@ export const TEXT_TASKS = {
     effort: "medium",
     note: "Turns approved script into scene briefs and game specs.",
   },
+  /** Picks the words a reader may not know on each page and explains them plainly (read-along word help). */
+  wordHelp: {
+    model: MODEL_IDS.spark,
+    effort: "low",
+    note: "Short list per page; once per recorded story, not per tap.",
+  },
   /** Tiny health check. */
   smoke: {
     model: MODEL_IDS.spark,

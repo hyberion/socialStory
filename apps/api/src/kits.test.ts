@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { Hono } from "hono";
-import { pageFingerprint, sampleEvent, samplePlayer, sampleStory } from "@socialstory/core";
+import { pageFingerprint, sampleEvent, samplePlayer, sampleStory, type NarrationFile } from "@socialstory/core";
+import { narrationKey, saveNarration, storySpeech } from "./narration.js";
 import { listKits, loadKit, publishKit, writeDrawnFrom } from "./kits.js";
 import { kitRoutes } from "./kitRoutes.js";
 
@@ -95,5 +96,47 @@ describe("kit routes", () => {
     expect((await app.request("/api/kits/doctor/cast-nobody.png")).status).toBe(404);
     expect((await app.request("/api/kits/doctor/..%2F..%2Fstories%2Fdoctor.json")).status).toBe(404);
     expect((await app.request("/api/kits/..%2Fimages/page-01.png")).status).toBe(404);
+  });
+});
+
+describe("read-along in a published kit", () => {
+  const MP3 = Buffer.from("ID3 fake audio");
+  function narrate(dataDir: string, pages: number[]) {
+    const voice = "test-voice";
+    const speech = storySpeech(sampleStory, sampleEvent);
+    const file: NarrationFile = { voice, model: "eleven_multilingual_v2", pages: {} };
+    for (const n of pages) {
+      const text = speech[n - 1]!;
+      const k = narrationKey(text, voice);
+      writeFileSync(join(dataDir, "images", "doctor", `say-${k}.mp3`), MP3);
+      file.pages[k] = { text, audio: `say-${k}.mp3`, words: [{ start: 0, end: 0.4 }], help: [{ word: "nurse", means: "A nurse helps the doctor." }] };
+    }
+    saveNarration("doctor", file, dataDir);
+  }
+
+  it("attaches each page's recording and serves it as audio", async () => {
+    const dataDir = setup([1, 2]);
+    narrate(dataDir, [1, 2]);
+    const { kit } = publish(dataDir);
+    expect(kit.pages[0]?.narration?.audio).toBe("page-01.mp3");
+    expect(kit.pages[1]?.narration?.help[0]?.word).toBe("nurse");
+    const app = new Hono().route("/kits", kitRoutes(dataDir));
+    const res = await app.request("/kits/doctor/page-01.mp3");
+    expect(res.headers.get("content-type")).toBe("audio/mpeg");
+  });
+
+  it("follows a page that moved, and drops a page whose words changed", () => {
+    const dataDir = setup([1, 2, 3]);
+    narrate(dataDir, [2, 3]);
+    const pages = [...sampleStory.pages];
+    [pages[1], pages[2]] = [pages[2]!, pages[1]!]; // swap pages 2 and 3
+    pages[3] = { ...pages[3]!, sentences: [{ text: "New words here.", type: "descriptive" }] };
+    const { kit, warnings } = publish(dataDir, { ...sampleStory, pages });
+    expect(kit.pages[1]?.narration).toBeDefined();
+    expect(kit.pages[2]?.narration).toBeDefined();
+    expect(kit.pages[0]?.narration).toBeUndefined();
+    expect(kit.pages[3]?.narration).toBeUndefined();
+    expect(warnings.some((w) => w.message.includes("no read-along"))).toBe(true);
+    expect(existsSync(join(dataDir, "published", "doctor", "page-02.mp3"))).toBe(true);
   });
 });

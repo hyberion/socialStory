@@ -9,6 +9,7 @@ export * from "./art.js";
 export * from "./photos.js";
 export * from "./region.js";
 export * from "./kit.js";
+export * from "./narration.js";
 export * from "./when.js";
 export * from "./reading.js";
 export * from "./onboarding.js";
