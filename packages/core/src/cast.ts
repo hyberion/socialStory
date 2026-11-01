@@ -1,4 +1,5 @@
 import type { PlayerProfile } from "./profile.js";
+import { currentAge } from "./onboarding.js";
 import type { ComfortItem, Event, PhotoRef } from "./event.js";
 
 /**
@@ -43,9 +44,21 @@ function applyPlans(event: Event, members: CastMember[]): CastMember[] {
     .map((m) => (planFor(m) === "generic" && !m.photo ? { ...m, appearance: undefined } : m));
 }
 
+/**
+ * How the player is described to the image model. Nov 1: Benjamin (26) was
+ * drawn as a small boy, even from his photo, because the role only said
+ * "the child". Their real age keeps them drawn as who they are.
+ */
+export function playerRole(player: PlayerProfile, today: Date = new Date()): string {
+  const age = currentAge(player, today);
+  if (!age) return "the child";
+  const who = age < 13 ? "child" : age < 18 ? "teenager" : "adult";
+  return `the main character, a ${age}-year-old ${who}; draw them at this age`;
+}
+
 export function castFor(event: Event, player: PlayerProfile): CastMember[] {
   return applyPlans(event, [
-    { id: PLAYER_CAST_ID, kind: "person", name: player.displayName, role: "the child", appearance: player.appearance, photo: player.photo },
+    { id: PLAYER_CAST_ID, kind: "person", name: player.displayName, role: playerRole(player), appearance: player.appearance, photo: player.photo },
     ...event.companions.map((c) => ({
       id: c.id,
       kind: "person" as const,

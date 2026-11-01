@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { samplePlayer, sampleEvent, sampleStory, sampleUser } from "./fixtures.js";
-import { castFor } from "./cast.js";
+import { castFor, playerRole } from "./cast.js";
 import { buildCastPortraitPrompt, buildPagePrompt, castOnPage, pageSetting } from "./art.js";
 import { worldRulesFor } from "./region.js";
 
@@ -10,6 +10,23 @@ describe("castFor", () => {
   it("lists the player, companions, people and comfort items, in that order", () => {
     expect(cast.map((m) => m.id)).toEqual(["player", "c-dad", "p-patel", "p-nurse", "bear", "headphones", "transport"]);
     expect(cast[0]!.name).toBe("Sam");
+  });
+});
+
+describe("the player's age in the pictures", () => {
+  const today = new Date(2026, 10, 1);
+  it("draws the player at their real age", () => {
+    expect(playerRole({ ...samplePlayer, age: 26 }, today)).toContain("26-year-old adult");
+    expect(playerRole({ ...samplePlayer, age: 15 }, today)).toContain("15-year-old teenager");
+    expect(playerRole({ ...samplePlayer, age: 7 }, today)).toContain("7-year-old child");
+    expect(playerRole({ ...samplePlayer, age: undefined, birthYear: 2000, birthMonth: 1 }, today)).toContain("26-year-old");
+  });
+  it("falls back to 'the child' with no age", () => {
+    expect(playerRole({ ...samplePlayer, age: undefined, birthYear: undefined }, today)).toBe("the child");
+  });
+  it("reaches the portrait prompt", () => {
+    const me = castFor(sampleEvent, { ...samplePlayer, age: 26 }).find((m) => m.id === "player")!;
+    expect(buildCastPortraitPrompt(me)).toContain("26-year-old adult");
   });
 });
 

@@ -149,7 +149,7 @@ export function buildPagePrompt(
   const scene = page.sceneBrief ?? page.sentences.map((s) => s.text).join(" ");
   const people = references.filter((m) => m.kind === "person");
   const props = references.filter((m) => m.kind === "prop");
-  const lines = [`Illustrate this scene for one page of a children's story: ${scene}`];
+  const lines = [`Illustrate this scene for one page of an illustrated story: ${scene}`];
   if (setting) lines.push(`Setting: ${setting} Draw the scene there, not outside.`);
 
   if (references.length) {
