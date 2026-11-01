@@ -14,5 +14,6 @@ export * from "./reading.js";
 export * from "./onboarding.js";
 export * from "./interview.js";
 export * from "./eventInterview.js";
+export * from "./photoText.js";
 export * from "./templates.js";
 export * from "./fixtures.js";

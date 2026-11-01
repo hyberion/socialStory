@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Event, PhotoChecklist, Person, Step } from "@socialstory/core";
+import { photoListText, type Event, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
 import { events, localOffset } from "./eventsApi";
 
 const lines = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
@@ -15,7 +15,22 @@ const toLocalInput = (iso: string) => (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(iso
  * written. Saving it gives the photo to-do list; the story can be written
  * now or after gathering photos.
  */
-export function EventOutline({ initial, onWritten, onDone }: { initial: Event; onWritten: (id: string) => void; onDone: () => void }) {
+export function EventOutline({
+  initial,
+  childName,
+  onWritten,
+  onDone,
+  hasStory,
+  onOpenStory,
+}: {
+  initial: Event;
+  childName?: string;
+  onWritten: (id: string) => void;
+  onDone: () => void;
+  /** The story is already written: offer to open it instead of writing again. */
+  hasStory?: boolean;
+  onOpenStory?: () => void;
+}) {
   const [e, setE] = useState<Event>(initial);
   const [saved, setSaved] = useState(initial.id !== "new");
   const [dirty, setDirty] = useState(false);
@@ -84,6 +99,35 @@ export function EventOutline({ initial, onWritten, onDone }: { initial: Event; o
     } finally {
       setBusy(undefined);
     }
+  }
+
+  const listText = () => (photos ? photoListText(e, childName ?? "your child", photos) : "");
+  const [copied, setCopied] = useState(false);
+  async function copyList() {
+    try {
+      await navigator.clipboard.writeText(listText());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError("Couldn't copy. Try Print or Email instead.");
+    }
+  }
+  async function shareList() {
+    try {
+      await navigator.share({ title: `Photos for ${e.title}`, text: listText() });
+    } catch {
+      /* the user closed the share sheet */
+    }
+  }
+  /** Prints only the photo list, as a checklist. */
+  function printList() {
+    document.body.classList.add("print-photos");
+    const done = () => {
+      document.body.classList.remove("print-photos");
+      window.removeEventListener("afterprint", done);
+    };
+    window.addEventListener("afterprint", done);
+    window.print();
   }
 
   const everyone = [...e.companions, ...e.people];
@@ -256,20 +300,31 @@ export function EventOutline({ initial, onWritten, onDone }: { initial: Event; o
       <div className="toolbar bottom">
         <span className="status">{busy ?? (dirty ? "Unsaved changes" : saved ? "Saved" : "Not saved yet")}</span>
         <button onClick={() => void save()} disabled={!!busy || (saved && !dirty)}>Save outline</button>
-        <button className="primary" onClick={() => void write()} disabled={!!busy}>Write the story now</button>
+        {hasStory && onOpenStory && <button onClick={onOpenStory} disabled={!!busy}>Open the story</button>}
+        <button className={hasStory ? "" : "primary"} onClick={() => void write()} disabled={!!busy}>
+          {hasStory ? "Write the story again" : "Write the story now"}
+        </button>
       </div>
 
       {saved && photos && (
-        <section className="card form">
-          <h2>Photos that would help</h2>
+        <section className="card form photo-section" id="photos">
+          <h2>Photos that would help{e.title ? `: ${e.title}` : ""}</h2>
           <p className="muted">
             Gather these whenever you can; every one is optional. You can write the story now and add photos later, or come back
-            once you have them.
+            once you have them. This list stays here, and you can take it with you:
           </p>
+          <div className="keep-list no-print">
+            <button onClick={printList}>🖨 Print or save as PDF</button>
+            <a className="button" href={`mailto:?subject=${encodeURIComponent(`Photos for ${e.title}`)}&body=${encodeURIComponent(listText())}`}>
+              ✉ Email it to me
+            </a>
+            <button onClick={() => void copyList()}>{copied ? "Copied" : "Copy the list"}</button>
+            {"share" in navigator && <button onClick={() => void shareList()}>Share…</button>}
+          </div>
           <PhotoList title="Most helpful" items={most} />
           {nice.length > 0 && <PhotoList title="Nice to have" items={nice} />}
           <ul className="tips">{photos.generalTips.map((t) => <li key={t}>{t}</li>)}</ul>
-          <button onClick={onDone}>I'll come back with photos</button>
+          <button className="no-print" onClick={onDone}>I'll come back with photos</button>
         </section>
       )}
     </main>
@@ -283,6 +338,7 @@ function PhotoList({ title, items }: { title: string; items: PhotoChecklist["ite
       <ul className="photo-todo">
         {items.map((p) => (
           <li key={p.id}>
+            <span className="box" aria-hidden="true">☐</span>
             <strong>{p.label}</strong>
             <span className="muted"> {p.why}</span>
             {p.tip && <small> {p.tip}</small>}

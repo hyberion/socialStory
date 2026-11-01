@@ -213,3 +213,20 @@ h2 { margin: 28px 0 10px; }
 .tips { color: var(--muted); font-size: 0.9rem; }
 .usual-steps { margin: 0; padding: 10px 10px 10px 30px; background: var(--bg); border-radius: 10px; display: grid; gap: 4px; }
 .interview-title { margin: 0; font-size: 0.95rem; color: var(--muted); font-weight: 600; }
+
+/* ---- Keeping the photo list ---- */
+.keep-list { display: flex; gap: 8px; flex-wrap: wrap; }
+a.button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); text-decoration: none; }
+.photo-todo { list-style: none; padding-left: 0; }
+.photo-todo .box { margin-right: 8px; }
+.story-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+
+/* Print only the photo checklist, in black on white. */
+@media print {
+  body.print-photos main > *:not(.photo-section) { display: none !important; }
+  body.print-photos .no-print { display: none !important; }
+  body.print-photos { background: #fff; color: #000; }
+  body.print-photos .photo-section { border: none; box-shadow: none; padding: 0; }
+  body.print-photos .muted, body.print-photos small { color: #333; }
+  body.print-photos .photo-todo li { break-inside: avoid; margin-bottom: 6px; }
+}

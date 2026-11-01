@@ -57,7 +57,7 @@ const SECTION_LABELS: Record<StorySection, string> = {
  * Every word is editable; sentences and pages move freely; nothing here
  * costs anything except "Rewrite this page". The checker only warns.
  */
-export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
+export function Editor({ id, onBack, onOutline }: { id: string; onBack: () => void; onOutline?: () => void }) {
   const [draft, setDraft] = useState<DraftView>();
   const [edit, setEdit] = useState<EditStory>();
   const [dirty, setDirty] = useState(false);
@@ -163,7 +163,12 @@ export function Editor({ id, onBack }: { id: string; onBack: () => void }) {
   return (
     <main className="page wide">
       <header className="editor-head">
-        <button className="link" onClick={onBack}>← All stories</button>
+        <div className="row">
+          <button className="link" onClick={onBack}>← All stories</button>
+          {onOutline && (
+            <button className="link" onClick={onOutline}>Outline and photo list</button>
+          )}
+        </div>
         <label className="title-label" htmlFor="story-title">Story title ✎</label>
         <input
           id="story-title"

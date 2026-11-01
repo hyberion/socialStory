@@ -11,7 +11,7 @@ import { ProfileInterview } from "./Interview";
 
 type Screen =
   | { kind: "home" }
-  | { kind: "story"; id: string }
+  | { kind: "story"; id: string; fromOutline?: boolean }
   | { kind: "profile"; id?: string; initial?: Omit<PlayerProfile, "id"> }
   | { kind: "interview" }
   | { kind: "new-story" }
@@ -40,12 +40,38 @@ export function App() {
   }, [screen]);
 
   const home = () => setScreen({ kind: "home" });
-  if (screen.kind === "story") return <Editor id={screen.id} onBack={home} />;
+  const childOf = (e: Event) => kids?.find((k) => k.id === e.playerId)?.displayName;
+  const openOutline = (id: string) =>
+    events
+      .load(id)
+      .then((event) => setScreen({ kind: "outline", event }))
+      .catch(() => setError("That story was made from a sample event, so it has no outline to open."));
+
+  if (screen.kind === "story")
+    return (
+      <Editor
+        id={screen.id}
+        onBack={home}
+        onOutline={saved.some((e) => e.id === screen.id) || screen.fromOutline ? () => void openOutline(screen.id) : undefined}
+      />
+    );
   if (screen.kind === "profile") return <ProfileForm id={screen.id} initial={screen.initial} onDone={home} />;
   if (screen.kind === "new-story")
     return <NewStory onCancel={home} onOutline={(event) => setScreen({ kind: "outline", event })} />;
   if (screen.kind === "outline")
-    return <EventOutline initial={screen.event} onDone={home} onWritten={(id) => setScreen({ kind: "story", id })} />;
+    return (
+      <EventOutline
+        initial={screen.event}
+        childName={childOf(screen.event)}
+        hasStory={stories?.includes(screen.event.id)}
+        onOpenStory={() => setScreen({ kind: "story", id: screen.event.id, fromOutline: true })}
+        onDone={home}
+        onWritten={(id) => {
+          setStories((s) => [...new Set([...(s ?? []), id])]);
+          setScreen({ kind: "story", id, fromOutline: true });
+        }}
+      />
+    );
   if (screen.kind === "interview")
     return <ProfileInterview onCancel={home} onReview={(initial) => setScreen({ kind: "profile", initial })} />;
 
@@ -93,14 +119,22 @@ export function App() {
               </button>
             </li>
           ))}
-        {stories?.map((id) => (
-          <li key={id}>
-            <button className="story-link" onClick={() => setScreen({ kind: "story", id })}>
-              {id}
-              <span className="muted">Review and edit →</span>
-            </button>
-          </li>
-        ))}
+        {stories?.map((id) => {
+          const ev = saved.find((e) => e.id === id);
+          return (
+            <li key={id} className={ev ? "story-row" : undefined}>
+              <button className="story-link" onClick={() => setScreen({ kind: "story", id })}>
+                {ev?.title ?? id}
+                <span className="muted">Review and edit →</span>
+              </button>
+              {ev && (
+                <button className="small" onClick={() => setScreen({ kind: "outline", event: ev })}>
+                  Outline and photo list
+                </button>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </main>
   );
