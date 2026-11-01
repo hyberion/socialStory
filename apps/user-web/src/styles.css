@@ -230,3 +230,20 @@ a.button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px sol
   body.print-photos .muted, body.print-photos small { color: #333; }
   body.print-photos .photo-todo li { break-inside: avoid; margin-bottom: 6px; }
 }
+
+/* ---- Photo letter ---- */
+.letter-section { display: grid; gap: 10px; line-height: 1.55; }
+.letter-section h2 { margin: 6px 0 0; }
+.letter-section h3 { margin: 8px 0 0; font-size: 1.05rem; }
+.letter-section ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.letter-section p { margin: 0; }
+.letter-section .signature { margin-top: 18px; }
+.letter-section.big { font-size: 1.45rem; }
+.letter-section.big h2 { font-size: 1.9rem; }
+.letter-section.big h3 { font-size: 1.5rem; }
+@media print {
+  body.print-letter main > *:not(.letter-section) { display: none !important; }
+  body.print-letter .no-print { display: none !important; }
+  body.print-letter { background: #fff; color: #000; }
+  body.print-letter .letter-section { border: none; box-shadow: none; padding: 0; font-size: 12pt; }
+}

@@ -177,6 +177,10 @@ export function photoChecklist(event: Event, player: PlayerProfile): PhotoCheckl
   for (const group of KIND_EXTRAS) {
     if (!matchesKind(event, group.keywords)) continue;
     for (const item of group.items) {
+      // Skip an extra the event already covers ("The exam room" when the
+      // event has an exam room, so "Inside the exam room" is already listed).
+      const core = item.label.toLowerCase().replace(/^the /, "");
+      if (candidates.some((c) => c.label.toLowerCase().includes(core))) continue;
       candidates.push({
         id: `extra-${slug(item.label)}`,
         label: item.label,

@@ -109,7 +109,7 @@ When a user adds an event, the app suggests which photos to take, so they don't 
 - **Tips shown once:** every photo is optional and 3 to 5 is plenty; shoot from your child's eye height; calm everyday shots are fine; avoid other people's faces and ask before photographing staff.
 - **Never suggests photographing the hard part itself** (no needle close-ups).
 
-**Photo letter:** a short note you can print or show on your phone when asking to take pictures: what the photos are for, that only you and the app use them, and that they're never posted or shared. Draft in [`photo-letter.md`](photo-letter.md). **Status:** draft text written; in-app version planned (after the hackathon).
+**Photo letter:** a short note to print, or show on your phone at the front desk, when asking to take pictures. Open it with **📄 Letter to show staff** on the photo list. It's filled in from the outline (your child's name, the day, the people and places you'd like to photograph) and explains what the photos are for: only your child's story, never posted, shared or used for ads, and sent to an AI service to make the drawings. It asks for staff photos only "if you're comfortable," suggests a name badge or website photo instead, never asks to photograph other people, and says it's fine to say no. **Phone view** makes the text big enough to read across a counter. **Status:** built. Two promises from the original draft wait until they're true: deleting photos any time (needs the delete feature) and that the AI service doesn't train on them (needs a check of Meta's terms).
 
 ## Fixing pictures
 

@@ -1,5 +1,7 @@
 # Photo letter (draft)
 
+> **Built in the app (Nov 1)** as "📄 Letter to show staff" on the photo list, generated from the outline by `packages/core/src/photoLetter.ts`. The app version leaves out the two promises flagged below until they're true.
+
 A note the user can print, or show on their phone, when asking to take pictures at a place their child will visit. The app will fill in the bracketed parts. Kept short on purpose: most people will read it standing at a front desk.
 
 **Rule:** every promise here has to be true of the app. If how we handle photos changes, this letter changes first.

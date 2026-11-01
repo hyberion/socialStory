@@ -129,3 +129,28 @@ describe("extra steps keep their order", () => {
     expect(d.slice(-3)).toEqual(["We get a sticker.", "We wave goodbye.", "We leave and go home."]);
   });
 });
+
+import { photoLetter } from "./photoLetter.js";
+
+describe("photo letter", () => {
+  it("is filled in from the event, asks only about places and people, and promises only what's true", () => {
+    const e = eventFromDraft("doctor", doctorAnswers, args);
+    const letter = photoLetter(e, "Sam", photoChecklist(e, samplePlayer));
+    const text = JSON.stringify(letter);
+    expect(letter.opening[0]).toContain("My child, Sam, is coming here on Tuesday, November 3 for a doctor visit.");
+    expect(letter.asks.some((a) => a.startsWith("Dr. Patel, only if you're comfortable"))).toBe(true);
+    expect(text).not.toMatch(/Bear|headphones/);       // the child's own things aren't asked about
+    expect(text).not.toMatch(/delete|train/i);         // not promised until it's true
+    expect(letter.closing[0]).toContain("fine to say no");
+  });
+});
+
+describe("photo list duplicates", () => {
+  it("doesn't list the exam room twice", () => {
+    const e = eventFromDraft("doctor", doctorAnswers, args);
+    const labels = photoChecklist(e, samplePlayer).items.map((i) => i.label);
+    expect(labels.filter((l) => /exam room/i.test(l))).toEqual(["Inside the exam room"]);
+    const letter = photoLetter(e, "Sam", photoChecklist(e, samplePlayer));
+    expect(letter.asks.every((a) => a[0] === a[0]!.toUpperCase())).toBe(true);
+  });
+});

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { photoListText, type Event, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
+import { photoLetter, photoListText, type Event, type PhotoLetter, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
 import { events, localOffset } from "./eventsApi";
 
 const lines = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
@@ -119,16 +119,19 @@ export function EventOutline({
       /* the user closed the share sheet */
     }
   }
-  /** Prints only the photo list, as a checklist. */
-  function printList() {
-    document.body.classList.add("print-photos");
+  /** Prints just one part of the page: the photo checklist or the letter. */
+  function printOnly(what: "print-photos" | "print-letter") {
+    document.body.classList.add(what);
     const done = () => {
-      document.body.classList.remove("print-photos");
+      document.body.classList.remove(what);
       window.removeEventListener("afterprint", done);
     };
     window.addEventListener("afterprint", done);
     window.print();
   }
+  const printList = () => printOnly("print-photos");
+  const [letterOpen, setLetterOpen] = useState(false);
+  const [letterBig, setLetterBig] = useState(false);
 
   const everyone = [...e.companions, ...e.people];
   const most = photos?.items.filter((p) => p.priority === "most-helpful") ?? [];
@@ -320,6 +323,7 @@ export function EventOutline({
             </a>
             <button onClick={() => void copyList()}>{copied ? "Copied" : "Copy the list"}</button>
             {"share" in navigator && <button onClick={() => void shareList()}>Share…</button>}
+            <button onClick={() => setLetterOpen(true)}>📄 Letter to show staff</button>
           </div>
           <PhotoList title="Most helpful" items={most} />
           {nice.length > 0 && <PhotoList title="Nice to have" items={nice} />}
@@ -327,7 +331,53 @@ export function EventOutline({
           <button className="no-print" onClick={onDone}>I'll come back with photos</button>
         </section>
       )}
+
+      {saved && photos && letterOpen && (
+        <LetterView
+          letter={photoLetter(e, childName ?? "", photos)}
+          big={letterBig}
+          onBig={setLetterBig}
+          onPrint={() => printOnly("print-letter")}
+          onClose={() => setLetterOpen(false)}
+        />
+      )}
     </main>
+  );
+}
+
+/**
+ * The letter to print or hold up at the front desk. Phone view makes the
+ * text big enough to read from across a counter.
+ */
+function LetterView({
+  letter,
+  big,
+  onBig,
+  onPrint,
+  onClose,
+}: {
+  letter: PhotoLetter;
+  big: boolean;
+  onBig: (v: boolean) => void;
+  onPrint: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <section className={big ? "card letter-section big" : "card letter-section"} id="letter">
+      <div className="keep-list no-print">
+        <button onClick={onPrint}>🖨 Print or save as PDF</button>
+        <button onClick={() => onBig(!big)}>{big ? "Normal size" : "📱 Phone view (big text)"}</button>
+        <button onClick={onClose}>Close</button>
+      </div>
+      <h2>{letter.title}</h2>
+      {letter.opening.map((p) => <p key={p}>{p}</p>)}
+      <h3>{letter.promisesTitle}</h3>
+      <ul>{letter.promises.map((p) => <li key={p}>{p}</li>)}</ul>
+      <h3>{letter.askTitle}</h3>
+      <ul>{letter.asks.map((p) => <li key={p}>{p}</li>)}</ul>
+      {letter.closing.map((p) => <p key={p}>{p}</p>)}
+      <p className="signature">Name: ____________________ &nbsp; Phone (optional): ________________</p>
+    </section>
   );
 }
 

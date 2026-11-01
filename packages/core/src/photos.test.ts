@@ -28,7 +28,8 @@ describe("photoChecklist", () => {
 
   it("adds common extras for the kind of event as nice-to-haves", () => {
     const { items } = photoChecklist(sampleEvent, samplePlayer);
-    const extra = items.find((i) => i.label === "The exam room");
+    // ("The exam room" is skipped here: the sample visit already has an exam room.)
+    const extra = items.find((i) => i.label === "The scale");
     expect(extra?.priority).toBe("nice-to-have");
     expect(extra?.attachTo).toEqual({ kind: "place", id: "pl-office" });
   });
