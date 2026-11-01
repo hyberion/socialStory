@@ -22,6 +22,7 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 | Published demo kits | Judges see a finished story and game instantly, no waiting or cost | **Have** (doctor); haircut fixture still to write |
 | Dev-only routes stay off in production | `/api/dev/*` must not exist publicly | **Have** (blocked when `NODE_ENV=production`); verify on the droplet |
 | Logs contain no story text or photos | Good habit from day one | **Check** (the request logger logs paths only; verify) |
+| Three made-up demo children (Brad, Nov 1): a boy, a girl, and a range of skin tones across them, each with a licensed stock photo and generic comfort items ("tablet", "stuffed tiger") | Shows the pictures work for every child, not only one, and that skin tone is kept (the watercolor look once lightened Sam's brown skin; fixed Nov 1) | **Get** (Brad) stock photos; **Build** (us) the three profiles and their "All about me" stories |
 | No branded characters in public demo material (video, demo kits, screenshots) | A family drawing their own child's Elmo for private use is one thing; an AI-drawn Elmo in a public, judged submission is another. Use generic toys (Sam's bunny) | **Have** for the fixtures; **check** the video before upload (Nov 1: Benjamin's "All about me" test drew a very recognizable Elmo) |
 
 ## Stage B: public prototype (real families)
