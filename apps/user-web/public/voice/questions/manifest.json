@@ -1,0 +1,18 @@
+{
+  "voice": "KxR7w7QY9Rc4gig86VPG",
+  "model": "eleven_multilingual_v2",
+  "clips": {
+    "profile-name": "Let's set up your child's profile. What's your child's name, or the nickname you use?",
+    "profile-looks": "What does your child look like? Things like hair, skin, and favorite clothes. This keeps them looking the same in every picture.",
+    "profile-age": "How old is your child? You can skip this one.",
+    "profile-reading": "How does your child do with reading? For example: not reading yet, short simple sentences, or reads well.",
+    "profile-communication": "How does your child usually communicate? For example: full sentences, short phrases, single words, or a device or app.",
+    "profile-hard": "What's hard for your child? Things like loud places, sudden noises, waiting, being touched, or meeting new people.",
+    "profile-helps": "What helps your child when things get hard?",
+    "profile-comfort": "Does your child have a comfort item, like a stuffed animal, a blanket, or headphones? If so, what does it look like?",
+    "profile-loves": "What does your child love? Favorite things, topics, or characters.",
+    "profile-screen": "On a phone or tablet, what can your child do comfortably? Tap things, drag things around, or type?",
+    "profile-ways-in": "Does your child take in stories best by reading, by listening, or by playing games?",
+    "profile-anything-else": "Is there anything else that would help us understand your child?"
+  }
+}
