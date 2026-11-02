@@ -1,6 +1,9 @@
 import { Hono } from "hono";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { addVoiceRoute } from "./voiceRoute.js";
+import { addDemoGate } from "./gate.js";
+import { FLAT_PRICES } from "./budget.js";
+import { budget } from "./spend.js";
 import { logger } from "hono/logger";
 import { sampleStory, validateStory } from "@socialstory/core";
 import { config } from "./config.js";
@@ -19,9 +22,17 @@ import { EventInterviewReply, PageDraft, ProfileInterviewReply } from "@socialst
 
 export const app = new Hono().basePath("/api");
 
+// The demo passcode comes first, so it covers every route below it (voice included).
+addDemoGate(app, config.DEMO_PASSCODE, { secure: config.NODE_ENV === "production" });
+
 // Live voice: the browser streams microphone audio here; we relay it to Meta.
 export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
-addVoiceRoute(app, upgradeWebSocket, () => ({ apiKey: config.MODEL_API_KEY, url: config.MUSE_VOICE_URL }));
+addVoiceRoute(app, upgradeWebSocket, () => {
+  // Each spoken answer counts against the demo's daily budget.
+  budget.check();
+  budget.record(FLAT_PRICES.voice, "voice");
+  return { apiKey: config.MODEL_API_KEY, url: config.MUSE_VOICE_URL };
+});
 
 app.use(logger());
 
@@ -82,6 +93,7 @@ app.route(
 );
 
 app.onError((err, c) => {
+  if (err.name === "BudgetReached") return c.json({ ok: false, error: err.message }, 429);
   console.error(err);
   return c.json({ ok: false, error: err.message }, 500);
 });

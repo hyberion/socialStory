@@ -271,3 +271,9 @@ label.button.disabled { opacity: 0.5; cursor: default; }
 .look.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
 .child-photo { display: grid; grid-template-columns: 160px 160px; gap: 10px; }
 .child-photo > img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+
+/* Demo passcode screen */
+.unlock { max-width: 420px; margin: 12vh auto; padding: 0 16px; display: grid; gap: 12px; }
+.unlock form { display: grid; gap: 10px; }
+.unlock label { display: grid; gap: 6px; }
+.unlock .error { color: #9a3b2e; margin: 0; }

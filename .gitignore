@@ -25,3 +25,6 @@ pnpm-debug.log*
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+# Demo data packed for the server (pnpm demo-data)
+demo-data/

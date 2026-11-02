@@ -2,10 +2,14 @@ import { decodeMaskToRaster, parseImageStream, recordsOfKind, type ResponsesEven
 import { MODEL_IDS } from "@socialstory/core";
 import { meta } from "./meta.js";
 import type { Segmenter } from "./sam.js";
+import { FLAT_PRICES } from "./budget.js";
+import { budget } from "./spend.js";
 
 /** Kept apart from sam.ts so tests of the cutout logic don't need a Meta key. */
 /** The real thing: one SAM 3.1 call. Picks the most confident object, or the biggest if no scores. */
 export const samSegment: Segmenter = async (photo, phrase) => {
+  budget.check();
+  budget.record(FLAT_PRICES.segment, "segment");
   // Meta's SAM request uses fields the OpenAI types don't know about, so it's built loosely.
   const stream = (await meta.responses.create({
     model: MODEL_IDS.segment,

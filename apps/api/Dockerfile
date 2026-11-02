@@ -17,6 +17,8 @@ WORKDIR /app
 COPY --from=build /out/node_modules ./node_modules
 COPY --from=build /out/package.json ./package.json
 COPY --from=build /repo/apps/api/dist ./dist
+# The data folder belongs to the app user, so the volume mounted there is writable.
+RUN mkdir -p /data && chown node:node /data
 USER node
 EXPOSE 8787
 CMD ["node", "dist/index.js"]

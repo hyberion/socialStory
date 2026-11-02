@@ -1,4 +1,5 @@
-import { IMAGE_TASKS, type ImageTaskName } from "@socialstory/core";
+import { IMAGE_PRICE, IMAGE_TASKS, type ImageTaskName } from "@socialstory/core";
+import { budget } from "./spend.js";
 import { meta } from "./meta.js";
 
 /**
@@ -33,6 +34,8 @@ export async function generateImage(
   references: ReferenceImage[] = [],
 ): Promise<GeneratedImage> {
   const settings = IMAGE_TASKS[task];
+  budget.check();
+  budget.record(IMAGE_PRICE, task);
   const started = Date.now();
 
   const content = [

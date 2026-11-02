@@ -11,16 +11,17 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 
 | Item | Why | Status |
 | --- | --- | --- |
-| Check the Official Rules for what judges need (live link? test login? video only?) | Decides whether a public build is required at all | **Get** (Brad) |
-| A domain or subdomain for the two apps | The user app and player app each need an address | **Get** (Brad): pick one; Caddy config is ready for any name |
+| Check the Official Rules for what judges need (live link? test login? video only?) | Decides whether a public build is required at all | **Have** (Nov 1): public repo, 3-minute video, and judges look at the live product. No live-link field on the form, so the links go in the description and README |
+| A domain or subdomain for the two apps | The user app and player app each need an address | **Have**: app.newmythology.net and play.newmythology.net |
 | DigitalOcean droplet with Docker | Runs everything | **Get** (Brad) account and droplet; **Build** (us) the setup |
 | HTTPS | Required for the player app to install on a tablet and work offline | **Have** (Caddy does it automatically) |
-| Dockerfile and compose for production | One command to deploy | **Build**: exists, never tested on a real Docker host |
+| Dockerfile and compose for production | One command to deploy | **Have** (`docker-compose.prod.yml`, `infra/`): build steps and production start tested by hand; the first real Docker build is on the droplet |
 | Separate production Meta key (`asd-app-prod`) | A leaked or abused demo key can't touch the dev key, and can be revoked alone | **Get** (Brad) |
-| Spending protection | A public "generate" button lets strangers spend Meta credits | **Build**: daily budget cap on the server, plus generation behind a demo passcode. **Check**: whether Meta's console offers a spending limit |
-| Demo passcode on the user app | Keeps random visitors out of generation; judges get the code | **Build** (small) |
+| Spending protection | A public "generate" button lets strangers spend Meta credits | **Have**: `DAILY_BUDGET_USD` cap on every paid call, plus the passcode. **Check**: whether Meta's console offers a spending limit |
+| Demo passcode on the user app | Keeps random visitors out of generation; judges get the code | **Have** (`DEMO_PASSCODE`; player app stays open) |
 | Published demo kits | Judges see a finished story and game instantly, no waiting or cost | **Have** (doctor); haircut fixture still to write |
 | Dev-only routes stay off in production | `/api/dev/*` must not exist publicly | **Have** (blocked when `NODE_ENV=production`); verify on the droplet |
+| Only demo data on the server (`pnpm demo-data <ids>`), never the whole local data folder | It holds real test photos (Benjamin's) that must not go public | **Have** |
 | Logs contain no story text or photos | Good habit from day one | **Check** (the request logger logs paths only; verify) |
 | Three made-up demo children (Brad, Nov 1): a boy, a girl, a range of skin tones across them, and one older (11 or 12, shows age is drawn right), each with a licensed stock photo and generic comfort items ("tablet", "stuffed tiger") | Shows the pictures work for every child, not only one, and that skin tone is kept (the watercolor look once lightened Sam's brown skin; fixed Nov 1) | **Get** (Brad) stock photos; **Build** (us) the three profiles and their "All about me" stories |
 | No branded characters in public demo material (video, demo kits, screenshots) | A family drawing their own child's Elmo for private use is one thing; an AI-drawn Elmo in a public, judged submission is another. Use generic toys (Sam's bunny) | **Have** for the fixtures; **check** the video before upload (Nov 1: Benjamin's "All about me" test drew a very recognizable Elmo) |

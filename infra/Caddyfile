@@ -1,12 +1,26 @@
 # Production reverse proxy. Caddy gets and renews HTTPS certificates
-# automatically. Replace the two hostnames with your real (sub)domains,
+# automatically. The two hostnames come from .env (USER_HOST, PLAY_HOST),
 # both pointed at the droplet's IP with A records.
 
-user.example.com {
+(app) {
 	encode gzip
+	header {
+		# Standard hygiene: no framing by other sites, no sniffing, no referrer leaks.
+		X-Frame-Options DENY
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+	}
 	handle /api/* {
+		# Photos and recordings go up through here; the API checks sizes itself.
+		request_body {
+			max_size 20MB
+		}
 		reverse_proxy api:8787
 	}
+}
+
+{$USER_HOST:app.newmythology.net} {
+	import app
 	handle {
 		root * /srv/user-web
 		try_files {path} /index.html
@@ -14,11 +28,8 @@ user.example.com {
 	}
 }
 
-play.example.com {
-	encode gzip
-	handle /api/* {
-		reverse_proxy api:8787
-	}
+{$PLAY_HOST:play.newmythology.net} {
+	import app
 	handle {
 		root * /srv/player-app
 		try_files {path} /index.html

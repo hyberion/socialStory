@@ -32,6 +32,10 @@ const Env = z.object({
   ELEVENLABS_API_KEY: z.string().optional(),
   /** The voice that reads interview questions (and later, stories). */
   ELEVENLABS_VOICE_ID: z.string().optional(),
+  /** Public demo: the passcode judges type before they can generate anything. Unset = no gate (local). */
+  DEMO_PASSCODE: z.string().min(4).optional(),
+  /** Public demo: most the server may spend on AI calls per day, in US dollars. Unset = no cap (local). */
+  DAILY_BUDGET_USD: z.coerce.number().positive().optional(),
   /** Testing only: send live voice to a stand-in instead of Meta. */
   MUSE_VOICE_URL: z.string().url().optional(),
 });

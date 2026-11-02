@@ -24,6 +24,7 @@
     "photo-list": "pnpm --filter @socialstory/api photo-list",
     "publish-kit": "pnpm --filter @socialstory/api publish-kit",
     "narrate": "pnpm --filter @socialstory/api narrate",
+    "demo-data": "pnpm --filter @socialstory/api demo-data",
     "voice-questions": "pnpm --filter @socialstory/api voice-questions",
     "style-test": "pnpm --filter @socialstory/api style-test"
   }

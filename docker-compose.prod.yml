@@ -1,0 +1,43 @@
+# Production, on the droplet:
+#   docker compose -f docker-compose.prod.yml up -d --build
+# Settings come from .env next to this file (see infra/README.md).
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /data
+    volumes:
+      # Stories, pictures, photos, recordings and the spending log live in
+      # ./data on the droplet (copied from pnpm demo-data). Owned by uid 1000.
+      - ./data:/data
+    # Not published to the internet: only Caddy talks to it.
+    expose:
+      - "8787"
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/web.Dockerfile
+    restart: unless-stopped
+    # Only the hostnames; the keys stay with the API.
+    environment:
+      USER_HOST: ${USER_HOST:-app.newmythology.net}
+      PLAY_HOST: ${PLAY_HOST:-play.newmythology.net}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  caddy_data:
+  caddy_config:

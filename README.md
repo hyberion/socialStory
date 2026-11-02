@@ -69,6 +69,7 @@ Then open:
 | `pnpm draw-story [event]` | Illustrates a written story and builds a contact sheet. Replaced images move to `history/<date-time>/`. `--pages 2,5` redraws only those pages; `--new-cast` redraws the portraits |
 | `pnpm publish-kit [event]` | Publishes the written story and its pictures to the player app as a locked copy. Warns about missing or out-of-date pictures |
 | `pnpm style-test` | Draws the same scene in all 8 illustration looks (cast sheet + page each, ~$0.24) and builds a comparison sheet. `--looks clay,graphic` for some; `--redo` to draw again |
+| `pnpm demo-data <id> [id ...]` | Packs only these stories (and the profile and photos they use) into `demo-data/` for the server. See [`infra/README.md`](infra/README.md) |
 | `pnpm narrate [event]` | Records the read-along for a written story with ElevenLabs (word timings included) and asks Spark for word help. Only pages whose words changed are recorded again; `--redo` for all. Then `pnpm publish-kit [event]` |
 | `pnpm voice-questions` | Records the interview questions with ElevenLabs (once; commit the MP3s). With no voice set, lists your voices |
 | `pnpm photo-list [event]` | Shows the photo checklist for an event (free) |

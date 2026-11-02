@@ -28,7 +28,16 @@ export function addVoiceRoute(
               /* browser already gone */
             }
           };
-          transcriber = new MuseTranscriber({ ...options(), handsFree }, {
+          let opts: TranscriberOptions;
+          try {
+            opts = options();
+          } catch (err) {
+            // e.g. the demo's daily budget is used up
+            send({ type: "error", message: (err as Error).message });
+            ws.close();
+            return;
+          }
+          transcriber = new MuseTranscriber({ ...opts, handsFree }, {
             onText: (text) => send({ type: "text", text }),
             onDone: (text) => {
               send({ type: "done", text });

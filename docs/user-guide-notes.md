@@ -183,6 +183,10 @@ Things users should know about the player app, so nothing surprises them.
 | Games built from the story's words (match, drag the word, fill in the blank). Never scored or timed; a miss just shows the answer. | Planned (after the hackathon) |
 | A tour of the place with no people in it. | Planned (after the hackathon) |
 
+## The public demo
+
+The demo at app.newmythology.net asks for a **passcode** once (judges get it with the submission). The player app at play.newmythology.net needs no code: it only shows finished, published stories. The demo also has a **daily spending limit**: once it's reached, the app says so plainly and can't make anything new until the next day, while finished stories keep working.
+
 ## Privacy (the guide needs a plain section on this)
 
 - **Read-along recordings:** to record a page, its words (which include your child's name) are sent to ElevenLabs, the voice service. Interview questions are different: they were recorded ahead of time and say "your child". Word help is picked by Meta's Spark from the same words the story was written from.

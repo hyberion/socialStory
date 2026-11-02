@@ -3,8 +3,9 @@ import { zodTextFormat } from "openai/helpers/zod";
 import type { Reasoning } from "openai/resources";
 import type { ResponseUsage } from "openai/resources/responses/responses";
 import type { z } from "zod";
-import { TEXT_TASKS, type ReasoningEffort, type TextTaskName } from "@socialstory/core";
+import { TEXT_TASKS, estimateCost, type ReasoningEffort, type TextTaskName } from "@socialstory/core";
 import { config } from "./config.js";
+import { budget } from "./spend.js";
 
 /**
  * The Meta Model API is OpenAI-SDK compatible. The SDK does NOT read
@@ -63,12 +64,15 @@ export async function runTextTask(
   input: string,
   options: TaskOptions = {},
 ): Promise<TextResult> {
+  budget.check();
   const response = await meta.responses.create({
     ...settingsFor(task, options.effort),
     input,
     instructions: options.instructions,
   });
-  return { text: response.output_text, usage: toUsage(response.usage) };
+  const usage = toUsage(response.usage);
+  budget.record(estimateCost(TEXT_TASKS[task].model, usage), task);
+  return { text: response.output_text, usage };
 }
 
 /**
@@ -82,14 +86,17 @@ export async function runStructuredTask<S extends z.ZodTypeAny>(
   input: string,
   options: TaskOptions = {},
 ): Promise<StructuredResult<z.infer<S>>> {
+  budget.check();
   const response = await meta.responses.parse({
     ...settingsFor(task, options.effort),
     input,
     instructions: options.instructions,
     text: { format: zodTextFormat(schema, schemaName) },
   });
+  const usage = toUsage(response.usage);
+  budget.record(estimateCost(TEXT_TASKS[task].model, usage), task);
   if (!response.output_parsed) {
     throw new Error(`Model returned no parseable ${schemaName} (status: ${response.status}).`);
   }
-  return { data: response.output_parsed as z.infer<S>, usage: toUsage(response.usage) };
+  return { data: response.output_parsed as z.infer<S>, usage };
 }
