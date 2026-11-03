@@ -13,10 +13,10 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 | --- | --- | --- |
 | Check the Official Rules for what judges need (live link? test login? video only?) | Decides whether a public build is required at all | **Have** (Nov 1): public repo, 3-minute video, and judges look at the live product. No live-link field on the form, so the links go in the description and README |
 | A domain or subdomain for the two apps | The user app and player app each need an address | **Have**: app.newmythology.net and play.newmythology.net |
-| DigitalOcean droplet with Docker | Runs everything | **Get** (Brad) account and droplet; **Build** (us) the setup |
+| DigitalOcean droplet with Docker | Runs everything | **Have** (Nov 2): 2 vCPU / 2 GB, NYC, swap on, firewall 22/80/443 only; live at app. and play.newmythology.net |
 | HTTPS | Required for the player app to install on a tablet and work offline | **Have** (Caddy does it automatically) |
 | Dockerfile and compose for production | One command to deploy | **Have** (`docker-compose.prod.yml`, `infra/`): build steps and production start tested by hand; the first real Docker build is on the droplet |
-| Separate production Meta key (`asd-app-prod`) | A leaked or abused demo key can't touch the dev key, and can be revoked alone | **Get** (Brad) |
+| Separate production Meta key (`asd-app-prod`) | A leaked or abused demo key can't touch the dev key, and can be revoked alone | **Have** (Nov 2), only in the droplet's `.env` |
 | Spending protection | A public "generate" button lets strangers spend Meta credits | **Have**: `DAILY_BUDGET_USD` cap on every paid call, plus the passcode. **Check**: whether Meta's console offers a spending limit |
 | Demo passcode on the user app | Keeps random visitors out of generation; judges get the code | **Have** (`DEMO_PASSCODE`; player app stays open) |
 | Published demo kits | Judges see a finished story and game instantly, no waiting or cost | **Have** (doctor); haircut fixture still to write |
