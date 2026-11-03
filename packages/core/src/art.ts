@@ -156,17 +156,40 @@ export function placeForPage(
   const step = event.steps[index];
   if (!step) return undefined;
   const isEntrance = (ph: PhotoRef) => ph.id.endsWith("-entrance");
-  if (step.placeId) {
-    const place = event.places.find((p) => p.id === step.placeId);
-    if (!place) return undefined;
-    const photo = place.photos.find((ph) => ph.id.endsWith("-inside")) ?? place.photos.find((ph) => !isEntrance(ph));
-    return { place, step, where: "inside", photo };
-  }
   const firstPlaced = event.steps.findIndex((s) => s.placeId);
-  const place = event.places[0];
-  if (!place || firstPlaced < 0 || index > firstPlaced) return undefined;
-  return { place, step, where: "entrance", photo: place.photos.find(isEntrance) };
+  const first = event.places[0];
+  const entrance = (place: Event["places"][number]) => ({ place, step, where: "entrance" as const, photo: place.photos.find(isEntrance) });
+
+  // Before the first step with a place: arriving, at the first place's front entrance.
+  if (!step.placeId) {
+    if (!first || firstPlaced < 0 || index > firstPlaced) return undefined;
+    return entrance(first);
+  }
+  const place = event.places.find((p) => p.id === step.placeId);
+  if (!place) return undefined;
+  // The very first step, when it's about getting there ("We go to the lab"), is the arrival too.
+  if (index === firstPlaced && place.id === first?.id && ARRIVING.test(step.description)) return entrance(place);
+
+  // Inside: this room's own photo first, then an extra about this room kept on another place
+  // ("the exam table" for "the exam room"), then any other photo of it that isn't the entrance.
+  const words = significantWords(place.name);
+  const aboutThisRoom = (ph: PhotoRef) => ph.id.startsWith("extra-") && words.some((w) => ph.id.includes(w));
+  const aboutAnotherRoom = (ph: PhotoRef) =>
+    ph.id.startsWith("extra-") &&
+    event.places.some((o) => o.id !== place.id && significantWords(o.name).some((w) => ph.id.includes(w)));
+  const photo =
+    place.photos.find((ph) => ph.id.endsWith("-inside")) ??
+    event.places.flatMap((p) => p.photos).find(aboutThisRoom) ??
+    place.photos.find((ph) => !isEntrance(ph) && !aboutAnotherRoom(ph));
+  return { place, step, where: "inside", photo };
 }
+
+/** Words that mean "we're on our way" or "we've just got there". */
+const ARRIVING = /\b(go to|going to|get to|drive to|walk to|ride to|arrive|arrives|come to|walk in|go in|go inside|front door)\b/i;
+
+/** "the exam room" -> ["exam", "room"]: the words that pick a room out (longer than 3 letters). */
+const significantWords = (name: string) =>
+  name.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 3 && w !== "room" && w !== "office");
 
 export function buildPagePrompt(
   page: StoryPage,

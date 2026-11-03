@@ -51,14 +51,15 @@ export const GENERAL_PHOTO_TIPS = [
 ];
 
 /** Extra things worth photographing for common kinds of events. Matched by keyword. */
-const KIND_EXTRAS: Array<{ keywords: string[]; items: Array<{ label: string; why: string }> }> = [
+/** `room`: a word in the name of the place an extra belongs in ("exam" -> the exam room). Otherwise it's the first place. */
+const KIND_EXTRAS: Array<{ keywords: string[]; items: Array<{ label: string; why: string; room?: string }> }> = [
   {
     keywords: ["doctor", "pediatric", "clinic", "checkup", "check-up", "physical"],
     items: [
       { label: "The check-in desk", why: "Often the first stop inside, and sometimes busy." },
-      { label: "The exam room", why: "Where the visit itself happens." },
-      { label: "The exam table with its paper cover", why: "The crinkly paper surprises some kids." },
-      { label: "The scale", why: "Many visits start with standing on it." },
+      { label: "The exam room", why: "Where the visit itself happens.", room: "exam" },
+      { label: "The exam table with its paper cover", why: "The crinkly paper surprises some kids.", room: "exam" },
+      { label: "The scale", why: "Many visits start with standing on it.", room: "exam" },
     ],
   },
   {
@@ -189,7 +190,11 @@ export function photoChecklist(event: Event, player: PlayerProfile): PhotoCheckl
         id: `extra-${slug(item.label)}`,
         label: item.label,
         why: item.why,
-        attachTo: firstPlace ? { kind: "place", id: firstPlace.id } : { kind: "event" },
+        attachTo: (() => {
+          const room = item.room ? event.places.find((p) => p.name.toLowerCase().includes(item.room!)) : undefined;
+          const place = room ?? firstPlace;
+          return place ? { kind: "place" as const, id: place.id } : { kind: "event" as const };
+        })(),
         strong: false,
       });
     }

@@ -97,6 +97,37 @@ describe("props and region", () => {
     expect(pageSetting(sampleStory.pages[1]!, sampleEvent)).toMatch(/^Outside, at the front entrance of Dr. Patel's office\./);
   });
 
+  it("handles a visit that starts inside, with the exam-table photo kept on the lab (Brad's lab test, Nov 2)", () => {
+    const lab = {
+      ...sampleEvent,
+      places: [
+        {
+          id: "pl-office",
+          name: "Quest lab",
+          sensoryNotes: [],
+          photos: [
+            { id: "place-pl-office-entrance", src: "e/out.jpg" },
+            { id: "place-pl-office-inside", src: "e/in.jpg" },
+            { id: "extra-the-exam-table-with-its-paper-cover", src: "e/table.jpg" },
+          ],
+        },
+        { id: "pl-exam", name: "the exam room", sensoryNotes: [], photos: [] },
+      ],
+      steps: [
+        { id: "t1", description: "We go to the lab nurse's office.", placeId: "pl-office", personIds: [], fixed: false },
+        { id: "t3", description: "We wait in the waiting room.", placeId: "pl-office", personIds: [], fixed: false },
+        { id: "t5", description: "The nurse checks how tall I am.", placeId: "pl-exam", personIds: [], fixed: false },
+      ],
+    };
+    const page = (stepId: string) => ({ ...sampleStory.pages[2]!, stepId });
+    // "We go to..." as the first step: the arrival, at the entrance.
+    expect(placeForPage(page("t1"), lab)).toMatchObject({ where: "entrance", photo: { id: "place-pl-office-entrance" } });
+    // Waiting: the lab's own inside photo, not the exam table.
+    expect(placeForPage(page("t3"), lab)?.photo?.id).toBe("place-pl-office-inside");
+    // The exam room finds the exam-table photo even though it was kept on the lab.
+    expect(placeForPage(page("t5"), lab)?.photo?.id).toBe("extra-the-exam-table-with-its-paper-cover");
+  });
+
   it("draws a page in the real place when the user photographed it (Nov 2)", () => {
     const withPhotos = {
       ...sampleEvent,

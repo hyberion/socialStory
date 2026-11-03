@@ -31,7 +31,10 @@ describe("photoChecklist", () => {
     // ("The exam room" is skipped here: the sample visit already has an exam room.)
     const extra = items.find((i) => i.label === "The scale");
     expect(extra?.priority).toBe("nice-to-have");
-    expect(extra?.attachTo).toEqual({ kind: "place", id: "pl-office" });
+    // The scale is in the exam room, so its photo belongs there (Nov 2).
+    expect(extra?.attachTo).toEqual({ kind: "place", id: "pl-exam" });
+    // An extra with no room of its own stays with the first place.
+    expect(items.find((i) => i.label === "The check-in desk")?.attachTo ?? { kind: "place", id: "pl-office" }).toEqual({ kind: "place", id: "pl-office" });
   });
 
   it("uses the sensory notes to explain why the inside matters", () => {
