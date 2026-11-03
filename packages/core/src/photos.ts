@@ -1,6 +1,7 @@
 import type { Event } from "./event.js";
 import type { PlayerProfile } from "./profile.js";
 import { comfortsFor } from "./cast.js";
+import { storyView } from "./aboutMe.js";
 
 /**
  * A photo checklist for the user, built from the event itself, with no
@@ -116,7 +117,8 @@ function slug(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function photoChecklist(event: Event, player: PlayerProfile): PhotoChecklist {
+export function photoChecklist(fullEvent: Event, player: PlayerProfile): PhotoChecklist {
+  const event = storyView(fullEvent);
   const candidates: Array<Omit<PhotoSuggestion, "priority"> & { strong: boolean }> = [];
   const firstPlace = event.places[0];
   // Place and extra photos are stored on the place under their to-do id.

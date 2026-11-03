@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { players } from "./playersApi";
-import { photoLetter, photoListText, type Event, type PhotoLetter, type PhotoRef, type PlayerProfile, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
+import { ABOUT_ME_KIND, photoLetter, photoListText, type Event, type PhotoLetter, type PhotoRef, type PlayerProfile, type PhotoChecklist, type Person, type Step } from "@socialstory/core";
 import { events, localOffset } from "./eventsApi";
 
 const lines = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
@@ -33,6 +33,7 @@ export function EventOutline({
   onOpenStory?: () => void;
 }) {
   const [e, setE] = useState<Event>(initial);
+  const aboutMe = e.kind === ABOUT_ME_KIND;
   const [saved, setSaved] = useState(initial.id !== "new");
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState<string>();
@@ -203,13 +204,19 @@ export function EventOutline({
         This is the plan the story is written from. Change anything; leave out what you don't know yet. Nothing is written until
         you say so.
       </p>
+      {aboutMe && (
+        <p className="hint">
+          This is an "All about me" story: just your child and their own things, with nothing to get ready for. So there's no
+          date, no other people, no places and nothing hard here. Those belong in stories about events.
+        </p>
+      )}
 
       <section className="card form">
         <label>
           <span>What it's called</span>
           <input value={e.title} onChange={(x) => set({ title: x.target.value })} />
         </label>
-        <div className="row">
+        {!aboutMe && <div className="row">
           <label>
             <span>When</span>
             <input
@@ -218,13 +225,14 @@ export function EventOutline({
               onChange={(x) => set({ startsAt: x.target.value ? `${x.target.value}:00${localOffset(new Date(x.target.value))}` : "" })}
             />
           </label>
-        </div>
+        </div>}
         <label>
           <span>Why it's happening (the way you'd explain it to your child)</span>
           <input value={e.purpose ?? ""} onChange={(x) => set({ purpose: x.target.value || undefined })} />
         </label>
       </section>
 
+      {!aboutMe && (
       <section className="card form">
         <h2>People</h2>
         {(["companions", "people"] as const).map((list) => (
@@ -262,6 +270,7 @@ export function EventOutline({
           </fieldset>
         ))}
       </section>
+      )}
 
       <section className="card form">
         <h2>Steps, in order</h2>
@@ -276,10 +285,12 @@ export function EventOutline({
                 <button className="icon" disabled={e.steps.length === 1} onClick={() => set({ steps: e.steps.filter((_, n) => n !== i) })} aria-label="Delete step">×</button>
               </div>
               <div className="row step-meta">
-                <label className="choice">
-                  <input type="checkbox" checked={s.fixed} onChange={(x) => setStep(i, { fixed: x.target.checked })} />
-                  <span>Will happen no matter what</span>
-                </label>
+                {!aboutMe && (
+                  <label className="choice">
+                    <input type="checkbox" checked={s.fixed} onChange={(x) => setStep(i, { fixed: x.target.checked })} />
+                    <span>Will happen no matter what</span>
+                  </label>
+                )}
                 {e.places.length > 0 && (
                   <select value={s.placeId ?? ""} onChange={(x) => setStep(i, { placeId: x.target.value || undefined })} aria-label="Where">
                     <option value="">(no particular place)</option>
@@ -308,51 +319,55 @@ export function EventOutline({
       </section>
 
       <section className="card form">
-        <h2>Places, getting there, and hard parts</h2>
-        {e.places.map((pl, i) => (
-          <div key={pl.id} className="person">
-            <input value={pl.name} onChange={(x) => set({ places: e.places.map((p, n) => (n === i ? { ...p, name: x.target.value } : p)) })} />
-            <textarea
-              rows={2}
-              placeholder="What it's like: noisy, bright, smells like soap (one per line)"
-              value={pl.sensoryNotes.join("\n")}
-              onChange={(x) => set({ places: e.places.map((p, n) => (n === i ? { ...p, sensoryNotes: lines(x.target.value) } : p)) })}
-            />
-          </div>
-        ))}
-        <button className="small" onClick={() => set({ places: [...e.places, { id: newId("pl-"), name: "", photos: [], sensoryNotes: [] }] })}>+ Add a place</button>
-        <div className="row">
-          <label>
-            <span>Getting there</span>
-            <select
-              value={e.transport?.mode ?? ""}
-              onChange={(x) =>
-                set({ transport: x.target.value ? { mode: x.target.value as "car", name: e.transport?.name ?? `the ${x.target.value}`, appearance: e.transport?.appearance } : undefined })
-              }
-            >
-              <option value="">Not set</option>
-              {["car", "bus", "train", "walk", "other"].map((m) => <option key={m} value={m}>{m}</option>)}
-            </select>
-          </label>
-          {e.transport && e.transport.mode !== "walk" && (
-            <>
+        <h2>{aboutMe ? "Anything else" : "Places, getting there, and hard parts"}</h2>
+        {!aboutMe && (
+          <>
+            {e.places.map((pl, i) => (
+              <div key={pl.id} className="person">
+                <input value={pl.name} onChange={(x) => set({ places: e.places.map((p, n) => (n === i ? { ...p, name: x.target.value } : p)) })} />
+                <textarea
+                  rows={2}
+                  placeholder="What it's like: noisy, bright, smells like soap (one per line)"
+                  value={pl.sensoryNotes.join("\n")}
+                  onChange={(x) => set({ places: e.places.map((p, n) => (n === i ? { ...p, sensoryNotes: lines(x.target.value) } : p)) })}
+                />
+              </div>
+            ))}
+            <button className="small" onClick={() => set({ places: [...e.places, { id: newId("pl-"), name: "", photos: [], sensoryNotes: [] }] })}>+ Add a place</button>
+            <div className="row">
               <label>
-                <span>Called</span>
-                <input value={e.transport.name} onChange={(x) => set({ transport: { ...e.transport!, name: x.target.value } })} />
+                <span>Getting there</span>
+                <select
+                  value={e.transport?.mode ?? ""}
+                  onChange={(x) =>
+                    set({ transport: x.target.value ? { mode: x.target.value as "car", name: e.transport?.name ?? `the ${x.target.value}`, appearance: e.transport?.appearance } : undefined })
+                  }
+                >
+                  <option value="">Not set</option>
+                  {["car", "bus", "train", "walk", "other"].map((m) => <option key={m} value={m}>{m}</option>)}
+                </select>
               </label>
-              <label>
-                <span>Looks like</span>
-                <input value={e.transport.appearance ?? ""} onChange={(x) => set({ transport: { ...e.transport!, appearance: x.target.value || undefined } })} />
-              </label>
-            </>
-          )}
-        </div>
+              {e.transport && e.transport.mode !== "walk" && (
+                <>
+                  <label>
+                    <span>Called</span>
+                    <input value={e.transport.name} onChange={(x) => set({ transport: { ...e.transport!, name: x.target.value } })} />
+                  </label>
+                  <label>
+                    <span>Looks like</span>
+                    <input value={e.transport.appearance ?? ""} onChange={(x) => set({ transport: { ...e.transport!, appearance: x.target.value || undefined } })} />
+                  </label>
+                </>
+              )}
+            </div>
+            <label>
+              <span>What will be hard (one per line)</span>
+              <textarea rows={3} value={hard} onChange={(x) => { setHard(x.target.value); setDirty(true); }} />
+            </label>
+          </>
+        )}
         <label>
-          <span>What will be hard (one per line)</span>
-          <textarea rows={3} value={hard} onChange={(x) => { setHard(x.target.value); setDirty(true); }} />
-        </label>
-        <label>
-          <span>Anything else about the day</span>
+          <span>{aboutMe ? "Anything else true about your child" : "Anything else about the day"}</span>
           <textarea rows={2} value={e.notes ?? ""} onChange={(x) => set({ notes: x.target.value || undefined })} />
         </label>
       </section>
@@ -381,7 +396,7 @@ export function EventOutline({
             </a>
             <button onClick={() => void copyList()}>{copied ? "Copied" : "Copy the list"}</button>
             {"share" in navigator && <button onClick={() => void shareList()}>Share…</button>}
-            <button onClick={() => setLetterOpen(true)}>📄 Letter to show staff</button>
+            {!aboutMe && <button onClick={() => setLetterOpen(true)}>📄 Letter to show staff</button>}
           </div>
           {photoNote && <p className="note good no-print">{photoNote}</p>}
           {added.length > 0 && (

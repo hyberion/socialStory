@@ -2,7 +2,7 @@ import type { DetailLevel, PlayerProfile, ReadingLevel } from "./profile.js";
 import { READING_LIMITS } from "./reading.js";
 import { HARD_THING_PROMPTS } from "./onboarding.js";
 import { dateWords, timeWords, wallClock } from "./when.js";
-import { ABOUT_ME_KIND } from "./aboutMe.js";
+import { ABOUT_ME_KIND, storyView } from "./aboutMe.js";
 import type { Event } from "./event.js";
 import type { Story } from "./story.js";
 import type { Issue } from "./validate.js";
@@ -87,7 +87,8 @@ Scene briefs
 - If the vehicle is in the picture, name it by its exact cast name and put its id in inPicture.
 - Calm scenes only: no scary faces, needles close up, or crying.`;
 
-function formatEvent(event: Event, player: PlayerProfile): string {
+function formatEvent(fullEvent: Event, player: PlayerProfile): string {
+  const event = storyView(fullEvent);
   const people = new Map(event.people.map((p) => [p.id, p]));
   const places = new Map(event.places.map((p) => [p.id, p]));
   // The event's own wall-clock time (not the server's time zone); empty = not decided.

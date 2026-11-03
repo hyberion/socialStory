@@ -12,6 +12,27 @@ export const ABOUT_ME_KIND = "about-me";
 
 export const aboutMeId = (playerId: string) => `${playerId.replace(/^player-/, "")}-about-me`;
 
+/**
+ * What a story is made from. An "All about me" story is only the child and
+ * their own things, so it ignores getting there, places, hard parts and other
+ * people, even if they were filled in (Nov 3: the shared outline asked
+ * "Getting there?" and Leo's about-me story got a car). Every other event is
+ * used as it is. The story writer, the pictures and the photo list all read
+ * events through this.
+ */
+export function storyView(event: Event): Event {
+  if (event.kind !== ABOUT_ME_KIND) return event;
+  return {
+    ...event,
+    transport: undefined,
+    places: [],
+    people: [],
+    companions: [],
+    hardParts: [],
+    steps: event.steps.map(({ placeId: _place, ...step }) => ({ ...step, personIds: [] })),
+  };
+}
+
 export function aboutMeEvent(player: PlayerProfile): Event {
   const name = player.displayName.trim() || "me";
   const steps: Array<{ id: string; description: string }> = [

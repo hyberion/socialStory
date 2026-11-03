@@ -1,5 +1,6 @@
 import type { PlayerProfile } from "./profile.js";
 import { currentAge } from "./onboarding.js";
+import { storyView } from "./aboutMe.js";
 import type { ComfortItem, Event, PhotoRef } from "./event.js";
 
 /**
@@ -56,7 +57,8 @@ export function playerRole(player: PlayerProfile, today: Date = new Date()): str
   return `the main character, a ${age}-year-old ${who}; draw them at this age`;
 }
 
-export function castFor(event: Event, player: PlayerProfile): CastMember[] {
+export function castFor(fullEvent: Event, player: PlayerProfile): CastMember[] {
+  const event = storyView(fullEvent);
   return applyPlans(event, [
     { id: PLAYER_CAST_ID, kind: "person", name: player.displayName, role: playerRole(player), appearance: player.appearance, photo: player.photo },
     ...event.companions.map((c) => ({

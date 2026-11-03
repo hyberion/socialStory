@@ -1,5 +1,6 @@
 import type { Event, PhotoRef } from "./event.js";
 import { PLAYER_CAST_ID, TRANSPORT_CAST_ID, type CastMember } from "./cast.js";
+import { storyView } from "./aboutMe.js";
 import type { StoryPage } from "./story.js";
 
 /**
@@ -150,8 +151,9 @@ export function pageSetting(page: StoryPage, event: Event): string | undefined {
  */
 export function placeForPage(
   page: StoryPage,
-  event: Event,
+  fullEvent: Event,
 ): { place: Event["places"][number]; step: Event["steps"][number]; where: "inside" | "entrance"; photo?: PhotoRef } | undefined {
+  const event = storyView(fullEvent);
   const index = page.stepId ? event.steps.findIndex((s) => s.id === page.stepId) : -1;
   const step = event.steps[index];
   if (!step) return undefined;
