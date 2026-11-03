@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { samplePlayer, sampleEvent, sampleStory, sampleUser } from "./fixtures.js";
 import { castFor, playerRole } from "./cast.js";
-import { buildCastPortraitPrompt, buildPagePrompt, castOnPage, pageSetting } from "./art.js";
+import { buildCastPortraitPrompt, buildPagePrompt, castOnPage, pageSetting, placeForPage } from "./art.js";
 import { worldRulesFor } from "./region.js";
 
 const cast = castFor(sampleEvent, samplePlayer);
@@ -93,8 +93,38 @@ describe("props and region", () => {
     const setting = pageSetting(waiting, sampleEvent);
     expect(setting).toBe("Indoors, inside Dr. Patel's office. This moment: We wait in the waiting room.");
     expect(buildPagePrompt(waiting, [], [], setting)).toContain("Setting: Indoors, inside Dr. Patel's office.");
-    // The car page has no place, so no indoor setting.
-    expect(pageSetting(sampleStory.pages[1]!, sampleEvent)).toBeUndefined();
+    // The car page comes before the first place: drawn outside the front entrance, never indoors (or inside the car).
+    expect(pageSetting(sampleStory.pages[1]!, sampleEvent)).toMatch(/^Outside, at the front entrance of Dr. Patel's office\./);
+  });
+
+  it("draws a page in the real place when the user photographed it (Nov 2)", () => {
+    const withPhotos = {
+      ...sampleEvent,
+      places: sampleEvent.places.map((p) =>
+        p.id === "pl-office"
+          ? { ...p, photos: [{ id: "place-pl-office-entrance", src: "events/x/entrance.jpg" }, { id: "place-pl-office-inside", src: "events/x/inside.jpg" }] }
+          : p,
+      ),
+    };
+    const waiting = sampleStory.pages[2]!;
+    const arrival = sampleStory.pages[1]!;
+    // Inside: the room's photo, never the entrance's.
+    expect(placeForPage(waiting, withPhotos)?.photo?.id).toBe("place-pl-office-inside");
+    // Arriving: the entrance photo.
+    expect(placeForPage(arrival, withPhotos)).toMatchObject({ where: "entrance", photo: { id: "place-pl-office-entrance" } });
+    // No photo of the exam room: no photo, but still the setting.
+    const exam = sampleStory.pages.find((p) => p.stepId && sampleEvent.steps.find((s) => s.id === p.stepId)?.placeId === "pl-exam");
+    if (exam) expect(placeForPage(exam, withPhotos)?.photo).toBeUndefined();
+    // Going home (after the places) has no place at all.
+    const home = { ...waiting, stepId: "s4" };
+    expect(placeForPage(home, withPhotos)).toBeUndefined();
+
+    const prompt = buildPagePrompt(waiting, castOnPage(waiting, cast), [], pageSetting(waiting, withPhotos), undefined, "Dr. Patel's office");
+    const n = castOnPage(waiting, cast).length;
+    expect(prompt).toContain(`${n + 1}. a photo of the real Dr. Patel's office`);
+    expect(prompt).toContain("Leave out every person, sign, logo, poster and piece of writing in that photo.");
+    // Without a photo, nothing about one.
+    expect(buildPagePrompt(waiting, [], [], pageSetting(waiting, sampleEvent))).not.toContain("photo");
   });
 
   it("sends the region rules with every page", () => {

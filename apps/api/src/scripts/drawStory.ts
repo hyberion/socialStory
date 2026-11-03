@@ -27,6 +27,7 @@ import {
   buildCastPortraitPrompt,
   buildPagePrompt,
   pageSetting,
+  placeForPage,
   castFor,
   castOnPage,
   formatDollars,
@@ -80,14 +81,17 @@ const photosDir = resolve(dataDir, "photos");
 /** Loads a cast member's real photo, if they have one and the file exists. */
 function loadPhoto(member: CastMember): ReferenceImage | undefined {
   // The SAM cutout (just the person or object) is the cleaner reference.
-  const src = member.photo?.cutout ?? member.photo?.src;
+  return loadImage(member.photo?.cutout ?? member.photo?.src, member.name);
+}
+
+function loadImage(src: string | undefined, whose: string): ReferenceImage | undefined {
   if (!src) return undefined;
   const path = isAbsolute(src) ? src : resolve(photosDir, src);
   const mimeType = ({ ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp" } as const)[
     extname(path).toLowerCase() as ".png"
   ];
   if (!existsSync(path) || !mimeType) {
-    console.warn(`  ! ${member.name}'s photo "${src}" wasn't found or isn't PNG/JPG/WEBP; drawing from the description.`);
+    console.warn(`  ! ${whose}'s photo "${src}" wasn't found or isn't PNG/JPG/WEBP; drawing from the description.`);
     return undefined;
   }
   return { data: readFileSync(path), mimeType };
@@ -178,7 +182,7 @@ for (const member of cast) {
 
 // ---- 2. Pages ---------------------------------------------------------------
 
-const pageResults: Array<Result & { refs: CastMember[]; skipped?: boolean }> = [];
+const pageResults: Array<Result & { refs: CastMember[]; skipped?: boolean; placePhoto?: string }> = [];
 // Remember what each picture was drawn from, so publishing can spot pictures
 // whose words changed afterwards.
 const drawnFrom = readDrawnFrom(name, dataDir);
@@ -186,19 +190,23 @@ for (const [i, page] of story.pages.entries()) {
   const number = i + 1;
   const file = `page-${String(number).padStart(2, "0")}.png`;
   const refs = castOnPage(page, cast).filter((m) => portraits.has(m.id));
+  // The user's photo of where this page happens, if any: the drawn room looks like the real one.
+  const at = placeForPage(page, event);
+  const placeImage = at?.photo ? loadImage(at.photo.src, at.place.name) : undefined;
+  const placeLabel = placeImage && at ? (at.where === "entrance" ? `${at.place.name} (front entrance)` : at.place.name) : undefined;
   if (onlyPages && !onlyPages.has(number)) {
     pageResults.push({ file: existsSync(resolve(outDir, file)) ? file : undefined, refs, skipped: true });
     continue;
   }
-  const result = await draw(`page ${number} of ${story.pages.length}`, file, () =>
+  const result = await draw(`page ${number} of ${story.pages.length}${placeLabel ? ` (from your photo of ${placeLabel})` : ""}`, file, () =>
     generateImage(
       "page",
-      buildPagePrompt(page, refs, worldRules, pageSetting(page, event), player.illustrationLook),
-      refs.map((m) => portraits.get(m.id)!),
+      buildPagePrompt(page, refs, worldRules, pageSetting(page, event), player.illustrationLook, placeLabel),
+      [...refs.map((m) => portraits.get(m.id)!), ...(placeImage ? [placeImage] : [])],
     ),
   );
   if (result.file) drawnFrom.pages[file] = pageFingerprint(page);
-  pageResults.push({ ...result, refs });
+  pageResults.push({ ...result, refs, placePhoto: placeLabel });
 }
 writeDrawnFrom(name, drawnFrom, dataDir);
 
@@ -252,7 +260,9 @@ ${story.pages
     }</span>
 ${page.sentences.map((s) => `<p class="text">${esc(s.text)}</p>`).join("")}
 <p class="brief">Picture: ${esc(page.sceneBrief ?? "(no brief)")}</p>
-<p class="muted">In the picture: ${r.refs.length ? esc(r.refs.map((m) => m.name).join(", ")) : "nobody"}</p>
+<p class="muted">In the picture: ${r.refs.length ? esc(r.refs.map((m) => m.name).join(", ")) : "nobody"}${
+      r.placePhoto ? ` · drawn from your photo of ${esc(r.placePhoto)}` : ""
+    }</p>
 </figcaption></figure>`;
   })
   .join("\n")}

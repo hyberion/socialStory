@@ -1,4 +1,4 @@
-import type { Event } from "./event.js";
+import type { Event, PhotoRef } from "./event.js";
 import type { CastMember } from "./cast.js";
 import type { StoryPage } from "./story.js";
 
@@ -133,10 +133,39 @@ export function buildCastPortraitPrompt(member: CastMember, options: { fromPhoto
  * picture prompt never said where it was.
  */
 export function pageSetting(page: StoryPage, event: Event): string | undefined {
-  const step = page.stepId ? event.steps.find((s) => s.id === page.stepId) : undefined;
+  const at = placeForPage(page, event);
+  if (!at) return undefined;
+  return at.where === "inside"
+    ? `Indoors, inside ${at.place.name}. This moment: ${at.step.description}`
+    : `Outside, at the front entrance of ${at.place.name}. This moment: ${at.step.description}`;
+}
+
+/**
+ * Where a page happens, and the user's photo of that spot if they took one.
+ * A step with a place happens inside it (the room's photo, never the
+ * entrance's). A step before the first one with a place is the arrival: it
+ * happens at the front entrance of the first place (its entrance photo).
+ * Steps after that with no place (going home) have none. Nov 2: so the drawn
+ * waiting room looks like the real one.
+ */
+export function placeForPage(
+  page: StoryPage,
+  event: Event,
+): { place: Event["places"][number]; step: Event["steps"][number]; where: "inside" | "entrance"; photo?: PhotoRef } | undefined {
+  const index = page.stepId ? event.steps.findIndex((s) => s.id === page.stepId) : -1;
+  const step = event.steps[index];
   if (!step) return undefined;
-  const place = step.placeId ? event.places.find((p) => p.id === step.placeId) : undefined;
-  return place ? `Indoors, inside ${place.name}. This moment: ${step.description}` : undefined;
+  const isEntrance = (ph: PhotoRef) => ph.id.endsWith("-entrance");
+  if (step.placeId) {
+    const place = event.places.find((p) => p.id === step.placeId);
+    if (!place) return undefined;
+    const photo = place.photos.find((ph) => ph.id.endsWith("-inside")) ?? place.photos.find((ph) => !isEntrance(ph));
+    return { place, step, where: "inside", photo };
+  }
+  const firstPlaced = event.steps.findIndex((s) => s.placeId);
+  const place = event.places[0];
+  if (!place || firstPlaced < 0 || index > firstPlaced) return undefined;
+  return { place, step, where: "entrance", photo: place.photos.find(isEntrance) };
 }
 
 export function buildPagePrompt(
@@ -145,6 +174,8 @@ export function buildPagePrompt(
   worldRules: string[] = [],
   setting?: string,
   look?: IllustrationLook,
+  /** The name of the place whose real photo is attached after the cast portraits. */
+  placePhotoOf?: string,
 ): string {
   const scene = page.sceneBrief ?? page.sentences.map((s) => s.text).join(" ");
   const people = references.filter((m) => m.kind === "person");
@@ -152,13 +183,22 @@ export function buildPagePrompt(
   const lines = [`Illustrate this scene for one page of an illustrated story: ${scene}`];
   if (setting) lines.push(`Setting: ${setting} Draw the scene there, not outside.`);
 
+  if (references.length || placePhotoOf) {
+    const listed = [
+      ...references.map((m, i) => `${i + 1}. ${m.name}${m.kind === "prop" ? " (an object)" : ""}`),
+      ...(placePhotoOf ? [`${references.length + 1}. a photo of the real ${placePhotoOf}`] : []),
+    ];
+    lines.push("", `The attached images are, in this order: ${listed.join("; ")}.`);
+  }
   if (references.length) {
     lines.push(
-      "",
-      `The attached images are reference drawings, in this order: ${references
-        .map((m, i) => `${i + 1}. ${m.name}${m.kind === "prop" ? " (an object)" : ""}`)
-        .join("; ")}.`,
-      "Everyone and everything shown must look exactly like its reference: same face, hair, skin tone, body and clothes for people; same shape and colors for objects.",
+      "Everyone and everything shown must look exactly like its reference drawing: same face, hair, skin tone, body and clothes for people; same shape and colors for objects.",
+    );
+  }
+  if (placePhotoOf) {
+    lines.push(
+      `Draw the scene in the place shown in the photo of ${placePhotoOf}: keep its layout, furniture, colors, windows and doors, redrawn in the illustration style below, not as a photo.`,
+      "Leave out every person, sign, logo, poster and piece of writing in that photo.",
     );
   }
   lines.push(
