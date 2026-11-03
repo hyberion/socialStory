@@ -29,6 +29,19 @@ describe("the player's age in the pictures", () => {
     expect(buildCastPortraitPrompt(me)).toContain("wearing everyday shoes");
   });
 
+  it("says how big the child is beside the adults, and keeps vehicles full size (Nov 3)", () => {
+    const at = (age: number) => castFor(sampleEvent, { ...samplePlayer, age });
+    const page = { ...sampleStory.pages[2]!, inPicture: ["player", "c-dad", "transport"] };
+    const prompt = (age: number) => buildPagePrompt(page, castOnPage(page, at(age)));
+    expect(prompt(26)).toContain("Sam is fully grown: draw them at adult height");
+    expect(prompt(15)).toContain("Sam is a teenager: nearly adult height");
+    expect(prompt(7)).toContain("Sam is a child: smaller than the adults");
+    expect(prompt(7)).toContain("Draw the vehicle at its real, full size");
+    // Alone on the page: nothing to compare with, so no size line.
+    const alone = { ...page, inPicture: ["player"] };
+    expect(buildPagePrompt(alone, castOnPage(alone, at(26)))).not.toContain("fully grown");
+  });
+
   it("falls back to 'the child' with no age", () => {
     expect(playerRole({ ...samplePlayer, age: undefined, birthYear: undefined }, today)).toBe("the child");
   });

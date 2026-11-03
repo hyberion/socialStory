@@ -1,5 +1,5 @@
 import type { Event, PhotoRef } from "./event.js";
-import type { CastMember } from "./cast.js";
+import { PLAYER_CAST_ID, TRANSPORT_CAST_ID, type CastMember } from "./cast.js";
 import type { StoryPage } from "./story.js";
 
 /**
@@ -237,6 +237,21 @@ export function buildPagePrompt(
       ? `Show only these people: ${people.map((m) => m.name).join(", ")}. Do not add anyone else. Everyone wears shoes unless the scene says otherwise.`
       : "Show no people in this picture.",
   );
+  // Relative size (Nov 3: Benjamin, 26, shrank to child size sitting beside Dad; the pickup came out toy-sized).
+  const player = people.find((m) => m.id === PLAYER_CAST_ID);
+  const stage = player?.role.match(/(\d+)-year-old (child|teenager|adult)/)?.[2];
+  if (player && stage && people.length > 1) {
+    lines.push(
+      stage === "adult"
+        ? `${player.name} is fully grown: draw them at adult height, about as tall as the other adults, on every page.`
+        : stage === "teenager"
+          ? `${player.name} is a teenager: nearly adult height, a little shorter than the adults.`
+          : `${player.name} is a child: smaller than the adults beside them.`,
+    );
+  }
+  if (props.some((m) => m.id === TRANSPORT_CAST_ID)) {
+    lines.push("Draw the vehicle at its real, full size, bigger than the people beside it, never toy-sized.");
+  }
   if (props.length) {
     lines.push(
       `Include ${props.map((m) => m.name).join(" and ")} exactly as referenced. Do not replace ${
