@@ -134,3 +134,19 @@ describe("draft routes", () => {
     expect((await app.request("/api/drafts/doctor/images/..%2F..%2Fstories%2Fdoctor.json")).status).toBe(404);
   });
 });
+
+describe("publish state in the editor (Nov 3: no sign that Publish worked)", () => {
+  it("says whether the shelf has exactly the saved words", async () => {
+    const { dataDir } = setup();
+    expect(loadDraft("doctor", dataDir)!.published).toBeUndefined();
+    const app = new Hono().route("/drafts", draftRoutes({ rewrite: async () => { throw new Error("unused"); }, writer: fakeWriter, dataDir }));
+    expect((await app.request("/drafts/doctor/publish", { method: "POST" })).status).toBe(200);
+    {
+      expect(loadDraft("doctor", dataDir)!.published?.current).toBe(true);
+      // Change one word and save: the shelf is now behind.
+      const edited = { ...sampleStory, pages: [{ ...pages[0]!, sentences: [{ ...pages[0]!.sentences[0]!, text: "Something new." }, ...pages[0]!.sentences.slice(1)] }, ...pages.slice(1)] };
+      saveDraft("doctor", { story: edited, origins: pages.map((_, i) => i) }, dataDir);
+      expect(loadDraft("doctor", dataDir)!.published).toMatchObject({ current: false });
+    }
+  });
+});

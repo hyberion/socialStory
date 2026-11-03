@@ -277,3 +277,6 @@ label.button.disabled { opacity: 0.5; cursor: default; }
 .unlock form { display: grid; gap: 10px; }
 .unlock label { display: grid; gap: 6px; }
 .unlock .error { color: #9a3b2e; margin: 0; }
+
+/* "✓ Published": calm and clearly done, not greyed out like a broken button. */
+button.published { background: #e5f4e4; border-color: #7fb07a; color: #2f5d2b; font-weight: 600; opacity: 1; cursor: default; }

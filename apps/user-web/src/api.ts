@@ -8,6 +8,8 @@ export interface DraftView {
   cast: Array<{ id: string; name: string; kind: "person" | "prop" }>;
   pictures: Record<string, number>;
   drawnFrom: Record<string, string>;
+  /** On the child's shelf: when, and whether the shelf has exactly these words. */
+  published?: { at: string; current: boolean };
 }
 
 export interface PublishResult {

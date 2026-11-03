@@ -15,7 +15,7 @@ import {
   type ReadingLevel,
   type StoryPage,
 } from "@socialstory/core";
-import { pageFile, readDrawnFrom, writeDrawnFrom } from "./kits.js";
+import { loadKit, pageFile, readDrawnFrom, writeDrawnFrom } from "./kits.js";
 import { DATA_DIR, imagesDir, storiesDir } from "./paths.js";
 import { loadPlayer } from "./players.js";
 import { loadEvent } from "./events.js";
@@ -70,7 +70,13 @@ export interface DraftView {
   pictures: Record<string, number>;
   /** Picture file -> fingerprint of the page content it was drawn from. */
   drawnFrom: Record<string, string>;
+  /** On the child's shelf: when, and whether the shelf has exactly these words. */
+  published?: { at: string; current: boolean };
 }
+
+/** The words of a story, for comparing the saved draft with what's on the shelf. */
+const wordsOf = (title: string, pages: Array<{ sentences: Array<{ text: string }> }>) =>
+  JSON.stringify([title.trim(), pages.map((p) => p.sentences.map((s) => s.text.trim()))]);
 
 export function loadDraft(id: string, dataDir = DATA_DIR): DraftView | undefined {
   const story = loadStory(id, dataDir);
@@ -91,6 +97,10 @@ export function loadDraft(id: string, dataDir = DATA_DIR): DraftView | undefined
     cast: castFor(ctx.event, ctx.player).map((m) => ({ id: m.id, name: m.name, kind: m.kind })),
     pictures,
     drawnFrom: readDrawnFrom(id, dataDir).pages,
+    published: (() => {
+      const kit = loadKit(id, dataDir);
+      return kit ? { at: kit.publishedAt, current: wordsOf(kit.title, kit.pages) === wordsOf(story.title, story.pages) } : undefined;
+    })(),
   };
 }
 

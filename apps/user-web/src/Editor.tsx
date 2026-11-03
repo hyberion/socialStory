@@ -99,6 +99,7 @@ export function Editor({ id, onBack, onOutline }: { id: string; onBack: () => vo
     setEdit((s) => (s ? fn(s) : s));
     setDirty(true);
     setPublished(undefined);
+    setDraft((d) => (d?.published ? { ...d, published: { ...d.published, current: false } } : d));
   };
   const updatePage = (key: string, fn: (p: EditPage) => EditPage) =>
     update((s) => ({ ...s, pages: s.pages.map((p) => (p.key === key ? fn(p) : p)) }));
@@ -154,7 +155,10 @@ export function Editor({ id, onBack, onOutline }: { id: string; onBack: () => vo
   async function publish() {
     if (!(await save())) return;
     const result = await run("Publishing…", () => api.publish(id));
-    if (result) setPublished(result);
+    if (result) {
+      setPublished(result);
+      setDraft((d) => (d ? { ...d, published: { at: result.publishedAt, current: true } } : d));
+    }
   }
 
   const issuesFor = (i: number) => check.issues.filter((x) => x.page === i);
@@ -187,7 +191,21 @@ export function Editor({ id, onBack, onOutline }: { id: string; onBack: () => vo
         <button onClick={() => setConfirmRegenerate(false)} disabled={!!busy}>Write it again</button>
         <button onClick={() => setConfirmRegenerate(true)} disabled={!!busy}>Take more care</button>
         <button onClick={save} disabled={!dirty || !!busy}>Save</button>
-        <button className="primary" onClick={publish} disabled={!!busy}>Publish to the shelf</button>
+        {(() => {
+          // Nov 3: the old button gave no sign it had worked. It now says whether the shelf is up to date.
+          const onShelf = draft.published;
+          const current = !!onShelf?.current && !dirty;
+          return (
+            <button
+              className={current ? "published" : "primary"}
+              onClick={publish}
+              disabled={!!busy || current}
+              title={onShelf ? `On the shelf since ${new Date(onShelf.at).toLocaleString()}` : undefined}
+            >
+              {busy === "Publishing…" ? "Publishing…" : current ? "✓ Published" : onShelf ? "Publish changes" : "Publish to the shelf"}
+            </button>
+          );
+        })()}
       </div>
 
       {confirmRegenerate !== undefined && (
