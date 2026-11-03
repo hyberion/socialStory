@@ -204,7 +204,13 @@ export function buildPagePrompt(
   const people = references.filter((m) => m.kind === "person");
   const props = references.filter((m) => m.kind === "prop");
   const lines = [`Illustrate this scene for one page of an illustrated story: ${scene}`];
-  if (setting) lines.push(`Setting: ${setting} Draw the scene there, not outside.`);
+  // Nov 3: "not outside" was added to every setting, so the entrance page came out inside the lobby.
+  if (setting)
+    lines.push(
+      setting.startsWith("Outside")
+        ? `Setting: ${setting} Draw the scene outdoors, standing in front of the entrance, not inside the building.`
+        : `Setting: ${setting} Draw the scene there, not outside.`,
+    );
 
   if (references.length || placePhotoOf) {
     const listed = [

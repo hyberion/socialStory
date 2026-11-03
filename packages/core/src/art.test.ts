@@ -126,6 +126,10 @@ describe("props and region", () => {
     expect(placeForPage(page("t3"), lab)?.photo?.id).toBe("place-pl-office-inside");
     // The exam room finds the exam-table photo even though it was kept on the lab.
     expect(placeForPage(page("t5"), lab)?.photo?.id).toBe("extra-the-exam-table-with-its-paper-cover");
+    // The entrance page is drawn outdoors, without the "not outside" rule for rooms (Nov 3).
+    const prompt = buildPagePrompt(page("t1"), [], [], pageSetting(page("t1"), lab));
+    expect(prompt).toContain("Draw the scene outdoors, standing in front of the entrance");
+    expect(prompt).not.toContain("not outside");
   });
 
   it("draws a page in the real place when the user photographed it (Nov 2)", () => {

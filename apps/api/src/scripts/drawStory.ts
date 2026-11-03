@@ -101,8 +101,10 @@ const unknown = validateStory(story, { castIds: cast.map((m) => m.id) }).issues.
 );
 for (const issue of unknown) console.warn(`  ! Page ${(issue.page ?? 0) + 1}: ${issue.message} (skipping them)`);
 
+// PowerShell turns "--pages 2,3,4" into "--pages 2 3 4", so stray page numbers after it count too.
+const pageList = [values.pages ?? "", ...positionals.slice(1)].join(",");
 const onlyPages = values.pages
-  ? new Set(values.pages.split(",").map((n) => Number.parseInt(n.trim(), 10)))
+  ? new Set(pageList.split(/[\s,]+/).filter(Boolean).map((n) => Number.parseInt(n.trim(), 10)).filter((n) => Number.isFinite(n)))
   : undefined;
 
 mkdirSync(outDir, { recursive: true });
