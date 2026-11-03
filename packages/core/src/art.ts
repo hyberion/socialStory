@@ -108,7 +108,7 @@ export function buildCastPortraitPrompt(member: CastMember, options: { fromPhoto
         ]
       : [
           `Character reference portrait of ${describe(member)}.`,
-          "Full body, standing, facing forward, relaxed and friendly, alone on a plain pale cream background.",
+          "Full body, standing, facing forward, relaxed and friendly, wearing everyday shoes, alone on a plain pale cream background.",
           "No other people or objects.",
         ];
   if (options.fromPhoto) {
@@ -214,7 +214,9 @@ export function buildPagePrompt(
 
   if (references.length || placePhotoOf) {
     const listed = [
-      ...references.map((m, i) => `${i + 1}. ${m.name}${m.kind === "prop" ? " (an object)" : ""}`),
+      // Each person's role goes with their name, so their age holds on every page
+      // (Nov 3: Benjamin, 26, came out as a small child when sitting beside Dad).
+      ...references.map((m, i) => `${i + 1}. ${m.name}${m.kind === "prop" ? " (an object)" : m.role ? ` (${m.role})` : ""}`),
       ...(placePhotoOf ? [`${references.length + 1}. a photo of the real ${placePhotoOf}`] : []),
     ];
     lines.push("", `The attached images are, in this order: ${listed.join("; ")}.`);
@@ -232,7 +234,7 @@ export function buildPagePrompt(
   }
   lines.push(
     people.length
-      ? `Show only these people: ${people.map((m) => m.name).join(", ")}. Do not add anyone else.`
+      ? `Show only these people: ${people.map((m) => m.name).join(", ")}. Do not add anyone else. Everyone wears shoes unless the scene says otherwise.`
       : "Show no people in this picture.",
   );
   if (props.length) {

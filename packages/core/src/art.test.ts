@@ -21,6 +21,14 @@ describe("the player's age in the pictures", () => {
     expect(playerRole({ ...samplePlayer, age: 7 }, today)).toContain("7-year-old child");
     expect(playerRole({ ...samplePlayer, age: undefined, birthYear: 2000, birthMonth: 1 }, today)).toContain("26-year-old");
   });
+  it("keeps the age on every page, not only the portrait (Nov 3)", () => {
+    const me = castFor(sampleEvent, { ...samplePlayer, age: 26 }).find((m) => m.id === "player")!;
+    const page = { ...sampleStory.pages[2]!, inPicture: ["player"] };
+    expect(buildPagePrompt(page, [me])).toContain("1. Sam (the main character, a 26-year-old adult");
+    expect(buildPagePrompt(page, [me])).toContain("Everyone wears shoes");
+    expect(buildCastPortraitPrompt(me)).toContain("wearing everyday shoes");
+  });
+
   it("falls back to 'the child' with no age", () => {
     expect(playerRole({ ...samplePlayer, age: undefined, birthYear: undefined }, today)).toBe("the child");
   });
@@ -43,7 +51,8 @@ describe("art prompts", () => {
     const refs = castOnPage(shotPage, cast);
     const prompt = buildPagePrompt(shotPage, refs);
     expect(refs.map((m) => m.name)).toEqual(["Sam", "Dad", "Dr. Patel", "Bear"]);
-    expect(prompt).toContain("1. Sam; 2. Dad; 3. Dr. Patel; 4. Bear (an object)");
+    // Names in order, each person with their role (so ages hold), objects marked.
+    expect(prompt).toMatch(/1\. Sam \(the main character, a 7-year-old child[^)]*\); 2\. Dad \([^)]+\); 3\. Dr\. Patel \([^)]+\); 4\. Bear \(an object\)/);
     expect(prompt).toContain("Do not add anyone else");
   });
 
