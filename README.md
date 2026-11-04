@@ -2,17 +2,22 @@
 
 *Meta Global AI Developer Hackathon 2026 · Indie track · Theme 1: Build for Your World*
 
-This app helps autistic kids get ready for the moments that scare them: the doctor, a new school, a haircut. Parents snap a few photos and describe what's coming, and AI turns it into a personalized prep journey (a story, playful games built from the real people and places, and a countdown) that builds familiarity day by day and walks alongside the child on the day itself. Not a script for compliance, but a calm, honest preview that gives kids information and choices.
+**Try it live:** [play.newmythology.net](https://play.newmythology.net) (the child's app, open to all) · [app.newmythology.net](https://app.newmythology.net) (the parent's app; the demo passcode is in the submission)
 
-Design principles, Social Story criteria and the generation pipeline: [`docs/design-principles.md`](docs/design-principles.md). Every user-facing setting and what it does: [`docs/user-guide-notes.md`](docs/user-guide-notes.md). Rules for coding agents: [`AGENTS.md`](AGENTS.md).
+socialStory helps autistic children get ready for new and hard moments: a doctor's visit, a haircut, a first day at school. A parent talks through who their child is and what's coming up, adds a few photos if they have them, and gets a short illustrated Social Story about their child's real day, written to Carol Gray's criteria. They check and approve every word; then their child reads it on a calm tablet app with read-along, tap-a-word help and a "Who's Who" to meet everyone first. No scores, streaks or timers. It informs and offers choices; it never scripts compliance.
+
+Design principles and decisions: [`docs/design-principles.md`](docs/design-principles.md). Every user-facing setting and what it does: [`docs/user-guide-notes.md`](docs/user-guide-notes.md). Deploying: [`infra/README.md`](infra/README.md). Rules for coding agents: [`AGENTS.md`](AGENTS.md).
 
 ## Built with
 
-- **Muse Spark**: writes and revises stories against Carol Gray's Social Story criteria
-- **Muse Image**: consistent, calm illustrations
-- **SAM 3.1**: cuts real people and objects out of parent photos to use as game pieces
-- **Muse Voice Transcribe**: parents describe events by voice
-- React + Vite, Node + Hono, Postgres, Docker
+- **Muse Voice Transcribe (realtime)**: parents answer the interview by voice, hands-free if they like
+- **Muse Spark**: listens to each answer to fill the profile and event; writes and revises the story to Carol Gray's criteria with strict structured output; explains new words
+- **SAM 3.1**: cuts real people and comfort toys out of parents' photos, as references for the drawings
+- **Muse Image**: a reference portrait of everyone, then every page drawn to match, in the real rooms from the parent's photos
+- ElevenLabs for the read-along voice (Meta has no text-to-speech model yet)
+- React + Vite, Node + Hono, Docker + Caddy on DigitalOcean
+
+*"socialStory" is a working name for this hackathon project. Social Stories™ is a trademark of Carol Gray. This project follows her published criteria but is not affiliated with or endorsed by Carol Gray.*
 
 ## Repo layout
 
