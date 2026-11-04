@@ -28,3 +28,6 @@ Thumbs.db
 
 # Demo data packed for the server (pnpm demo-data)
 demo-data/
+
+# Demo data package for the server
+demo.tgz
