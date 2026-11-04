@@ -140,3 +140,23 @@ describe("read-along in a published kit", () => {
     expect(existsSync(join(dataDir, "published", "doctor", "page-02.mp3"))).toBe(true);
   });
 });
+
+describe("pictures small enough for tablets (Nov 4: pages waited for 3-4 MB PNGs)", () => {
+  it("turns published PNGs into small WebPs and points the kit at them", async () => {
+    const sharp = (await import("sharp")).default;
+    const { shrinkKitImages } = await import("./kitImages.js");
+    const dataDir = setup([]);
+    const big = await sharp({ create: { width: 1536, height: 1024, channels: 3, background: "#cfe3d9" } }).png().toBuffer();
+    writeFileSync(join(dataDir, "images", "doctor", "page-01.png"), big);
+    publish(dataDir);
+    expect(await shrinkKitImages("doctor", dataDir)).toBe(1);
+    const kit = loadKit("doctor", dataDir)!;
+    expect(kit.pages[0]?.image).toBe("page-01.webp");
+    expect(existsSync(join(dataDir, "published", "doctor", "page-01.webp"))).toBe(true);
+    expect(existsSync(join(dataDir, "published", "doctor", "page-01.png"))).toBe(false);
+    // Served as WebP, and running it again changes nothing.
+    const app = new Hono().route("/kits", kitRoutes(dataDir));
+    expect((await app.request("/kits/doctor/page-01.webp")).headers.get("content-type")).toBe("image/webp");
+    expect(await shrinkKitImages("doctor", dataDir)).toBe(0);
+  });
+});

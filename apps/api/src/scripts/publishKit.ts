@@ -10,6 +10,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Story, validateStory, castFor } from "@socialstory/core";
 import { publishKit } from "../kits.js";
+import { shrinkKitImages } from "../kitImages.js";
 import { storiesDir } from "../paths.js";
 import { pickEvent, pickPlayer } from "./report.js";
 
@@ -26,8 +27,9 @@ const story = Story.parse(JSON.parse(readFileSync(storyFile, "utf8")).story);
 const player = pickPlayer(event);
 const check = validateStory(story, { cast: castFor(event, player), readingLevel: player.readingLevel });
 const { kit, warnings, dir } = publishKit({ id: name, event, player, story });
+const shrunk = await shrinkKitImages(name);
 
-console.log(`\n  Published "${kit.title}" (${kit.pages.length} pages, ${kit.pages.filter((p) => p.image).length} pictures)`);
+console.log(`\n  Published "${kit.title}" (${kit.pages.length} pages, ${kit.pages.filter((p) => p.image).length} pictures, ${shrunk} made smaller for tablets)`);
 for (const issue of check.issues) console.log(`  ! Story check: ${issue.message}`);
 for (const w of warnings) console.log(`  ! ${w.message}`);
 console.log(`\n  Saved to ${dir}`);

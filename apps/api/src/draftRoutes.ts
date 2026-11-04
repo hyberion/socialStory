@@ -5,6 +5,7 @@ import { castFor, validateStory } from "@socialstory/core";
 import { DATA_DIR, imagesDir } from "./paths.js";
 import { draftContext, keepPicture, listDrafts, loadDraft, loadStory, rewritePage, saveDraft, type RewritePage } from "./drafts.js";
 import { publishKit } from "./kits.js";
+import { shrinkKitImages } from "./kitImages.js";
 import { writeStory, type GenerateDraft } from "./storyWriter.js";
 
 /**
@@ -82,13 +83,14 @@ export function draftRoutes(options: {
   });
 
   /** Publishes the saved story. The checker warns but never blocks: the user decides. */
-  routes.post("/:id/publish", (c) => {
+  routes.post("/:id/publish", async (c) => {
     const id = c.req.param("id");
     const ctx = draftContext(id, dataDir);
     const story = loadStory(id, dataDir);
     if (!ctx || !story) return c.json({ error: "No story with that id" }, 404);
     const check = validateStory(story, { cast: castFor(ctx.event, ctx.player), readingLevel: ctx.player.readingLevel });
     const { kit, warnings } = publishKit({ id, event: ctx.event, player: ctx.player, story }, dataDir);
+    await shrinkKitImages(id, dataDir); // small pictures, so pages turn without waiting
     return c.json({
       publishedAt: kit.publishedAt,
       warnings: [...check.issues.map((i) => ({ page: i.page, message: i.message })), ...warnings],

@@ -16,6 +16,7 @@
     "draw-story": "tsx src/scripts/drawStory.ts",
     "photo-list": "tsx src/scripts/photoList.ts",
     "publish-kit": "tsx src/scripts/publishKit.ts",
+    "shrink-kits": "tsx src/scripts/shrinkKits.ts",
     "narrate": "tsx src/scripts/narrate.ts",
     "demo-data": "tsx src/scripts/demoData.ts",
     "voice-questions": "tsx src/scripts/voiceQuestions.ts",

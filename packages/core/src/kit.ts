@@ -80,7 +80,7 @@ export function summarizeKit(kit: PublishedKit): KitSummary {
 }
 
 /** Only these file names may be served from a kit folder (no paths, no tricks). */
-export const KIT_FILE_PATTERN = /^(page-\d{2}\.(png|mp3)|cast-[a-z0-9-]+\.png)$/;
+export const KIT_FILE_PATTERN = /^(page-\d{2}\.(png|webp|mp3)|cast-[a-z0-9-]+\.(png|webp))$/;
 
 /**
  * A short fingerprint of what a page's picture was drawn from: the picture

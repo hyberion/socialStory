@@ -19,6 +19,17 @@ export function StoryViewer({ kit, onHome }: { kit: PublishedKit; onHome?: () =>
   const isFirst = index === 0;
   const isLast = index === kit.pages.length - 1;
 
+  // Fetch every page's picture as soon as the story opens, so turning a page
+  // never waits for its picture (Nov 4: pictures appeared a beat after the words).
+  useEffect(() => {
+    const keep = kit.pages.filter((p) => p.image).map((p) => {
+      const img = new Image();
+      img.src = kitFileUrl(kit.id, p.image!);
+      return img;
+    });
+    return () => keep.forEach((img) => (img.src = ""));
+  }, [kit]);
+
   const narration = sensory.soundEnabled ? page.narration : undefined;
   const read = useReadAlong(narration ? kitFileUrl(kit.id, narration.audio) : undefined, narration, sensory.narrationRate);
   const deviceVoice = sensory.soundEnabled && "speechSynthesis" in window;
