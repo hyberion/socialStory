@@ -51,6 +51,7 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 | ElevenLabs' terms and settings for story text (Nov 1) | Read-along sends each page's words, including the child's name, to ElevenLabs. Check retention, whether they train on it, and whether zero-retention is available on our plan; say it plainly in the app, the privacy policy and the photo letter | **Check** |
 | FERPA and district privacy agreements | Only when schools join | **Later** |
 | Photo letter's promises verified against the above | Every line must be true | **Check** |
+| Product name vs. "Social Stories™" (Nov 4) | Carol Gray's site marks "Social Stories™"; a name built on it leans on her mark. Use the term only to describe what the app makes | **Asked**: Brad emailed Carol Gray's team (Nov 4, 2:30 AM). **Decide** a name of our own before launch (ideas: Story Ahead, Know Before, Ready Story, First Look) |
 | Branded toys and characters in a family's own stories (Brad, Nov 1) | A child's comfort item is often a licensed character (Elmo). Brad's view: private, never sold or published, much like a family photo of the child holding the toy. Decide whether to draw it as it is or as a look-alike, and get a lawyer's view | **Check** with a lawyer; **Build** a notice in the terms and the app: "Characters, brands and products shown are the property of their respective owners." (A notice is good practice, not legal protection) |
 
 ### Safety and cost
