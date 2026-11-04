@@ -526,7 +526,7 @@ function PageCard(props: {
             Rewrite
           </button>
           <button onClick={() => setShowRewrite(false)}>Cancel</button>
-          <p className="muted small-note">Only this page changes. About 5 seconds. Your note guides the writer but can't add facts the event doesn't have.</p>
+          <p className="muted small-note">Only this page's words change; the picture description and who's in it stay as you set them. About 5 seconds. Your note guides the writer but can't add facts the event doesn't have.</p>
         </div>
       )}
 

@@ -146,7 +146,7 @@ Cost note (for us, not the guide): $0.01 per picture, so about $0.10 for a cast 
 | Approve | Your child can now see this story. Nothing reaches your child before you approve it. Each page gets its own checkmark; approved pages are locked. | Planned |
 | Edit | Change any word yourself, right on the page. You can also change what the picture shows and who's in it. | Built |
 | Reorder | Drag a sentence (⠿) to a new spot, even onto another page. Move whole pages with ↑ ↓. Add or delete sentences and pages. Instant, and free. **Pictures stay with their pages** when pages move; a deleted page's picture is kept in history, never thrown away. | Built |
-| Rewrite this page | Rewrites just one page, with an optional note like "mention the fish more." Takes a few seconds; your other pages aren't touched. The note guides the writer but can't add facts the event doesn't have. | Built |
+| Rewrite this page | Rewrites just the words of one page, with an optional note like "mention the fish more." The picture description and who's in the picture stay exactly as you set them. Takes a few seconds; your other pages aren't touched. The note guides the writer but can't add facts the event doesn't have. | Built |
 | Write it again | A whole new story. Each attempt comes out a little different, so this often fixes it. Takes about 10 seconds. Replaces your edits, but the current version is kept in history; pictures stay until you redraw them. | Built |
 | Take more care with this one | Same as Write it again, but the writer spends more time on it. Takes about 30 seconds instead of 10. | Built |
 

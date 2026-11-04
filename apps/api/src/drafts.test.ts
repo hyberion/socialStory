@@ -95,6 +95,9 @@ describe("rewritePage", () => {
     expect(page.section).toBe("body");
     expect(page.stepId).toBe("s2");
     expect(page.sentences[0]?.text).toContain("fish");
+    // The words change; the picture stays as the parent set it (Nov 3).
+    expect(page.sceneBrief).toBe(sampleStory.pages[2]!.sceneBrief);
+    expect(page.inPicture).toEqual(sampleStory.pages[2]!.inPicture);
   });
 });
 

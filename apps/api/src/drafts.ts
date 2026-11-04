@@ -193,7 +193,15 @@ export async function rewritePage(
   const story = Story.parse(args.story);
   const prompt = buildPageRewritePrompt(ctx.event, ctx.player, story, args.pageIndex, args.note?.slice(0, 300));
   const page = draftToPage(await generate(prompt));
-  // The section and step stay put, whatever the model returns.
+  // Rewrite changes the words only. The section, step and the picture (its
+  // description and who's in it) stay exactly as the parent left them
+  // (Nov 3: a rewrite put back the person the parent had just unticked).
   const original = story.pages[args.pageIndex]!;
-  return { ...page, section: original.section, stepId: original.stepId };
+  return {
+    ...page,
+    section: original.section,
+    stepId: original.stepId,
+    sceneBrief: original.sceneBrief,
+    inPicture: original.inPicture,
+  };
 }
