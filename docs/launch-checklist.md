@@ -72,6 +72,7 @@ Status: **Have** = done. **Build** = we write it (code or config). **Get** = Bra
 | No third-party analytics or trackers in the player app | Children's privacy; COPPA | **Have** (none); keep it that way |
 | Minimal first-party usage counts in the user app (stories made, published) | Learn what's used without tracking anyone | **Build** |
 | Picture-look counts: how many children use each look, and how often people switch away from one (Brad, Nov 1) | Decide which looks to keep, improve or add (storybook, clay, realistic are waiting) | **Build**: aggregate counts only, no names or images |
+| Editor warnings in parents' words (Brad, Nov 3): "Maya is ticked, but the picture description doesn't mention her", never `inPicture`, `player` or `p-desk` | The checker's messages were written for us, and parents see them | **Build** |
 | Accessibility check (WCAG AA) of both apps | Many users and players are disabled | **Build** + review |
 | Support email and a feedback channel | Parents need a human to reach | **Get** |
 | What-if plan: key leaked, data exposed, server down | Know the first three steps before it happens | **Write** |
