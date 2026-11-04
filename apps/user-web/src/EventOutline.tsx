@@ -253,10 +253,11 @@ export function EventOutline({
                 </div>
                 <input placeholder="What they look like (for the pictures)" value={p.appearance ?? ""} onChange={(x) => setPerson(list, i, { appearance: x.target.value || undefined })} />
                 {list === "people" && (
-                  <input
+                  <ListText
                     placeholder='A friendly, true fact ("has a fish tank")'
-                    value={p.facts.join("; ")}
-                    onChange={(x) => setPerson(list, i, { facts: x.target.value.split(";").map((s) => s.trim()).filter(Boolean).slice(0, 3) })}
+                    items={p.facts}
+                    max={3}
+                    onChange={(facts) => setPerson(list, i, { facts })}
                   />
                 )}
               </div>
@@ -325,11 +326,11 @@ export function EventOutline({
             {e.places.map((pl, i) => (
               <div key={pl.id} className="person">
                 <input value={pl.name} onChange={(x) => set({ places: e.places.map((p, n) => (n === i ? { ...p, name: x.target.value } : p)) })} />
-                <textarea
-                  rows={2}
+                <ListText
+                  multiline
                   placeholder="What it's like: noisy, bright, smells like soap (one per line)"
-                  value={pl.sensoryNotes.join("\n")}
-                  onChange={(x) => set({ places: e.places.map((p, n) => (n === i ? { ...p, sensoryNotes: lines(x.target.value) } : p)) })}
+                  items={pl.sensoryNotes}
+                  onChange={(notes) => set({ places: e.places.map((p, n) => (n === i ? { ...p, sensoryNotes: notes } : p)) })}
                 />
               </div>
             ))}
@@ -533,5 +534,37 @@ function PhotoList({
         ))}
       </ul>
     </fieldset>
+  );
+}
+
+/**
+ * A box for a short list: one per line, or separated by ";" on one line. Keeps
+ * exactly what's typed while editing (Nov 3: rebuilding the text from the tidied
+ * list after every keystroke ate spaces and new lines) and hands on the tidied
+ * items: trimmed, no blanks, at most `max`.
+ */
+function ListText({
+  items,
+  onChange,
+  placeholder,
+  multiline,
+  max,
+}: {
+  items: string[];
+  onChange: (items: string[]) => void;
+  placeholder: string;
+  multiline?: boolean;
+  max?: number;
+}) {
+  const [text, setText] = useState(items.join(multiline ? "\n" : "; "));
+  const change = (value: string) => {
+    setText(value);
+    const parts = value.split(multiline ? "\n" : ";").map((s) => s.trim()).filter(Boolean);
+    onChange(max ? parts.slice(0, max) : parts);
+  };
+  return multiline ? (
+    <textarea rows={2} placeholder={placeholder} value={text} onChange={(x) => change(x.target.value)} />
+  ) : (
+    <input placeholder={placeholder} value={text} onChange={(x) => change(x.target.value)} />
   );
 }
